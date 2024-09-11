@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type OpLimits struct {
@@ -36,19 +36,19 @@ func (psr *OpLimits) GetOperationFeesWithoutAllocation() int64 {
 }
 
 type PayoutRecipe struct {
-	Baker            tezos.Address                `json:"baker"`
-	Delegator        tezos.Address                `json:"delegator,omitempty"`
+	Baker            mavryk.Address               `json:"baker"`
+	Delegator        mavryk.Address               `json:"delegator,omitempty"`
 	Cycle            int64                        `json:"cycle,omitempty"`
-	Recipient        tezos.Address                `json:"recipient,omitempty"`
+	Recipient        mavryk.Address               `json:"recipient,omitempty"`
 	Kind             enums.EPayoutKind            `json:"kind,omitempty"`
 	TxKind           enums.EPayoutTransactionKind `json:"tx_kind,omitempty"`
-	FATokenId        tezos.Z                      `json:"fa_token_id,omitempty"`
-	FAContract       tezos.Address                `json:"fa_contract,omitempty"`
-	DelegatedBalance tezos.Z                      `json:"delegator_balance,omitempty"`
-	StakedBalance    tezos.Z                      `json:"-"` // enable in output when relevant (P)
-	Amount           tezos.Z                      `json:"amount,omitempty"`
+	FATokenId        mavryk.Z                     `json:"fa_token_id,omitempty"`
+	FAContract       mavryk.Address               `json:"fa_contract,omitempty"`
+	DelegatedBalance mavryk.Z                     `json:"delegator_balance,omitempty"`
+	StakedBalance    mavryk.Z                     `json:"-"` // enable in output when relevant (P)
+	Amount           mavryk.Z                     `json:"amount,omitempty"`
 	FeeRate          float64                      `json:"fee_rate,omitempty"`
-	Fee              tezos.Z                      `json:"fee,omitempty"`
+	Fee              mavryk.Z                     `json:"fee,omitempty"`
 	OpLimits         *OpLimits                    `json:"op_limits,omitempty"`
 	Note             string                       `json:"note,omitempty"`
 	IsValid          bool                         `json:"valid,omitempty"`
@@ -58,7 +58,7 @@ type PayoutRecipe struct {
 	AllocationFeeCollected bool `json:"allocation_fee_collected,omitempty"`
 }
 
-func (candidate *PayoutRecipe) GetDestination() tezos.Address {
+func (candidate *PayoutRecipe) GetDestination() mavryk.Address {
 	return candidate.Recipient
 }
 
@@ -66,25 +66,25 @@ func (candidate *PayoutRecipe) GetTxKind() enums.EPayoutTransactionKind {
 	return candidate.TxKind
 }
 
-func (candidate *PayoutRecipe) GetFATokenId() tezos.Z {
+func (candidate *PayoutRecipe) GetFATokenId() mavryk.Z {
 	return candidate.FATokenId
 }
 
-func (candidate *PayoutRecipe) GetFAContract() tezos.Address {
+func (candidate *PayoutRecipe) GetFAContract() mavryk.Address {
 	return candidate.FAContract
 }
 
-func (candidate *PayoutRecipe) GetAmount() tezos.Z {
+func (candidate *PayoutRecipe) GetAmount() mavryk.Z {
 	return candidate.Amount
 }
 
 type PayoutRecipeIdentifier struct {
-	Delegator  tezos.Address                `json:"delegator,omitempty"`
-	Recipient  tezos.Address                `json:"recipient,omitempty"`
+	Delegator  mavryk.Address               `json:"delegator,omitempty"`
+	Recipient  mavryk.Address               `json:"recipient,omitempty"`
 	Kind       enums.EPayoutKind            `json:"kind,omitempty"`
 	TxKind     enums.EPayoutTransactionKind `json:"tx_kind,omitempty"`
-	FATokenId  tezos.Z                      `json:"fa_token_id,omitempty"`
-	FAContract tezos.Address                `json:"fa_contract,omitempty"`
+	FATokenId  mavryk.Z                     `json:"fa_token_id,omitempty"`
+	FAContract mavryk.Address               `json:"fa_contract,omitempty"`
 	IsValid    bool                         `json:"valid,omitempty"`
 }
 
@@ -201,7 +201,7 @@ func (pr *PayoutRecipe) ToPayoutReport() PayoutReport {
 		FeeRate:          pr.FeeRate,
 		Fee:              pr.Fee,
 		TransactionFee:   txFee,
-		OpHash:           tezos.ZeroOpHash,
+		OpHash:           mavryk.ZeroOpHash,
 		IsSuccess:        false,
 		Note:             pr.Note,
 	}
@@ -284,27 +284,27 @@ type CyclePayoutSummary struct {
 	Cycle                    int64     `json:"cycle"`
 	Delegators               int       `json:"delegators"`
 	PaidDelegators           int       `json:"paid_delegators"`
-	OwnStakedBalance         tezos.Z   `json:"own_staked_balance"`
-	OwnDelegatedBalance      tezos.Z   `json:"own_delegated_balance"`
-	ExternalStakedBalance    tezos.Z   `json:"external_staked_balance"`
-	ExternalDelegatedBalance tezos.Z   `json:"external_delegated_balance"`
-	EarnedFees               tezos.Z   `json:"cycle_fees"`
-	EarnedRewards            tezos.Z   `json:"cycle_rewards"`
-	DistributedRewards       tezos.Z   `json:"distributed_rewards"`
-	BondIncome               tezos.Z   `json:"bond_income"`
-	FeeIncome                tezos.Z   `json:"fee_income"`
-	IncomeTotal              tezos.Z   `json:"total_income"`
-	DonatedBonds             tezos.Z   `json:"donated_bonds"`
-	DonatedFees              tezos.Z   `json:"donated_fees"`
-	DonatedTotal             tezos.Z   `json:"donated_total"`
+	OwnStakedBalance         mavryk.Z  `json:"own_staked_balance"`
+	OwnDelegatedBalance      mavryk.Z  `json:"own_delegated_balance"`
+	ExternalStakedBalance    mavryk.Z  `json:"external_staked_balance"`
+	ExternalDelegatedBalance mavryk.Z  `json:"external_delegated_balance"`
+	EarnedFees               mavryk.Z  `json:"cycle_fees"`
+	EarnedRewards            mavryk.Z  `json:"cycle_rewards"`
+	DistributedRewards       mavryk.Z  `json:"distributed_rewards"`
+	BondIncome               mavryk.Z  `json:"bond_income"`
+	FeeIncome                mavryk.Z  `json:"fee_income"`
+	IncomeTotal              mavryk.Z  `json:"total_income"`
+	DonatedBonds             mavryk.Z  `json:"donated_bonds"`
+	DonatedFees              mavryk.Z  `json:"donated_fees"`
+	DonatedTotal             mavryk.Z  `json:"donated_total"`
 	Timestamp                time.Time `json:"timestamp"`
 }
 
-func (summary *CyclePayoutSummary) GetTotalStakedBalance() tezos.Z {
+func (summary *CyclePayoutSummary) GetTotalStakedBalance() mavryk.Z {
 	return summary.OwnStakedBalance.Add(summary.ExternalStakedBalance)
 }
 
-func (summary *CyclePayoutSummary) GetTotalDelegatedBalance() tezos.Z {
+func (summary *CyclePayoutSummary) GetTotalDelegatedBalance() mavryk.Z {
 	return summary.OwnDelegatedBalance.Add(summary.ExternalDelegatedBalance)
 }
 

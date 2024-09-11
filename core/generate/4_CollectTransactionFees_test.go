@@ -5,14 +5,14 @@ import (
 	"log/slog"
 	"testing"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/test/mock"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/test/mock"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 					Source:    mock.GetRandomAddress(),
 					Recipient: mock.GetRandomAddress(),
 				},
-				BondsAmount: tezos.NewZ(10000000),
+				BondsAmount: mavryk.NewZ(10000000),
 				TxKind:      enums.PAYOUT_TX_KIND_TEZ,
 			},
 		},
@@ -33,7 +33,7 @@ var (
 					Source:    mock.GetRandomAddress(),
 					Recipient: mock.GetRandomAddress(),
 				},
-				BondsAmount: tezos.NewZ(20000000),
+				BondsAmount: mavryk.NewZ(20000000),
 				TxKind:      enums.PAYOUT_TX_KIND_TEZ,
 			},
 		},

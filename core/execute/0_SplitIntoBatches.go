@@ -3,12 +3,12 @@ package execute
 import (
 	"errors"
 
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func splitIntoBatches(payouts []common.PayoutRecipe, limits *common.OperationLimits, metadataDeserializationGasLimit int64) ([]common.RecipeBatch, error) {

@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"time"
 
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func druRunExecutePayoutBatch(ctx *PayoutExecutionContext, logger *slog.Logger, batchId string, batch common.RecipeBatch) *common.BatchResult {

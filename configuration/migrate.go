@@ -5,10 +5,10 @@ import (
 	"errors"
 	"os"
 
-	"github.com/tez-capital/tezpay/common"
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/state"
+	"github.com/mavryk-network/mavpay/common"
+	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/state"
 
 	"github.com/hjson/hjson-go/v4"
 )

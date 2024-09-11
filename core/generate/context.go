@@ -3,9 +3,9 @@ package generate
 import (
 	"log/slog"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
 )
 
 type StageData struct {

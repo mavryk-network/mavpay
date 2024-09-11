@@ -3,11 +3,11 @@ package tezpay_configuration
 import (
 	"encoding/json"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/notifications"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/notifications"
 )
 
 type IncomeRecipientsV0 struct {

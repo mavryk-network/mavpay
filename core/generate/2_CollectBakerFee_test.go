@@ -4,13 +4,13 @@ import (
 	"log/slog"
 	"testing"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/test/mock"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/test/mock"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 				Recipient: mock.GetRandomAddress(),
 				FeeRate:   0.05,
 			},
-			BondsAmount: tezos.NewZ(10000000),
+			BondsAmount: mavryk.NewZ(10000000),
 			TxKind:      enums.PAYOUT_TX_KIND_TEZ,
 		},
 		{
@@ -30,7 +30,7 @@ var (
 				Recipient: mock.GetRandomAddress(),
 				FeeRate:   0.05,
 			},
-			BondsAmount: tezos.NewZ(20000000),
+			BondsAmount: mavryk.NewZ(20000000),
 			TxKind:      enums.PAYOUT_TX_KIND_TEZ,
 		},
 		{
@@ -39,7 +39,7 @@ var (
 				Recipient: mock.GetRandomAddress(),
 				FeeRate:   0.05,
 			},
-			BondsAmount: tezos.NewZ(20000000),
+			BondsAmount: mavryk.NewZ(20000000),
 			TxKind:      enums.PAYOUT_TX_KIND_FA1_2,
 		},
 	}
@@ -117,7 +117,7 @@ func TestCollectBakerFees(t *testing.T) {
 	adjustFee(ctx, feeRate)
 	result, err = CollectBakerFee(ctx, &common.GeneratePayoutsOptions{})
 	assert.Nil(err)
-	collectedFee := tezos.Zero
+	collectedFee := mavryk.Zero
 	for _, v := range result.StageData.PayoutCandidatesWithBondAmountAndFees {
 		if v.TxKind != enums.PAYOUT_TX_KIND_TEZ {
 			continue
@@ -126,12 +126,12 @@ func TestCollectBakerFees(t *testing.T) {
 		assert.Equal(v.InvalidBecause, enums.INVALID_PAYOUT_BELLOW_MINIMUM)
 		collectedFee = collectedFee.Add(v.Fee)
 	}
-	totalBonds := lo.Reduce(ctx.StageData.PayoutCandidatesWithBondAmount, func(agg tezos.Z, v PayoutCandidateWithBondAmount, _ int) tezos.Z {
+	totalBonds := lo.Reduce(ctx.StageData.PayoutCandidatesWithBondAmount, func(agg mavryk.Z, v PayoutCandidateWithBondAmount, _ int) mavryk.Z {
 		if v.TxKind != enums.PAYOUT_TX_KIND_TEZ {
 			return agg
 		}
 		return agg.Add(v.BondsAmount)
-	}, tezos.Zero)
+	}, mavryk.Zero)
 
 	assert.True(collectedFee.Equal(totalBonds))
 

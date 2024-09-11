@@ -1,6 +1,6 @@
 package mock
 
-import "github.com/trilitech/tzgo/tezos"
+import "blockwatch.cc/tzgo/tezos"
 
 func GetRandomAddress() tezos.Address {
 	k, _ := tezos.GenerateKey(tezos.KeyTypeEd25519)

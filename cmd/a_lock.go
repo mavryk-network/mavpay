@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/filelock"
-	"github.com/tez-capital/tezpay/state"
+	"github.com/mavryk-network/mavpay/state"
 )
 
 func lockCycle(cycle int64, unlockStore *func() error, resultChan chan<- error) {

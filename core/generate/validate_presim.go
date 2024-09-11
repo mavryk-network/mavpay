@@ -3,8 +3,8 @@ package generate
 import (
 	"log/slog"
 
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants/enums"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants/enums"
 )
 
 type PresimPayoutCandidate = PayoutCandidateWithBondAmountAndFee

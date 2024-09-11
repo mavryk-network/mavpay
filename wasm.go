@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"syscall/js"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/core"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/core"
 )
 
 func main() {

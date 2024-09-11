@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/trilitech/tzgo/rpc"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mvgo/rpc"
 )
 
 type CycleMonitorOptions struct {

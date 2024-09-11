@@ -8,9 +8,9 @@ import (
 	"log/slog"
 	"net"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 	"github.com/nikoksr/notify/service/mail"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
 )
 
 type EmailNotificatorConfiguration struct {

@@ -4,13 +4,13 @@ import (
 	"errors"
 	"time"
 
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/rpc"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type SimpleColletor struct {

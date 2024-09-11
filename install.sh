@@ -43,7 +43,7 @@ elif [ "$PLATFORM" = "aarch64" ]; then
 fi
 echo "Downloading tezpay-linux-$PLATFORM $LATEST..."
 
-if "$@" "https://github.com/tez-capital/tezpay/releases/download/$LATEST/tezpay-linux-$PLATFORM" &&
+if "$@" "https://github.com/mavryk-network/mavpay/releases/download/$LATEST/tezpay-linux-$PLATFORM" &&
     mv "$TMP_NAME" ./tezpay &&
     chmod +x ./tezpay; then
     echo "tezpay $LATEST for $PLATFORM successfuly installed."

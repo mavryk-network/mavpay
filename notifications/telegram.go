@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 	"github.com/nikoksr/notify/service/telegram"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
 	"golang.org/x/exp/slog"
 )
 

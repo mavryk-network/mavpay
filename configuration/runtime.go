@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"math"
 
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/notifications"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/notifications"
 )
 
 type RuntimeDelegatorRequirements struct {

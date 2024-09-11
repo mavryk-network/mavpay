@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/hjson/hjson-go/v4"
-	bc_seed "github.com/tez-capital/tezpay/configuration/seed/bc"
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
+	bc_seed "github.com/mavryk-network/mavpay/configuration/seed/bc"
+	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 func bcAliasing(configuration []byte) []byte {
@@ -43,7 +43,7 @@ func MigrateBcv0ToTPv0(sourceBytes []byte) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	address, err := tezos.ParseAddress(configuration.BakerPKH)
+	address, err := mavryk.ParseAddress(configuration.BakerPKH)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -62,9 +62,9 @@ func MigrateBcv0ToTPv0(sourceBytes []byte) ([]byte, error) {
 		}
 	}
 
-	overdelegationExcludedAddresses := make([]tezos.Address, len(configuration.Overdelegation.ExcludedAddresses))
+	overdelegationExcludedAddresses := make([]mavryk.Address, len(configuration.Overdelegation.ExcludedAddresses))
 	for index, pkh := range configuration.Overdelegation.ExcludedAddresses {
-		if addr, err := tezos.ParseAddress(pkh); err == nil {
+		if addr, err := mavryk.ParseAddress(pkh); err == nil {
 			overdelegationExcludedAddresses[index] = addr
 		} else {
 			slog.Warn("invalid PKH in overdelegation protections address list", "pkh", pkh)
@@ -74,7 +74,7 @@ func MigrateBcv0ToTPv0(sourceBytes []byte) ([]byte, error) {
 
 	delegatorOverrides := make(map[string]tezpay_configuration.DelegatorOverrideV0)
 	for k, delegatorOverride := range configuration.DelegatorOverrides {
-		if addr, err := tezos.ParseAddress(delegatorOverride.Recipient); err == nil {
+		if addr, err := mavryk.ParseAddress(delegatorOverride.Recipient); err == nil {
 			delegatorOverrides[k] = tezpay_configuration.DelegatorOverrideV0{
 				Recipient:      addr,
 				Fee:            &delegatorOverride.Fee,

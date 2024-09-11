@@ -16,7 +16,7 @@ To contribute to TEZPAY please read [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 1. Create directory where you want to store your `tezpay` configuration and reports
 	- e.g. `mk tezpay`
-2. Head to [Releases](https://github.com/tez-capital/tezpay/releases) and download latest release and place it into newly created directory
+2. Head to [Releases](https://github.com/mavryk-network/mavpay/releases) and download latest release and place it into newly created directory
 	- on linux you can just `wget -q https://raw.githubusercontent.com/tez-capital/tezpay/main/install.sh -O /tmp/install.sh && sh /tmp/install.sh`
 3. Create and adjust configuration file `config.hjson`  See our configuration examples for all available options.
 4. ...
@@ -28,4 +28,4 @@ If you want to use tezpay in container, please refer to [container readme](conta
 
 ## Credits
 
-- TEZPAY [default data collector](https://github.com/tez-capital/tezpay/blob/main/engines/colletor/default.go#L39) and [default transactor](https://github.com/tez-capital/tezpay/blob/main/engines/transactor/default.go#L39) (*only available right now*) are **Powered by [TzKT API](https://api.tzkt.io/)**
+- TEZPAY [default data collector](https://github.com/mavryk-network/mavpay/blob/main/engines/colletor/default.go#L39) and [default transactor](https://github.com/mavryk-network/mavpay/blob/main/engines/transactor/default.go#L39) (*only available right now*) are **Powered by [TzKT API](https://api.tzkt.io/)**

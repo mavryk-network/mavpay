@@ -3,8 +3,8 @@ package bc_seed
 import (
 	"encoding/json"
 
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
 )
 
 type IncomeRecipientsV0 struct {

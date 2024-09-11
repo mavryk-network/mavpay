@@ -6,13 +6,13 @@ import (
 	"log/slog"
 	"strings"
 
+	"blockwatch.cc/tzgo/tezos"
 	"github.com/hjson/hjson-go/v4"
-	trd_seed "github.com/tez-capital/tezpay/configuration/seed/trd"
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/notifications"
-	"github.com/trilitech/tzgo/tezos"
+	trd_seed "github.com/mavryk-network/mavpay/configuration/seed/trd"
+	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/notifications"
 	"gopkg.in/yaml.v3"
 )
 

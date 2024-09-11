@@ -3,20 +3,20 @@ package generate
 import (
 	"time"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/trilitech/tzgo/tezos"
 )
 
-func sumValidPayoutsAmount(payouts []common.PayoutRecipe) tezos.Z {
-	return lo.Reduce(payouts, func(agg tezos.Z, payout common.PayoutRecipe, _ int) tezos.Z {
+func sumValidPayoutsAmount(payouts []common.PayoutRecipe) mavryk.Z {
+	return lo.Reduce(payouts, func(agg mavryk.Z, payout common.PayoutRecipe, _ int) mavryk.Z {
 		if !payout.IsValid {
 			return agg
 		}
 		return agg.Add(payout.Amount)
-	}, tezos.Zero)
+	}, mavryk.Zero)
 }
 
 type AfterPayoutsBlueprintGeneratedHookData = common.CyclePayoutBlueprint

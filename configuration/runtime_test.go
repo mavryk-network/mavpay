@@ -3,9 +3,9 @@ package configuration
 import (
 	"testing"
 
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/stretchr/testify/assert"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func TestIsDonatingToTezCapital(t *testing.T) {
@@ -29,14 +29,14 @@ func TestIsDonatingToTezCapital(t *testing.T) {
 	configuration.IncomeRecipients.DonateBonds = .05
 	configuration.IncomeRecipients.DonateFees = .05
 	configuration.IncomeRecipients.Donations = map[string]float64{
-		tezos.ZeroAddress.String(): .5,
+		mavryk.ZeroAddress.String(): .5,
 	}
 	assert.True(configuration.IsDonatingToTezCapital())
 
 	configuration.IncomeRecipients.DonateBonds = .05
 	configuration.IncomeRecipients.DonateFees = .05
 	configuration.IncomeRecipients.Donations = map[string]float64{
-		tezos.ZeroAddress.String(): 1,
+		mavryk.ZeroAddress.String(): 1,
 	}
 	assert.False(configuration.IsDonatingToTezCapital())
 }

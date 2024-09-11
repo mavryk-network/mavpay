@@ -3,10 +3,10 @@ package common
 import (
 	"time"
 
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/signer"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/mvgo/signer"
 )
 
 type OperationStatus string

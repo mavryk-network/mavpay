@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"os"
 
+	"blockwatch.cc/tzgo/tezos"
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezpay/common"
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
 )
 
 func GenerateDefaultHJson() {

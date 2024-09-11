@@ -3,7 +3,7 @@ package utils
 import (
 	"math"
 
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
 )
 
 type FloatConstraint interface {

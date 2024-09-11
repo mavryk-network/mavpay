@@ -1,10 +1,10 @@
 package generate
 
 import (
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mvgo/codec"
 )
 
 func buildOpForEstimation[T common.TransferArgs](ctx *PayoutGenerationContext, batch []T, injectBurnTransactions bool) (*codec.Op, error) {

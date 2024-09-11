@@ -3,9 +3,9 @@ package common
 import (
 	"fmt"
 
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 func FormatAmount(kind enums.EPayoutTransactionKind, amount int64) string {
@@ -37,8 +37,8 @@ func FloatToPercentage(f float64) string {
 	return fmt.Sprintf("%.2f%%", f*100)
 }
 
-func ShortenAddress(taddr tezos.Address) string {
-	if taddr.Equal(tezos.ZeroAddress) || taddr.Equal(tezos.InvalidAddress) {
+func ShortenAddress(taddr mavryk.Address) string {
+	if taddr.Equal(mavryk.ZeroAddress) || taddr.Equal(mavryk.InvalidAddress) {
 		return ""
 	}
 	addr := taddr.String()

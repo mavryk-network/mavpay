@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type JsonPayouts struct {

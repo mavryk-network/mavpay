@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/notifications"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/notifications"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func _assert(condition bool, msg string) {

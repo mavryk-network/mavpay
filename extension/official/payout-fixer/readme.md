@@ -4,7 +4,7 @@ Compares the payouts reports with the payouts based on config and inject compens
 
 ## Installation
 
-1. Download the extension from the [releases page](https://github.com/tez-capital/tezpay/releases) based on your platform.
+1. Download the extension from the [releases page](https://github.com/mavryk-network/mavpay/releases) based on your platform.
 2. Place it into directory where you have tezpay installed.
 3. Add the extension to your tezpay configuration
 ```yaml

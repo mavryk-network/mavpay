@@ -1,5 +1,5 @@
 # TezPay Container Readme
-TezPay is a Tezos reward distributor that simplifies the process of distributing rewards to your stakeholders. This readme provides instructions on how to use the [tez-capital/tezpay](ghcr.io/tez-capital/tezpay) container image, which comes with both [tezpay](https://github.com/tez-capital/tezpay) and [eli](https://github.com/alis-is/eli) preinstalled.
+TezPay is a Tezos reward distributor that simplifies the process of distributing rewards to your stakeholders. This readme provides instructions on how to use the [tez-capital/tezpay](ghcr.io/tez-capital/tezpay) container image, which comes with both [tezpay](https://github.com/mavryk-network/mavpay) and [eli](https://github.com/alis-is/eli) preinstalled.
 
 ## Prerequisites
 Docker installed on your system.
@@ -40,4 +40,4 @@ docker run --rm -it ghcr.io/tez-capital/tezpay help
 ```
 
 ## Support
-For any questions or issues related to the container or TezPay, please visit the GitHub repository at [tez-capital/tezpay](https://github.com/tez-capital/tezpay) or submit an issue there.
+For any questions or issues related to the container or TezPay, please visit the GitHub repository at [tez-capital/tezpay](https://github.com/mavryk-network/mavpay) or submit an issue there.

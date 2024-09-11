@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mavryk-network/mavpay/configuration/seed"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/state"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/configuration/seed"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/state"
 	"golang.org/x/exp/slices"
 )
 

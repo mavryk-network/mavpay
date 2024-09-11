@@ -1,13 +1,13 @@
 package common
 
 import (
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type BatchResult struct {
 	Payouts   []PayoutRecipe `json:"payouts"`
-	OpHash    tezos.OpHash   `json:"op_hash"`
+	OpHash    mavryk.OpHash  `json:"op_hash"`
 	IsSuccess bool           `json:"is_success"`
 	Err       error          `json:"err"`
 }
@@ -20,13 +20,13 @@ func NewFailedBatchResult(payouts []PayoutRecipe, err error) *BatchResult {
 	}
 }
 
-func NewFailedBatchResultWithOpHash(Payouts []PayoutRecipe, opHash tezos.OpHash, err error) *BatchResult {
+func NewFailedBatchResultWithOpHash(Payouts []PayoutRecipe, opHash mavryk.OpHash, err error) *BatchResult {
 	result := NewFailedBatchResult(Payouts, err)
 	result.OpHash = opHash
 	return result
 }
 
-func NewSuccessBatchResult(payouts []PayoutRecipe, opHash tezos.OpHash) *BatchResult {
+func NewSuccessBatchResult(payouts []PayoutRecipe, opHash mavryk.OpHash) *BatchResult {
 	return &BatchResult{
 		Payouts:   payouts,
 		OpHash:    opHash,

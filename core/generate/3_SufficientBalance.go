@@ -7,13 +7,13 @@ import (
 
 	"log/slog"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type CheckBalanceHookData struct {
@@ -53,12 +53,12 @@ func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGeneration
 	// add all bonds, fees and donations destinations
 	totalPayouts = totalPayouts + len(configuration.IncomeRecipients.Bonds) + len(configuration.IncomeRecipients.Fees) + utils.Max(len(configuration.IncomeRecipients.Donations), 1)
 
-	requiredbalance := lo.Reduce(data.Payouts, func(agg tezos.Z, candidate PayoutCandidateWithBondAmountAndFee, _ int) tezos.Z {
+	requiredbalance := lo.Reduce(data.Payouts, func(agg mavryk.Z, candidate PayoutCandidateWithBondAmountAndFee, _ int) mavryk.Z {
 		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
 			return agg.Add(candidate.BondsAmount)
 		}
 		return agg
-	}, tezos.Zero)
+	}, mavryk.Zero)
 	// bonds * bondsPortionToBeForwarded
 	bondsToBeForwarded := ctx.StageData.BakerBondsAmount.Mul64(int64(bondsPortionToBeForwarded * 1000000)).Div64(1000000)
 	// fees * feesPortionToBeForwarded
@@ -66,7 +66,7 @@ func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGeneration
 
 	// add bonds,fees and donations to required balance
 	requiredbalance = requiredbalance.Add(bondsToBeForwarded).Add(feesToBeForwarded).Add(ctx.StageData.DonateBondsAmount)
-	requiredbalance = requiredbalance.Add(tezos.NewZ(constants.PAYOUT_FEE_BUFFER).Mul64(int64(totalPayouts)))
+	requiredbalance = requiredbalance.Add(mavryk.NewZ(constants.PAYOUT_FEE_BUFFER).Mul64(int64(totalPayouts)))
 
 	diff := payableBalance.Sub(requiredbalance)
 	if diff.IsNeg() || diff.IsZero() {

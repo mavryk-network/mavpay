@@ -1,13 +1,13 @@
 package generate
 
 import (
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 
 	"github.com/samber/lo"
 )
@@ -21,7 +21,7 @@ func ExecuteAfterBondsDistributed(data *AfterBondsDistributedHookData) error {
 	return extension.ExecuteHook(enums.EXTENSION_HOOK_AFTER_BONDS_DISTRIBUTED, "0.2", data)
 }
 
-func getBakerBondsAmount(cycleData *common.BakersCycleData, effectiveDelegatorsDelegatedBalance tezos.Z, configuration *configuration.RuntimeConfiguration) tezos.Z {
+func getBakerBondsAmount(cycleData *common.BakersCycleData, effectiveDelegatorsDelegatedBalance mavryk.Z, configuration *configuration.RuntimeConfiguration) mavryk.Z {
 	bakerDelegatedBalance := cycleData.GetBakerDelegatedBalance()
 	totalRewards := cycleData.GetTotalDelegatedRewards(configuration.PayoutConfiguration.PayoutMode)
 
@@ -43,7 +43,7 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	logger.Debug("distributing bonds")
 
 	candidates := ctx.StageData.PayoutCandidates
-	totalDelegatorsDelegatedBalance := lo.Reduce(candidates, func(total tezos.Z, candidate PayoutCandidate, _ int) tezos.Z {
+	totalDelegatorsDelegatedBalance := lo.Reduce(candidates, func(total mavryk.Z, candidate PayoutCandidate, _ int) mavryk.Z {
 		// of all delegators, including invalids, except ignored and possibly excluding bellow minimum balance
 		if candidate.IsInvalid {
 			if candidate.InvalidBecause == enums.INVALID_DELEGATOR_IGNORED {
@@ -54,7 +54,7 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 			}
 		}
 		return total.Add(candidate.GetDelegatedBalance())
-	}, tezos.NewZ(0))
+	}, mavryk.NewZ(0))
 
 	bakerBonds := getBakerBondsAmount(ctx.StageData.CycleData, totalDelegatorsDelegatedBalance, configuration)
 	availableRewards := ctx.StageData.CycleData.GetTotalDelegatedRewards(configuration.PayoutConfiguration.PayoutMode).Sub(bakerBonds)
@@ -63,7 +63,7 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 		if candidate.IsInvalid {
 			return PayoutCandidateWithBondAmount{
 				PayoutCandidate: candidate,
-				BondsAmount:     tezos.Zero,
+				BondsAmount:     mavryk.Zero,
 			}
 		}
 		return PayoutCandidateWithBondAmount{

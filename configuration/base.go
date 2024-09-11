@@ -7,15 +7,14 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/trilitech/tzgo/tezos"
-
+	"blockwatch.cc/tzgo/tezos"
 	"github.com/hjson/hjson-go/v4"
+	"github.com/mavryk-network/mavpay/common"
+	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/state"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/state"
 )
 
 func FloatAmountToMutez(amount float64) tezos.Z {

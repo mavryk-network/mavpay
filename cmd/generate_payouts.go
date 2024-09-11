@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/core"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/core"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 var generatePayoutsCmd = &cobra.Command{

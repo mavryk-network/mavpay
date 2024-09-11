@@ -1,5 +1,5 @@
 FROM alpine:edge
-LABEL org.opencontainers.image.source = "https://github.com/tez-capital/tezpay"
+LABEL org.opencontainers.image.source = "https://github.com/mavryk-network/mavpay"
 
 RUN apk add wget
 

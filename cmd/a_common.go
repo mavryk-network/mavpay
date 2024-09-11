@@ -9,16 +9,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants"
-	collector_engines "github.com/tez-capital/tezpay/engines/collector"
-	signer_engines "github.com/tez-capital/tezpay/engines/signer"
-	transactor_engines "github.com/tez-capital/tezpay/engines/transactor"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
+	"blockwatch.cc/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants"
+	collector_engines "github.com/mavryk-network/mavpay/engines/collector"
+	signer_engines "github.com/mavryk-network/mavpay/engines/signer"
+	transactor_engines "github.com/mavryk-network/mavpay/engines/transactor"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 )
 
 type configurationAndEngines struct {

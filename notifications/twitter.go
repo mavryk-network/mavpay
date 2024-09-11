@@ -10,8 +10,8 @@ import (
 
 	"github.com/dghubble/oauth1"
 	twitter "github.com/g8rswimmer/go-twitter/v2"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 )
 
 type twitterNotificatorConfiguration struct {
