@@ -3,11 +3,11 @@ package execute
 import (
 	"errors"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 )
 
@@ -44,21 +44,21 @@ func SplitIntoBatches(ctx *PayoutExecutionContext, options *common.ExecutePayout
 	payoutsWithoutFa := utils.RejectPayoutsByTxKind(payouts, enums.FA_OPERATION_KINDS)
 
 	faRecipes := utils.FilterPayoutsByTxKind(payouts, enums.FA_OPERATION_KINDS)
-	contractTezRecipes := utils.FilterPayoutsByType(payoutsWithoutFa, tezos.AddressTypeContract)
-	classicTezRecipes := utils.RejectPayoutsByType(payoutsWithoutFa, tezos.AddressTypeContract)
+	contractMavRecipes := utils.FilterPayoutsByType(payoutsWithoutFa, mavryk.AddressTypeContract)
+	classicMavRecipes := utils.RejectPayoutsByType(payoutsWithoutFa, mavryk.AddressTypeContract)
 
 	toBatch := make([][]common.PayoutRecipe, 0, 3)
 	if options.MixInFATransfers {
-		classicTezRecipes = append(classicTezRecipes, faRecipes...)
+		classicMavRecipes = append(classicMavRecipes, faRecipes...)
 	} else {
 		toBatch = append(toBatch, faRecipes)
 	}
 	if options.MixInContractCalls {
-		classicTezRecipes = append(classicTezRecipes, contractTezRecipes...)
+		classicMavRecipes = append(classicMavRecipes, contractMavRecipes...)
 	} else {
-		toBatch = append(toBatch, contractTezRecipes)
+		toBatch = append(toBatch, contractMavRecipes)
 	}
-	toBatch = append(toBatch, classicTezRecipes)
+	toBatch = append(toBatch, classicMavRecipes)
 
 	batchMetadataDeserializationGasLimit := lo.Reduce(ctx.PayoutBlueprints, func(agg int64, blueprint *common.CyclePayoutBlueprint, _ int) int64 {
 		return max(agg, blueprint.BatchMetadataDeserializationGasLimit)

@@ -48,7 +48,7 @@ const (
 	EXTENSION_HOOK_AFTER_CANDIDATES_GENERATED EExtensionHook = "after_candidates_generated"
 	// can adjust generated bond list (inject, remove, mutate)
 	EXTENSION_HOOK_AFTER_BONDS_DISTRIBUTED EExtensionHook = "after_bonds_distributed"
-	// can provide aditional logic to check balance and optionally skip in tezpay check
+	// can provide aditional logic to check balance and optionally skip in mavpay check
 	EXTENSION_HOOK_CHECK_BALANCE EExtensionHook = "check_balance"
 	// can adjust fees to be collected by baker
 	EXTENSION_HOOK_ON_FEES_COLLECTION EExtensionHook = "on_fees_collection"

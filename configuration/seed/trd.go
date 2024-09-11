@@ -6,13 +6,13 @@ import (
 	"log/slog"
 	"strings"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/hjson/hjson-go/v4"
 	trd_seed "github.com/mavryk-network/mavpay/configuration/seed/trd"
-	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"gopkg.in/yaml.v3"
 )
 
@@ -26,14 +26,14 @@ func trdAliasing(configuration []byte) []byte {
 }
 
 func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
-	slog.Debug("migrating trd configuration to tezpay")
+	slog.Debug("migrating trd configuration to mavpay")
 	configuration := trd_seed.GetDefault()
 	err := yaml.Unmarshal(trdAliasing(sourceBytes), &configuration)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	address, err := tezos.ParseAddress(configuration.BakingAddress)
+	address, err := mavryk.ParseAddress(configuration.BakingAddress)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -52,11 +52,11 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 		}
 	}
 
-	delegatorOverrides := make(map[string]tezpay_configuration.DelegatorOverrideV0, len(configuration.SpecialsMap)+len(configuration.SupportersSet))
+	delegatorOverrides := make(map[string]mavpay_configuration.DelegatorOverrideV0, len(configuration.SpecialsMap)+len(configuration.SupportersSet))
 	if len(configuration.SpecialsMap) > 0 {
 		for recipient, share := range configuration.SpecialsMap {
-			if addr, err := tezos.ParseAddress(recipient); err == nil {
-				delegatorOverrides[recipient] = tezpay_configuration.DelegatorOverrideV0{
+			if addr, err := mavryk.ParseAddress(recipient); err == nil {
+				delegatorOverrides[recipient] = mavpay_configuration.DelegatorOverrideV0{
 					Recipient:      addr,
 					Fee:            &share,
 					MinimumBalance: 0,
@@ -68,14 +68,14 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 	if len(configuration.SupportersSet) > 0 {
 		fee := 0.0
 		for recipient := range configuration.SupportersSet {
-			if _, err := tezos.ParseAddress(recipient); err == nil {
+			if _, err := mavryk.ParseAddress(recipient); err == nil {
 				if v, ok := delegatorOverrides[recipient]; ok {
 					if v.Fee == nil {
 						v.Fee = &fee
 					}
 					continue
 				}
-				delegatorOverrides[recipient] = tezpay_configuration.DelegatorOverrideV0{
+				delegatorOverrides[recipient] = mavpay_configuration.DelegatorOverrideV0{
 					Fee: &fee,
 				}
 			}
@@ -83,8 +83,8 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 	}
 
 	delegatorBellowMinimumBalanceRewardDestination := enums.REWARD_DESTINATION_NONE
-	feeOverrides := make(map[string][]tezos.Address, 0)
-	ignores := make([]tezos.Address, 0)
+	feeOverrides := make(map[string][]mavryk.Address, 0)
+	ignores := make([]mavryk.Address, 0)
 	if len(configuration.RulesMap) > 0 {
 		for k, v := range configuration.RulesMap {
 			if k == "mindelegation" {
@@ -97,7 +97,7 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 			switch v {
 			// if TOE -> ignore
 			case "TOE":
-				if addr, err := tezos.ParseAddress(k); err == nil {
+				if addr, err := mavryk.ParseAddress(k); err == nil {
 					ignores = append(ignores, addr)
 				} else {
 					slog.Warn("failed to parse address, please adjust configuration manually", "address", k)
@@ -107,9 +107,9 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 				fallthrough
 				// if TOF -> fee 1
 			case "TOF":
-				if addr, err := tezos.ParseAddress(k); err == nil {
+				if addr, err := mavryk.ParseAddress(k); err == nil {
 					if _, ok := feeOverrides["1"]; !ok {
-						feeOverrides["1"] = make([]tezos.Address, 0)
+						feeOverrides["1"] = make([]mavryk.Address, 0)
 					}
 					feeOverrides["1"] = append(feeOverrides["1"], addr)
 				} else {
@@ -118,17 +118,17 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 			case "Dexter":
 				slog.Warn("we do not support dexter right now, please check your configuration file and migrate it manually")
 			default:
-				targetAddr, err := tezos.ParseAddress(v)
+				targetAddr, err := mavryk.ParseAddress(v)
 				if err == nil { // if address redirect
-					if sourceAddr, err := tezos.ParseAddress(k); err == nil {
+					if sourceAddr, err := mavryk.ParseAddress(k); err == nil {
 						if v, ok := delegatorOverrides[sourceAddr.String()]; ok {
-							if v.Recipient != tezos.ZeroAddress {
+							if v.Recipient != mavryk.ZeroAddress {
 								slog.Warn("address already has a recipient, please adjust configuration manually", "address", k, "recipient", v.Recipient)
 							} else {
 								v.Recipient = targetAddr
 							}
 						} else {
-							delegatorOverrides[sourceAddr.String()] = tezpay_configuration.DelegatorOverrideV0{
+							delegatorOverrides[sourceAddr.String()] = mavpay_configuration.DelegatorOverrideV0{
 								Recipient: targetAddr,
 							}
 						}
@@ -172,7 +172,7 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 				}
 				notificationConfigurations = append(notificationConfigurations, result)
 			case "webhook":
-				slog.Warn("POST request by trd webhook plugin differs from tezpay, you may have to adjust your webhook logic")
+				slog.Warn("POST request by trd webhook plugin differs from mavpay, you may have to adjust your webhook logic")
 				var configuration trd_seed.WebhookPluginConfigurationV1
 				err := plugin.Decode(&configuration)
 				if err != nil {
@@ -265,16 +265,16 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 
 	donate := 0.05
 
-	migrated := tezpay_configuration.ConfigurationV0{
+	migrated := mavpay_configuration.ConfigurationV0{
 		Version:  0,
 		BakerPKH: address,
-		IncomeRecipients: tezpay_configuration.IncomeRecipientsV0{
+		IncomeRecipients: mavpay_configuration.IncomeRecipientsV0{
 			Bonds:  bondRecipients,
 			Fees:   feeRecipients,
 			Donate: &donate,
 		},
-		Delegators: tezpay_configuration.DelegatorsConfigurationV0{
-			Requirements: tezpay_configuration.DelegatorRequirementsV0{
+		Delegators: mavpay_configuration.DelegatorsConfigurationV0{
+			Requirements: mavpay_configuration.DelegatorRequirementsV0{
 				MinimumBalance:                        configuration.MinDelegation,
 				BellowMinimumBalanceRewardDestination: &delegatorBellowMinimumBalanceRewardDestination,
 			},
@@ -282,16 +282,16 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 			FeeOverrides: feeOverrides,
 			Ignore:       ignores,
 		},
-		Network: tezpay_configuration.TezosNetworkConfigurationV0{
+		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
 			RpcUrl:                 constants.DEFAULT_RPC_URL,
-			TzktUrl:                constants.DEFAULT_TZKT_URL,
+			MvktUrl:                constants.DEFAULT_MVKT_URL,
 			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			DoNotPaySmartContracts: false,
 		},
-		Overdelegation: tezpay_configuration.OverdelegationConfigurationV0{
+		Overdelegation: mavpay_configuration.OverdelegationConfigurationV0{
 			IsProtectionEnabled: true,
 		},
-		PayoutConfiguration: tezpay_configuration.PayoutConfigurationV0{
+		PayoutConfiguration: mavpay_configuration.PayoutConfigurationV0{
 			Fee:                     configuration.ServiceFee / 100,
 			IsPayingTxFee:           !configuration.DelPaysXferFee,
 			IsPayingAllocationTxFee: !configuration.DelPaysRaFee,

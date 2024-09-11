@@ -9,7 +9,7 @@ import (
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "prints tezpay version",
+	Short: "prints mavpay version",
 	Long:  "generates payouts without further processing",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print(constants.VERSION)

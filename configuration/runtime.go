@@ -4,32 +4,32 @@ import (
 	"encoding/json"
 	"math"
 
-	"blockwatch.cc/tzgo/tezos"
-	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type RuntimeDelegatorRequirements struct {
-	MinimumBalance                        tezos.Z
+	MinimumBalance                        mavryk.Z
 	BellowMinimumBalanceRewardDestination enums.ERewardDestination
 }
 
 type RuntimeDelegatorOverride struct {
-	Recipient                    tezos.Address `json:"recipient,omitempty"`
-	Fee                          *float64      `json:"fee,omitempty"`
-	MinimumBalance               tezos.Z       `json:"minimum_balance,omitempty"`
-	IsBakerPayingTxFee           *bool         `json:"baker_pays_transaction_fee,omitempty"`
-	IsBakerPayingAllocationTxFee *bool         `json:"baker_pays_allocation_fee,omitempty"`
-	MaximumBalance               *tezos.Z      `json:"maximum_balance,omitempty"`
+	Recipient                    mavryk.Address `json:"recipient,omitempty"`
+	Fee                          *float64       `json:"fee,omitempty"`
+	MinimumBalance               mavryk.Z       `json:"minimum_balance,omitempty"`
+	IsBakerPayingTxFee           *bool          `json:"baker_pays_transaction_fee,omitempty"`
+	IsBakerPayingAllocationTxFee *bool          `json:"baker_pays_allocation_fee,omitempty"`
+	MaximumBalance               *mavryk.Z      `json:"maximum_balance,omitempty"`
 }
 
 type RuntimeDelegatorsConfiguration struct {
 	Requirements RuntimeDelegatorRequirements        `json:"requirements,omitempty"`
 	Overrides    map[string]RuntimeDelegatorOverride `json:"overrides,omitempty"`
-	Ignore       []tezos.Address                     `json:"ignore,omitempty"`
-	Prefilter    []tezos.Address                     `json:"prefilter,omitempty"`
+	Ignore       []mavryk.Address                    `json:"ignore,omitempty"`
+	Prefilter    []mavryk.Address                    `json:"prefilter,omitempty"`
 }
 
 type RuntimeNotificatorConfiguration struct {
@@ -46,7 +46,7 @@ type RuntimePayoutConfiguration struct {
 	Fee                        float64                 `json:"fee,omitempty"`
 	IsPayingTxFee              bool                    `json:"baker_pays_transaction_fee,omitempty"`
 	IsPayingAllocationTxFee    bool                    `json:"baker_pays_allocation_fee,omitempty"`
-	MinimumAmount              tezos.Z                 `json:"minimum_payout_amount,omitempty"`
+	MinimumAmount              mavryk.Z                `json:"minimum_payout_amount,omitempty"`
 	IgnoreEmptyAccounts        bool                    `json:"ignore_empty_accounts,omitempty"`
 	TxGasLimitBuffer           int64                   `json:"transaction_gas_limit_buffer,omitempty"`
 	TxDeserializationGasBuffer int64                   `json:"transaction_deserialization_gas_buffer,omitempty"`
@@ -66,21 +66,21 @@ type RuntimeIncomeRecipients struct {
 }
 
 type RuntimeConfiguration struct {
-	BakerPKH                   tezos.Address
+	BakerPKH                   mavryk.Address
 	PayoutConfiguration        RuntimePayoutConfiguration
 	Delegators                 RuntimeDelegatorsConfiguration
 	IncomeRecipients           RuntimeIncomeRecipients
-	Network                    tezpay_configuration.TezosNetworkConfigurationV0
-	Overdelegation             tezpay_configuration.OverdelegationConfigurationV0
+	Network                    mavpay_configuration.MavrykNetworkConfigurationV0
+	Overdelegation             mavpay_configuration.OverdelegationConfigurationV0
 	NotificationConfigurations []RuntimeNotificatorConfiguration
-	Extensions                 []tezpay_configuration.ExtensionConfigurationV0
+	Extensions                 []mavpay_configuration.ExtensionConfigurationV0
 	SourceBytes                []byte `json:"-"`
 	DisableAnalytics           bool   `json:"disable_analytics,omitempty"`
 }
 
 func GetDefaultRuntimeConfiguration() RuntimeConfiguration {
 	return RuntimeConfiguration{
-		BakerPKH: tezos.InvalidKey.Address(),
+		BakerPKH: mavryk.InvalidKey.Address(),
 		PayoutConfiguration: RuntimePayoutConfiguration{
 			WalletMode:                 enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			PayoutMode:                 enums.PAYOUT_MODE_ACTUAL,
@@ -88,7 +88,7 @@ func GetDefaultRuntimeConfiguration() RuntimeConfiguration {
 			Fee:                        constants.DEFAULT_BAKER_FEE,
 			IsPayingTxFee:              false,
 			IsPayingAllocationTxFee:    false,
-			MinimumAmount:              FloatAmountToMutez(constants.DEFAULT_PAYOUT_MINIMUM_AMOUNT),
+			MinimumAmount:              FloatAmountToMumav(constants.DEFAULT_PAYOUT_MINIMUM_AMOUNT),
 			IgnoreEmptyAccounts:        false,
 			TxGasLimitBuffer:           constants.DEFAULT_TX_GAS_LIMIT_BUFFER,
 			TxDeserializationGasBuffer: constants.DEFAULT_TX_DESERIALIZATION_GAS_BUFFER,
@@ -100,22 +100,22 @@ func GetDefaultRuntimeConfiguration() RuntimeConfiguration {
 		},
 		Delegators: RuntimeDelegatorsConfiguration{
 			Requirements: RuntimeDelegatorRequirements{
-				MinimumBalance:                        FloatAmountToMutez(constants.DEFAULT_DELEGATOR_MINIMUM_BALANCE),
+				MinimumBalance:                        FloatAmountToMumav(constants.DEFAULT_DELEGATOR_MINIMUM_BALANCE),
 				BellowMinimumBalanceRewardDestination: enums.REWARD_DESTINATION_NONE,
 			},
 			Overrides: make(map[string]RuntimeDelegatorOverride),
-			Ignore:    make([]tezos.Address, 0),
-			Prefilter: make([]tezos.Address, 0),
+			Ignore:    make([]mavryk.Address, 0),
+			Prefilter: make([]mavryk.Address, 0),
 		},
-		Network: tezpay_configuration.TezosNetworkConfigurationV0{
+		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
 			RpcUrl:                 constants.DEFAULT_RPC_URL,
-			TzktUrl:                constants.DEFAULT_TZKT_URL,
+			MvktUrl:                constants.DEFAULT_MVKT_URL,
 			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			Explorer:               constants.DEFAULT_EXPLORER_URL,
 			DoNotPaySmartContracts: false,
 			IgnoreProtocolChanges:  false,
 		},
-		Overdelegation: tezpay_configuration.OverdelegationConfigurationV0{
+		Overdelegation: mavpay_configuration.OverdelegationConfigurationV0{
 			IsProtectionEnabled: true,
 		},
 		NotificationConfigurations: make([]RuntimeNotificatorConfiguration, 0),
@@ -124,7 +124,7 @@ func GetDefaultRuntimeConfiguration() RuntimeConfiguration {
 	}
 }
 
-func (configuration *RuntimeConfiguration) IsDonatingToTezCapital() bool {
+func (configuration *RuntimeConfiguration) IsDonatingToMavCapital() bool {
 	total := float64(0)
 	for k, v := range configuration.IncomeRecipients.Donations {
 		if constants.DEFAULT_DONATION_ADDRESS == k {

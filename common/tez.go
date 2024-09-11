@@ -18,16 +18,16 @@ func FormatAmount(kind enums.EPayoutTransactionKind, amount int64) string {
 	case enums.PAYOUT_TX_KIND_FA2:
 		return fmt.Sprintf("%d FA2", amount)
 	default:
-		return MutezToTezS(amount)
+		return MumavToMavS(amount)
 	}
 }
 
-func MutezToTezS(amount int64) string {
+func MumavToMavS(amount int64) string {
 	if amount == 0 {
 		return ""
 	}
-	tez := float64(amount) / constants.MUTEZ_FACTOR
-	return fmt.Sprintf("%f TEZ", tez)
+	mav := float64(amount) / constants.MUMAV_FACTOR
+	return fmt.Sprintf("%f MAV", mav)
 }
 
 func FloatToPercentage(f float64) string {

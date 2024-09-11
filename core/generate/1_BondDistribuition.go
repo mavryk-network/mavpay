@@ -69,7 +69,7 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 		return PayoutCandidateWithBondAmount{
 			PayoutCandidate: candidate,
 			BondsAmount:     availableRewards.Mul(candidate.GetDelegatedBalance()).Div(totalDelegatorsDelegatedBalance),
-			TxKind:          enums.PAYOUT_TX_KIND_TEZ,
+			TxKind:          enums.PAYOUT_TX_KIND_MAV,
 		}
 	})
 

@@ -3,18 +3,18 @@ package signer_engines
 import (
 	"errors"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/mavryk-network/mvgo/signer"
 )
 
 type InMemorySigner struct {
-	Key tezos.PrivateKey
+	Key mavryk.PrivateKey
 }
 
 func InitInMemorySigner(key string) (*InMemorySigner, error) {
-	tkey, err := tezos.ParsePrivateKey(key)
+	tkey, err := mavryk.ParsePrivateKey(key)
 	if err != nil {
 		return nil, errors.Join(constants.ErrSignerLoadFailed, err)
 	}
@@ -27,11 +27,11 @@ func (inMemSigner *InMemorySigner) GetId() string {
 	return "InMemorySigner"
 }
 
-func (inMemSigner *InMemorySigner) GetPKH() tezos.Address {
+func (inMemSigner *InMemorySigner) GetPKH() mavryk.Address {
 	return inMemSigner.Key.Address()
 }
 
-func (inMemSigner *InMemorySigner) GetKey() tezos.Key {
+func (inMemSigner *InMemorySigner) GetKey() mavryk.Key {
 	return inMemSigner.Key.Public()
 }
 

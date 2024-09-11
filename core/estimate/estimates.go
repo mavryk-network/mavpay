@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"slices"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/mavryk-network/mvgo/rpc"
 	"github.com/samber/lo"
 )
 
 type EstimationContext struct {
-	PayoutKey                            tezos.Key
+	PayoutKey                            mavryk.Key
 	Collector                            common.CollectorEngine
 	Configuration                        *configuration.RuntimeConfiguration
 	BatchMetadataDeserializationGasLimit int64
@@ -35,12 +35,12 @@ func splitIntoBatches[T any](candidates []T, capacity int) [][]T {
 	return batches
 }
 
-func buildOpForEstimation[T common.TransferArgs](payoutKey tezos.Key, batch []T, injectBurnTransactions bool) (*codec.Op, error) {
+func buildOpForEstimation[T common.TransferArgs](payoutKey mavryk.Key, batch []T, injectBurnTransactions bool) (*codec.Op, error) {
 	var err error
 	op := codec.NewOp().WithSource(payoutKey.Address())
 	op.WithTTL(constants.MAX_OPERATION_TTL)
 	if injectBurnTransactions {
-		op.WithTransfer(tezos.BurnAddress, 1)
+		op.WithTransfer(mavryk.BurnAddress, 1)
 	}
 	for _, p := range batch {
 		if err = common.InjectTransferContents(op, payoutKey.Address(), p); err != nil {
@@ -48,7 +48,7 @@ func buildOpForEstimation[T common.TransferArgs](payoutKey tezos.Key, batch []T,
 		}
 	}
 	if injectBurnTransactions {
-		op.WithTransfer(tezos.BurnAddress, 1)
+		op.WithTransfer(mavryk.BurnAddress, 1)
 	}
 	return op, err
 }
@@ -109,7 +109,7 @@ func estimateBatchFees[T common.TransferArgs](batch []T, ctx *EstimationContext)
 		if batch[i].GetDestination().IsContract() || slices.Contains([]enums.EPayoutTransactionKind{enums.PAYOUT_TX_KIND_FA1_2, enums.PAYOUT_TX_KIND_FA2}, batch[i].GetTxKind()) {
 			feeBuffer = ctx.Configuration.PayoutConfiguration.KtTxFeeBuffer
 		}
-		common.InjectLimits(op, []tezos.Limits{{
+		common.InjectLimits(op, []mavryk.Limits{{
 			GasLimit:     p.GasUsed + ctx.Configuration.PayoutConfiguration.TxGasLimitBuffer,
 			StorageLimit: utils.CalculateStorageLimit(p),
 			Fee:          p.Fee,
@@ -148,7 +148,7 @@ func EstimateTransactionFees[T common.TransferArgs](transactions []T, ctx *Estim
 
 	for _, tx := range transactions {
 		switch {
-		case tx.GetTxKind() == enums.PAYOUT_TX_KIND_TEZ && !tx.GetDestination().IsContract():
+		case tx.GetTxKind() == enums.PAYOUT_TX_KIND_MAV && !tx.GetDestination().IsContract():
 			standardTxs = append(standardTxs, tx)
 		case slices.Contains([]enums.EPayoutTransactionKind{enums.PAYOUT_TX_KIND_FA1_2, enums.PAYOUT_TX_KIND_FA2}, tx.GetTxKind()):
 			faTxs = append(faTxs, tx)

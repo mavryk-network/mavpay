@@ -24,7 +24,7 @@ func (rw rwCloser) Close() error {
 }
 
 func appendToFile(data []byte) error {
-	f, err := os.OpenFile("tezpay-fixer.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile("mavpay-fixer.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}

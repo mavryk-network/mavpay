@@ -30,8 +30,8 @@ var generatePayoutsCmd = &cobra.Command{
 			cycle = lastCompletedCycle + cycle
 		}
 
-		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToTezCapital() {
-			slog.Warn("⚠️  With your current configuration you are not going to donate to tez.capital 😔")
+		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToMavCapital() {
+			slog.Warn("⚠️  With your current configuration you are not going to donate to mavrykdynamics.com 😔")
 			time.Sleep(time.Second * 5)
 		}
 

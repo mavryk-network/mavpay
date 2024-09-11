@@ -16,12 +16,11 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hjson/hjson-go/v4 v4.4.0
 	github.com/jedib0t/go-pretty/v6 v6.5.9
+	github.com/mavryk-network/mvgo v1.19.3
 	github.com/nikoksr/notify v0.41.0
 	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
-	github.com/mavryk-network/mavpay v0.0.0-20240907092523-03cbd6b3cf6e
-	github.com/mavryk-network/mvgo v1.19.3
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 	gopkg.in/yaml.v3 v3.0.1
 )

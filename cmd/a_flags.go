@@ -21,7 +21,7 @@ const (
 	CYCLES_FLAG                      = "cycles"
 	FIRST_CYCLE_FLAG                 = "first-cycle"
 	LAST_CYCLE_FLAG                  = "last-cycle"
-	MUTEZ_FLAG                       = "mutez"
+	MUMAV_FLAG                       = "mumav"
 	START_DATE_FLAG                  = "start-date"
 	END_DATE_FLAG                    = "end-date"
 	MONTH_FLAG                       = "month"

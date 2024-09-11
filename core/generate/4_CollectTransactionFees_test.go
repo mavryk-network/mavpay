@@ -24,7 +24,7 @@ var (
 					Recipient: mock.GetRandomAddress(),
 				},
 				BondsAmount: mavryk.NewZ(10000000),
-				TxKind:      enums.PAYOUT_TX_KIND_TEZ,
+				TxKind:      enums.PAYOUT_TX_KIND_MAV,
 			},
 		},
 		{
@@ -34,7 +34,7 @@ var (
 					Recipient: mock.GetRandomAddress(),
 				},
 				BondsAmount: mavryk.NewZ(20000000),
-				TxKind:      enums.PAYOUT_TX_KIND_TEZ,
+				TxKind:      enums.PAYOUT_TX_KIND_MAV,
 			},
 		},
 	}
@@ -61,8 +61,8 @@ func TestCollectTransactionFees(t *testing.T) {
 
 	assert.Nil(err)
 	for i, v := range result.StageData.PayoutCandidatesSimulated {
-		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
-		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
 	}
 
 	t.Log("check allocation burn")
@@ -75,8 +75,8 @@ func TestCollectTransactionFees(t *testing.T) {
 
 	assert.Nil(err)
 	for i, v := range result.StageData.PayoutCandidatesSimulated {
-		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
-		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
 	}
 
 	t.Log("check storage burn")
@@ -89,8 +89,8 @@ func TestCollectTransactionFees(t *testing.T) {
 
 	assert.Nil(err)
 	for i, v := range result.StageData.PayoutCandidatesSimulated {
-		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
-		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
 	}
 
 	t.Log("chech paying tx fee")
@@ -142,8 +142,8 @@ func TestCollectTransactionFees(t *testing.T) {
 
 	assert.Nil(err)
 	for i, v := range result.StageData.PayoutCandidatesSimulated {
-		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
-		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUTEZ_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.LessOrEqual(v.BondsAmount.Int64()-constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
+		assert.GreaterOrEqual(v.BondsAmount.Int64()+constants.TEST_MUMAV_DEVIATION_TOLERANCE, payoutCandidatesWithBondAmountAndFees[i].BondsAmount.Int64()-collector.GetExpectedTxCosts())
 	}
 
 	t.Log("check batching")

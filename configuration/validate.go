@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
 	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 )
 
@@ -53,7 +53,7 @@ func (configuration *RuntimeConfiguration) Validate() (err error) {
 	}, float64(0))
 	_assert(utils.IsPortionWithin0n1(bondsPortions), getPortionRangeError("configuration.income_recipients.bonds sum", bondsPortions))
 	for k := range configuration.IncomeRecipients.Bonds {
-		_, err := tezos.ParseAddress(k)
+		_, err := mavryk.ParseAddress(k)
 		_assert(err == nil, fmt.Sprintf("configuration.income_recipients.bonds.%s has to be valid PKH", k))
 	}
 
@@ -63,7 +63,7 @@ func (configuration *RuntimeConfiguration) Validate() (err error) {
 	_assert(utils.IsPortionWithin0n1(feesPortions),
 		getPortionRangeError("configuration.income_recipients.fees sum", feesPortions))
 	for k := range configuration.IncomeRecipients.Fees {
-		_, err := tezos.ParseAddress(k)
+		_, err := mavryk.ParseAddress(k)
 		_assert(err == nil, fmt.Sprintf("configuration.income_recipients.fees.%s has to be valid PKH", k))
 	}
 
@@ -73,12 +73,12 @@ func (configuration *RuntimeConfiguration) Validate() (err error) {
 	_assert(utils.IsPortionWithin0n1(donatePortions),
 		getPortionRangeError("configuration.income_recipients.donations sum", donatePortions))
 	for k := range configuration.IncomeRecipients.Donations {
-		_, err := tezos.ParseAddress(k)
+		_, err := mavryk.ParseAddress(k)
 		_assert(err == nil, fmt.Sprintf("configuration.income_recipients.donations.%s has to be valid PKH", k))
 	}
 
 	for k, v := range configuration.Delegators.Overrides {
-		_, err := tezos.ParseAddress(k)
+		_, err := mavryk.ParseAddress(k)
 		_assert(err == nil, fmt.Sprintf("configuration.delegators.overrides.%s has to be valid PKH", k))
 		_assert(v.Fee == nil || utils.IsPortionWithin0n1(*v.Fee),
 			getPortionRangeError(fmt.Sprintf("configuration.delegators.overrides.%s fee", k), *v.Fee))

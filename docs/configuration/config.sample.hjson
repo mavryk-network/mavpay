@@ -1,6 +1,6 @@
 {
   # version of the configuration file
-  tezpay_config_version: 0
+  mavpay_config_version: 0
 
   # baker's public key hash
   baker: ""
@@ -13,7 +13,7 @@
     # payout mode to use, can be 'actual' or 'ideal'
     payout_mode: ideal
 
-    # balance check mode to use, can be 'protocol' or 'tzkt'
+    # balance check mode to use, can be 'protocol' or 'mvkt'
     balance_check_mode: protocol
 
     # fee to charge delegators for the payout (portion of the reward as decimal, e.g. 0.075 for 7.5%)
@@ -51,7 +51,7 @@
   delegators: {
     # Requirements delegators have to meet
     requirements: {
-      # Minimum balance of tez a delegator has to have to be considered for payout
+      # Minimum balance of mav a delegator has to have to be considered for payout
       minimum_balance: 0.5
 
       # Reward destination for delegators with balance below the minimum balance (possible values: 'none', 'everyone')
@@ -60,19 +60,19 @@
 
     # List of only delegator addresses to consider, if empty all delegators are considered
     prefilter: [
-      tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM
-      tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3
+      mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb
     ]
 
     # List of delegator addresses to ignore - wont be included in reward set, rewards will be redistributed
     ignore: [
-      tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU
-      tz1burnburnburnburnburnburnburjAYjjX
+      mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ
+      mv2burnburnburnburnburnburnbur7hzNeg
     ]
 
     # Overrides for specific delegators
     overrides: {
-      tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM: {
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: {
         # Redirects payout to the recipient 'address'
         recipient: ""
 
@@ -82,7 +82,7 @@
         # Overrides the minimum balance requirement for the delegator
         minimum_balance: 2.5
       }
-      tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE: {
+      mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb: {
         # Redirects payout to the recipient 'address'
         recipient: ""
 
@@ -97,8 +97,8 @@
         ""
       ]
       1: [
-        tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU
-        tz1burnburnburnburnburnburnburjAYjjX
+        mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ
+        mv2burnburnburnburnburnburnbur7hzNeg
       ]
     }
   }
@@ -107,13 +107,13 @@
   income_recipients: {
     # list of addresses and their share of the bonds
     bonds: {
-      tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM: 0.455
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
       tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE: 0.545
     }
 
     # list of addresses and their share of the fees
     fees: {
-      tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM: 0.455
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
       tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE: 0.545
     }
 
@@ -128,21 +128,21 @@
 
     # list of addresses and their share of the donations
     donations: {
-      tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM: 0.1
-      tz1UGkfyrT9yBt6U5PV7Qeui3pt3a8jffoWv: 0.9
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.1
+      mv1V4h45W3p4e1sjSBvRkK2uYbvkTnSuHg8g: 0.9
     }
   }
 
-  # tezos network configuration
+  # mavryk network configuration
   network: {
     # Url to rpc endpoint
-    rpc_url: https://eu.rpc.tez.capital/
+    rpc_url: https://rpc.mavryk.network/
 
-    # Url to tzkt endpoint
-    tzkt_url: https://api.tzkt.io/
+    # Url to mvkt endpoint
+    mvkt_url: https://api.mavryk.network/
 
     # Url to protocol rewards endpoint
-    protocol_rewards_url: https://protocol-rewards.tez.capital/
+    protocol_rewards_url: https://protocol-rewards.mavryk.network/
 
     # Url to block explorer
     explorer: https://tzstats.com/

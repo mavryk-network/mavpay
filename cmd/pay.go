@@ -38,8 +38,8 @@ var payCmd = &cobra.Command{
 		})
 		stdioReporter := reporter_engines.NewStdioReporter(config)
 
-		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToTezCapital() {
-			assertRequireConfirmation("⚠️  With your current configuration you are not going to donate to tez.capital.😔 Do you want to proceed?")
+		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToMavCapital() {
+			assertRequireConfirmation("⚠️  With your current configuration you are not going to donate to mavrykdynamics.com. 😔 Do you want to proceed?")
 		}
 
 		var generationResult *common.CyclePayoutBlueprint

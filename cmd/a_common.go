@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/constants"
@@ -19,6 +18,7 @@ import (
 	"github.com/mavryk-network/mavpay/extension"
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type configurationAndEngines struct {
@@ -46,13 +46,13 @@ func loadConfigurationEnginesExtensions() (*configurationAndEngines, error) {
 		}
 	}
 	// for testing point transactor to testnet
-	// transactorEngine, err := clients.InitDefaultTransactor("https://rpc.tzkt.io/ghostnet/", "https://api.ghostnet.tzkt.io/") // (config.Network.RpcUrl, config.Network.TzktUrl)
+	// transactorEngine, err := clients.InitDefaultTransactor("https://basenet.rpc.mavryk.network/", "https://basenet.api.mavryk.network/") // (config.Network.RpcUrl, config.Network.MvktUrl)
 	transactorEngine, err := transactor_engines.InitDefaultTransactor(config)
 	if err != nil {
 		return nil, errors.Join(constants.ErrTransactorLoadFailed, err)
 	}
 
-	collector, err := collector_engines.InitDefaultRpcAndTzktColletor(config)
+	collector, err := collector_engines.InitDefaultRpcAndMvktColletor(config)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ type versionInfo struct {
 	Version string `json:"tag_name"`
 }
 
-func GetProtocolWithRetry(collector common.CollectorEngine) tezos.ProtocolHash {
+func GetProtocolWithRetry(collector common.CollectorEngine) mavryk.ProtocolHash {
 	protocol, err := collector.GetCurrentProtocol()
 	for err != nil {
 		slog.Warn("failed to get protocol", "error", err.Error())

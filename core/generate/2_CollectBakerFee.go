@@ -31,7 +31,7 @@ func CollectBakerFee(ctx *PayoutGenerationContext, options *common.GeneratePayou
 			}
 		}
 
-		if candidateWithBondsAmount.TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if candidateWithBondsAmount.TxKind != enums.PAYOUT_TX_KIND_MAV {
 			logger.Debug("skipping fee collection for non mavryk payout", "delegate", candidateWithBondsAmount.Source, "tx_kind", candidateWithBondsAmount.TxKind)
 			return PayoutCandidateWithBondAmountAndFee{
 				PayoutCandidateWithBondAmount: candidateWithBondsAmount,

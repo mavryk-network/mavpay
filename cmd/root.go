@@ -60,9 +60,9 @@ func setupTextLogger(level slog.Level) {
 
 var (
 	RootCmd = &cobra.Command{
-		Use:   "tezpay",
-		Short: "TEZPAY",
-		Long: fmt.Sprintf(`TEZPAY %s - the tezos reward distributor
+		Use:   "mavpay",
+		Short: "MAVPAY",
+		Long: fmt.Sprintf(`MAVPAY %s - the mavryk reward distributor
 Copyright © %d alis.is
 `, constants.VERSION, time.Now().Year()),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {

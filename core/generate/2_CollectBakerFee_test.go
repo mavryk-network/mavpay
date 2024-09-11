@@ -22,7 +22,7 @@ var (
 				FeeRate:   0.05,
 			},
 			BondsAmount: mavryk.NewZ(10000000),
-			TxKind:      enums.PAYOUT_TX_KIND_TEZ,
+			TxKind:      enums.PAYOUT_TX_KIND_MAV,
 		},
 		{
 			PayoutCandidate: PayoutCandidate{
@@ -31,7 +31,7 @@ var (
 				FeeRate:   0.05,
 			},
 			BondsAmount: mavryk.NewZ(20000000),
-			TxKind:      enums.PAYOUT_TX_KIND_TEZ,
+			TxKind:      enums.PAYOUT_TX_KIND_MAV,
 		},
 		{
 			PayoutCandidate: PayoutCandidate{
@@ -78,14 +78,14 @@ func TestCollectBakerFees(t *testing.T) {
 	result, err = CollectBakerFee(ctx, &common.GeneratePayoutsOptions{})
 	assert.Nil(err)
 	feesAmount := lo.Reduce(payoutCandidatesWithBondAmount, func(agg int64, v PayoutCandidateWithBondAmount, _ int) int64 {
-		if v.TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if v.TxKind != enums.PAYOUT_TX_KIND_MAV {
 			return agg
 		}
 		return agg + utils.GetZPortion(v.BondsAmount, feeRate).Int64()
 	}, int64(0))
 	assert.Equal(feesAmount, result.StageData.BakerFeesAmount.Int64())
 	for i, v := range result.StageData.PayoutCandidatesWithBondAmountAndFees {
-		if payoutCandidatesWithBondAmount[i].TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if payoutCandidatesWithBondAmount[i].TxKind != enums.PAYOUT_TX_KIND_MAV {
 			continue
 		}
 		assert.Equal(utils.GetZPortion(payoutCandidatesWithBondAmount[i].BondsAmount, 1-feeRate).Int64(), v.BondsAmount.Int64())
@@ -98,14 +98,14 @@ func TestCollectBakerFees(t *testing.T) {
 	result, err = CollectBakerFee(ctx, &common.GeneratePayoutsOptions{})
 	assert.Nil(err)
 	donateAmount := lo.Reduce(payoutCandidatesWithBondAmount, func(agg int64, v PayoutCandidateWithBondAmount, _ int) int64 {
-		if v.TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if v.TxKind != enums.PAYOUT_TX_KIND_MAV {
 			return agg
 		}
 		return agg + utils.GetZPortion(utils.GetZPortion(v.BondsAmount, feeRate), donationRate).Int64()
 	}, int64(0))
 	assert.Equal(donateAmount, result.StageData.DonateFeesAmount.Int64())
 	for i, v := range result.StageData.PayoutCandidatesWithBondAmountAndFees {
-		if payoutCandidatesWithBondAmount[i].TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if payoutCandidatesWithBondAmount[i].TxKind != enums.PAYOUT_TX_KIND_MAV {
 			continue
 		}
 		assert.Equal(utils.GetZPortion(payoutCandidatesWithBondAmount[i].BondsAmount, 1-feeRate).Int64(), v.BondsAmount.Int64())
@@ -119,7 +119,7 @@ func TestCollectBakerFees(t *testing.T) {
 	assert.Nil(err)
 	collectedFee := mavryk.Zero
 	for _, v := range result.StageData.PayoutCandidatesWithBondAmountAndFees {
-		if v.TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if v.TxKind != enums.PAYOUT_TX_KIND_MAV {
 			continue
 		}
 		assert.True(v.IsInvalid)
@@ -127,7 +127,7 @@ func TestCollectBakerFees(t *testing.T) {
 		collectedFee = collectedFee.Add(v.Fee)
 	}
 	totalBonds := lo.Reduce(ctx.StageData.PayoutCandidatesWithBondAmount, func(agg mavryk.Z, v PayoutCandidateWithBondAmount, _ int) mavryk.Z {
-		if v.TxKind != enums.PAYOUT_TX_KIND_TEZ {
+		if v.TxKind != enums.PAYOUT_TX_KIND_MAV {
 			return agg
 		}
 		return agg.Add(v.BondsAmount)

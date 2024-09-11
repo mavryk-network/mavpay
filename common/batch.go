@@ -3,9 +3,9 @@ package common
 import (
 	"log/slog"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 )
 
@@ -22,7 +22,7 @@ func NewBatch(limits *OperationLimits, metadataDeserializationGasLimit int64) ba
 		Payouts:     make([]PayoutRecipe, 0),
 		UsedStorage: 0,
 		UsedGas:     metadataDeserializationGasLimit,
-		Op:          codec.NewOp().WithSource(tezos.ZeroAddress).WithBranch(tezos.MustParseBlockHash("BM4VEjb3EGdgNgJhwfVUsUqPYvZWJUHdmKKgabuDkwy6SmUKDve")), // dummy address
+		Op:          codec.NewOp().WithSource(mavryk.ZeroAddress).WithBranch(mavryk.MustParseBlockHash("BM4VEjb3EGdgNgJhwfVUsUqPYvZWJUHdmKKgabuDkwy6SmUKDve")), // dummy address
 		limits: OperationLimits{
 			HardGasLimitPerOperation:     limits.HardGasLimitPerOperation * 95 / 100,     // little reserve
 			HardStorageLimitPerOperation: limits.HardStorageLimitPerOperation * 95 / 100, // little reserve
@@ -68,7 +68,7 @@ func (b *RecipeBatch) ToOpExecutionContext(signer SignerEngine, transactor Trans
 		if i == 0 {
 			buffer = serializationGasLimit
 		}
-		InjectTransferContentsWithLimits(op, p.Recipient, &p, tezos.Limits{
+		InjectTransferContentsWithLimits(op, p.Recipient, &p, mavryk.Limits{
 			Fee:          p.OpLimits.TransactionFee,
 			GasLimit:     p.OpLimits.GasLimit + buffer,
 			StorageLimit: p.OpLimits.StorageLimit,

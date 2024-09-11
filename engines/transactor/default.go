@@ -6,30 +6,30 @@ import (
 	"net/http"
 	"time"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mavpay/engines/tzkt"
+	"github.com/mavryk-network/mavpay/engines/mvkt"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/mavryk-network/mvgo/rpc"
 )
 
 type DefaultRpcTransactor struct {
 	rpcUrl string
 	rpc    *rpc.Client
-	tzkt   *tzkt.Client
+	mvkt   *mvkt.Client
 }
 
 type DefaultRpcTransactorOpResult struct {
-	opHash tezos.OpHash
+	opHash mavryk.OpHash
 	result *rpc.Result
 	rpc    *rpc.Client
-	tzkt   *tzkt.Client
+	mvkt   *mvkt.Client
 }
 
-func (result *DefaultRpcTransactorOpResult) GetOpHash() tezos.OpHash {
+func (result *DefaultRpcTransactorOpResult) GetOpHash() mavryk.OpHash {
 	return result.opHash
 }
 
@@ -46,7 +46,7 @@ func (result *DefaultRpcTransactorOpResult) WaitForApply() error {
 			slog.Debug(`failed to confirm with live monitoring, falling back to polling`)
 		}
 		for ctx.Err() != context.Canceled {
-			applied, _ := result.tzkt.WasOperationApplied(ctx, result.opHash)
+			applied, _ := result.mvkt.WasOperationApplied(ctx, result.opHash)
 			slog.Debug("operation status checked", "op_hash", result.opHash, "applied", applied)
 			if applied == common.OPERATION_STATUS_APPLIED || applied == common.OPERATION_STATUS_FAILED {
 				cancel()
@@ -89,7 +89,7 @@ func InitDefaultTransactor(config *configuration.RuntimeConfiguration) (*Default
 		return nil, err
 	}
 
-	tzktClient, err := tzkt.InitClient(config.Network.TzktUrl, config.Network.ProtocolRewardsUrl, &tzkt.TzktClientOptions{
+	mvktClient, err := mvkt.InitClient(config.Network.MvktUrl, config.Network.ProtocolRewardsUrl, &mvkt.MvktClientOptions{
 		HttpClient:       client,
 		BalanceCheckMode: config.PayoutConfiguration.BalanceCheckMode,
 	})
@@ -100,7 +100,7 @@ func InitDefaultTransactor(config *configuration.RuntimeConfiguration) (*Default
 	result := &DefaultRpcTransactor{
 		rpcUrl: config.Network.RpcUrl,
 		rpc:    rpcClient,
-		tzkt:   tzktClient,
+		mvkt:   mvktClient,
 	}
 	return result, result.RefreshParams()
 }
@@ -135,13 +135,13 @@ func (transactor *DefaultRpcTransactor) GetLimits() (*common.OperationLimits, er
 	}, nil
 }
 
-func (transactor *DefaultRpcTransactor) Complete(op *codec.Op, key tezos.Key) error {
+func (transactor *DefaultRpcTransactor) Complete(op *codec.Op, key mavryk.Key) error {
 	op = op.WithParams(transactor.rpc.Params)
 	err := transactor.rpc.Complete(context.Background(), op, key)
 	return err
 }
 
-func (transactor *DefaultRpcTransactor) initOpResult(opHash tezos.OpHash, opts *rpc.CallOptions) (*DefaultRpcTransactorOpResult, error) {
+func (transactor *DefaultRpcTransactor) initOpResult(opHash mavryk.OpHash, opts *rpc.CallOptions) (*DefaultRpcTransactorOpResult, error) {
 	if opts == nil {
 		opts = &rpc.DefaultOptions
 	}
@@ -160,11 +160,11 @@ func (transactor *DefaultRpcTransactor) initOpResult(opHash tezos.OpHash, opts *
 		opHash: opHash,
 		result: res,
 		rpc:    rpcClient,
-		tzkt:   transactor.tzkt,
+		mvkt:   transactor.mvkt,
 	}, nil
 }
 
-func (transactor *DefaultRpcTransactor) Broadcast(op *codec.Op) (tezos.OpHash, error) {
+func (transactor *DefaultRpcTransactor) Broadcast(op *codec.Op) (mavryk.OpHash, error) {
 	return transactor.rpc.Broadcast(context.Background(), op)
 }
 
@@ -187,7 +187,7 @@ func (transactor *DefaultRpcTransactor) Send(op *codec.Op, opts *rpc.CallOptions
 	return transactor.rpc.Send(context.Background(), op, opts)
 }
 
-func (transactor *DefaultRpcTransactor) WaitOpConfirmation(opHash tezos.OpHash, ttl int64, confirmations int64) (*rpc.Receipt, error) {
+func (transactor *DefaultRpcTransactor) WaitOpConfirmation(opHash mavryk.OpHash, ttl int64, confirmations int64) (*rpc.Receipt, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	res := rpc.NewResult(opHash).WithTTL(ttl).WithConfirmations(confirmations)
 	transactor.rpc.Listen()

@@ -41,7 +41,7 @@ func CollectTransactionFees(ctx *PayoutGenerationContext, options *common.Genera
 	})
 
 	simulatedPayouts := lo.Map(simulatioResults, func(result estimate.EstimateResult[*PayoutCandidateWithBondAmountAndFee], _ int) PayoutCandidateSimulated {
-		if result.Transaction.IsInvalid { // we don't collect fees from non-tez payouts
+		if result.Transaction.IsInvalid { // we don't collect fees from non-mav payouts
 			return PayoutCandidateSimulated{
 				PayoutCandidateWithBondAmountAndFee: *result.Transaction,
 			}
@@ -59,7 +59,7 @@ func CollectTransactionFees(ctx *PayoutGenerationContext, options *common.Genera
 			PayoutCandidateWithBondAmountAndFee: *result.Transaction,
 			SimulationResult:                    result.Result,
 		}
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			if !candidate.IsBakerPayingTxFee {
 				candidate.BondsAmount = candidate.BondsAmount.Sub64(candidate.SimulationResult.GetOperationFeesWithoutAllocation())
 				candidate.TxFeeCollected = true

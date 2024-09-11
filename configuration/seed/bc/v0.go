@@ -21,7 +21,7 @@ type DelegatorOverrideV0 struct {
 	Fee       float64 `json:"fee,omitempty"`
 }
 
-type TezosNetworkConfigurationV0 struct {
+type MavrykNetworkConfigurationV0 struct {
 	RpcUrl                 string `json:"rpc_url,omitempty"`
 	DoNotPaySmartContracts bool   `json:"suppress_KT_payments,omitempty"`
 }
@@ -43,7 +43,7 @@ type ConfigurationV0 struct {
 	DelegatorRequirements      DelegatorRequirementsV0        `json:"delegator_requirements,omitempty"`
 	IncomeRecipients           IncomeRecipientsV0             `json:"income_recipients,omitempty"`
 	DelegatorOverrides         map[string]DelegatorOverrideV0 `json:"delegator_overrides,omitempty"`
-	Network                    TezosNetworkConfigurationV0    `json:"network_configuration,omitempty"`
+	Network                    MavrykNetworkConfigurationV0   `json:"network_configuration,omitempty"`
 	Overdelegation             OverdelegationConfigurationV0  `json:"overdelegation,omitempty"`
 	PaymentRequirements        PaymentRequirementsV0          `json:"payment_requirements,omitempty"`
 	NotificationConfigurations []json.RawMessage              `json:"notifications,omitempty"`
@@ -58,7 +58,7 @@ func GetDefault() ConfigurationV0 {
 			MinimumBalance: constants.DEFAULT_DELEGATOR_MINIMUM_BALANCE,
 		},
 		DelegatorOverrides: make(map[string]DelegatorOverrideV0),
-		Network: TezosNetworkConfigurationV0{
+		Network: MavrykNetworkConfigurationV0{
 			RpcUrl:                 constants.DEFAULT_RPC_URL,
 			DoNotPaySmartContracts: false,
 		},

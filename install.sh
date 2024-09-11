@@ -13,9 +13,9 @@ if which curl >/dev/null; then
 
     set -- curl -L $PROGRESS -o "$TMP_NAME"
     if [ "$PRERELEASE" = true ]; then
-        LATEST=$(curl -sL https://api.github.com/repos/tez-capital/tezpay/releases | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g' | head -n 1 | tr -d '[:space:]')
+        LATEST=$(curl -sL https://api.github.com/repos/mavryk-network/mavpay/releases | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g' | head -n 1 | tr -d '[:space:]')
     else
-        LATEST=$(curl -sL https://api.github.com/repos/tez-capital/tezpay/releases/latest | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g')
+        LATEST=$(curl -sL https://api.github.com/repos/mavryk-network/mavpay/releases/latest | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g')
     fi
 else
     if wget --help 2>&1 | grep "--show-progress" >/dev/null 2>&1; then
@@ -23,14 +23,14 @@ else
     fi
     set -- wget -q $PROGRESS -O "$TMP_NAME"
     if [ "$PRERELEASE" = true ]; then
-        LATEST=$(wget -qO- https://api.github.com/repos/tez-capital/tezpay/releases | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g' | head -n 1 | tr -d '[:space:]')
+        LATEST=$(wget -qO- https://api.github.com/repos/mavryk-network/mavpay/releases | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g' | head -n 1 | tr -d '[:space:]')
     else
-        LATEST=$(wget -qO- https://api.github.com/repos/tez-capital/tezpay/releases/latest | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g')
+        LATEST=$(wget -qO- https://api.github.com/repos/mavryk-network/mavpay/releases/latest | grep tag_name | sed 's/  "tag_name": "//g' | sed 's/",//g')
     fi
 fi
 
-if ./tezpay version | grep "$LATEST"; then
-    echo "Latest tezpay already available."
+if ./mavpay version | grep "$LATEST"; then
+    echo "Latest mavpay already available."
     exit 0
 fi
 
@@ -41,13 +41,13 @@ if [ "$PLATFORM" = "x86_64" ]; then
 elif [ "$PLATFORM" = "aarch64" ]; then
     PLATFORM="arm64"
 fi
-echo "Downloading tezpay-linux-$PLATFORM $LATEST..."
+echo "Downloading mavpay-linux-$PLATFORM $LATEST..."
 
-if "$@" "https://github.com/mavryk-network/mavpay/releases/download/$LATEST/tezpay-linux-$PLATFORM" &&
-    mv "$TMP_NAME" ./tezpay &&
-    chmod +x ./tezpay; then
-    echo "tezpay $LATEST for $PLATFORM successfuly installed."
+if "$@" "https://github.com/mavryk-network/mavpay/releases/download/$LATEST/mavpay-linux-$PLATFORM" &&
+    mv "$TMP_NAME" ./mavpay &&
+    chmod +x ./mavpay; then
+    echo "mavpay $LATEST for $PLATFORM successfuly installed."
 else
-    echo "tezpay installation failed!" 1>&2
+    echo "mavpay installation failed!" 1>&2
     exit 1
 fi

@@ -6,14 +6,14 @@ import (
 	"os"
 
 	"github.com/mavryk-network/mavpay/common"
-	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/state"
 
 	"github.com/hjson/hjson-go/v4"
 )
 
-type LatestConfigurationType = tezpay_configuration.ConfigurationV0
+type LatestConfigurationType = mavpay_configuration.ConfigurationV0
 
 func WriteMigratedConfiguration(source string, configuration LatestConfigurationType) error {
 	var marshaled []byte
@@ -45,7 +45,7 @@ func Migrate(sourceBytes []byte, versionInfo *common.ConfigurationVersionInfo, p
 	}
 
 	// load final config
-	configuration := tezpay_configuration.GetDefaultV0()
+	configuration := mavpay_configuration.GetDefaultV0()
 	err = hjson.Unmarshal(sourceBytes, &configuration)
 	if err != nil {
 		return nil, err

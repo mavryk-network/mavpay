@@ -68,7 +68,7 @@ func AccumulatePayouts(ctx *PayoutPrepareContext, options *common.PreparePayouts
 		}
 
 		candidate := result.Transaction
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			if !candidate.TxFeeCollected {
 				candidate.Amount = candidate.Amount.Add64(candidate.OpLimits.GetOperationFeesWithoutAllocation() - result.Result.GetOperationFeesWithoutAllocation())
 			}

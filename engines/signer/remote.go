@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/url"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/mavryk-network/mvgo/signer"
 	"github.com/mavryk-network/mvgo/signer/remote"
 )
@@ -18,9 +18,9 @@ type RemoteSignerSpecs struct {
 }
 
 type RemoteSigner struct {
-	Address tezos.Address
+	Address mavryk.Address
 	Remote  *remote.RemoteSigner
-	Key     tezos.Key
+	Key     mavryk.Key
 }
 
 func InitRemoteSignerFromSpecs(specs RemoteSignerSpecs) (*RemoteSigner, error) {
@@ -35,7 +35,7 @@ func InitRemoteSigner(address string, remoteUrl string) (*RemoteSigner, error) {
 	if err != nil {
 		return nil, errors.Join(constants.ErrSignerLoadFailed, err)
 	}
-	addr, err := tezos.ParseAddress(address)
+	addr, err := mavryk.ParseAddress(address)
 	if err != nil {
 		return nil, errors.Join(constants.ErrSignerLoadFailed, err)
 	}
@@ -56,11 +56,11 @@ func (remoteSigner *RemoteSigner) GetId() string {
 	return "RemoteSigner"
 }
 
-func (remoteSigner *RemoteSigner) GetPKH() tezos.Address {
+func (remoteSigner *RemoteSigner) GetPKH() mavryk.Address {
 	return remoteSigner.Address
 }
 
-func (remoteSigner *RemoteSigner) GetKey() tezos.Key {
+func (remoteSigner *RemoteSigner) GetKey() mavryk.Key {
 	return remoteSigner.Key
 }
 

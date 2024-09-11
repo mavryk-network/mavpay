@@ -43,7 +43,7 @@ func (validationContext *PayoutSimulatedValidationContext) Validate(validators .
 
 func ValidateSimulatedMinumumAmount(candidate *PayoutCandidateSimulated, configuration *configuration.RuntimeConfiguration, _ *configuration.RuntimeDelegatorOverride) {
 	treshhold := configuration.PayoutConfiguration.MinimumAmount
-	if treshhold.IsNeg() || candidate.TxKind != enums.PAYOUT_TX_KIND_TEZ { // if payout is not mavryk we respect anything above 0
+	if treshhold.IsNeg() || candidate.TxKind != enums.PAYOUT_TX_KIND_MAV { // if payout is not mavryk we respect anything above 0
 		treshhold = mavryk.Zero
 	}
 	diff := candidate.BondsAmount.Sub(treshhold)

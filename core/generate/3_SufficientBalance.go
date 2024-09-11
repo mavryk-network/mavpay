@@ -17,7 +17,7 @@ import (
 )
 
 type CheckBalanceHookData struct {
-	SkipTezCheck bool                                  `json:"skip_tez_check"`
+	SkipMavCheck bool                                  `json:"skip_mav_check"`
 	IsSufficient bool                                  `json:"is_sufficient"`
 	Message      string                                `json:"message"`
 	Payouts      []PayoutCandidateWithBondAmountAndFee `json:"payouts"`
@@ -32,7 +32,7 @@ func checkBalanceWithHook(data *CheckBalanceHookData) error {
 }
 
 func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGenerationContext) error {
-	if data.SkipTezCheck { // skip tez check for cases when pervious hook already checked it
+	if data.SkipMavCheck { // skip mav check for cases when pervious hook already checked it
 		return nil
 	}
 	payableBalance, err := ctx.GetCollector().GetBalance(ctx.PayoutKey.Address())
@@ -54,7 +54,7 @@ func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGeneration
 	totalPayouts = totalPayouts + len(configuration.IncomeRecipients.Bonds) + len(configuration.IncomeRecipients.Fees) + utils.Max(len(configuration.IncomeRecipients.Donations), 1)
 
 	requiredbalance := lo.Reduce(data.Payouts, func(agg mavryk.Z, candidate PayoutCandidateWithBondAmountAndFee, _ int) mavryk.Z {
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			return agg.Add(candidate.BondsAmount)
 		}
 		return agg
@@ -133,7 +133,7 @@ func CheckSufficientBalance(ctx *PayoutGenerationContext, options *common.Genera
 			return checkBalanceWithHook(data)
 		},
 		func(data *CheckBalanceHookData) error {
-			logger.Debug("checking tez balance with collector")
+			logger.Debug("checking mav balance with collector")
 			return checkBalanceWithCollector(data, ctx)
 		},
 	}

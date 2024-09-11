@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 	"os"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/hjson/hjson-go/v4"
 	"github.com/mavryk-network/mavpay/common"
-	tezpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 func GenerateDefaultHJson() {
-	config := tezpay_configuration.GetDefaultV0()
+	config := mavpay_configuration.GetDefaultV0()
 
 	sample, _ := hjson.MarshalWithOptions(config, hjson.EncoderOptions{
 		Eol:                   "\n",
@@ -28,7 +28,7 @@ func GenerateDefaultHJson() {
 	_ = os.WriteFile("docs/configuration/config.default.hjson", sample, 0644)
 }
 
-func genrateSample() *tezpay_configuration.ConfigurationV0 {
+func genrateSample() *mavpay_configuration.ConfigurationV0 {
 	logExtensionConfiguration := json.RawMessage(`{"LOG_FILE": "path/to/my/extension.log"}`)
 	feeExtensionConfiguration := json.RawMessage(`{"FEE": 0, "TOKEN": "1", "CONTRACT": "KT1Hkg6qgV3VykjgUXKbWcU3h6oJ1qVxUxZV"}`)
 
@@ -45,42 +45,42 @@ func genrateSample() *tezpay_configuration.ConfigurationV0 {
 	minimumDelayBlocks := int64(10)
 	maximumDelayBlocks := int64(250)
 
-	return &tezpay_configuration.ConfigurationV0{
+	return &mavpay_configuration.ConfigurationV0{
 		Version:  0,
-		BakerPKH: tezos.InvalidAddress,
-		Delegators: tezpay_configuration.DelegatorsConfigurationV0{
-			Requirements: tezpay_configuration.DelegatorRequirementsV0{
+		BakerPKH: mavryk.InvalidAddress,
+		Delegators: mavpay_configuration.DelegatorsConfigurationV0{
+			Requirements: mavpay_configuration.DelegatorRequirementsV0{
 				MinimumBalance:                        float64(0.5),
 				BellowMinimumBalanceRewardDestination: &bellowMinimumBalanceRewardDestination,
 			},
-			Overrides: map[string]tezpay_configuration.DelegatorOverrideV0{
-				"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM": {
-					Recipient:      tezos.InvalidAddress,
+			Overrides: map[string]mavpay_configuration.DelegatorOverrideV0{
+				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": {
+					Recipient:      mavryk.InvalidAddress,
 					Fee:            &fee,
 					MinimumBalance: 2.5,
 				},
-				"tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE": {
+				"mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb": {
 					MaximumBalance: &maximumBalance,
 				},
 			},
-			FeeOverrides: map[string][]tezos.Address{
-				"1":  {tezos.ZeroAddress, tezos.BurnAddress},
-				".5": {tezos.InvalidAddress},
+			FeeOverrides: map[string][]mavryk.Address{
+				"1":  {mavryk.ZeroAddress, mavryk.BurnAddress},
+				".5": {mavryk.InvalidAddress},
 			},
-			Ignore:    []tezos.Address{tezos.ZeroAddress, tezos.BurnAddress},
-			Prefilter: []tezos.Address{tezos.MustParseAddress("tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM"), tezos.MustParseAddress("tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE")},
+			Ignore:    []mavryk.Address{mavryk.ZeroAddress, mavryk.BurnAddress},
+			Prefilter: []mavryk.Address{mavryk.MustParseAddress("mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3"), mavryk.MustParseAddress("mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb")},
 		},
-		Network: tezpay_configuration.TezosNetworkConfigurationV0{
+		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
 			RpcUrl:                 constants.DEFAULT_RPC_URL,
-			TzktUrl:                constants.DEFAULT_TZKT_URL,
+			MvktUrl:                constants.DEFAULT_MVKT_URL,
 			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			Explorer:               "https://tzstats.com/",
 			DoNotPaySmartContracts: true,
 		},
-		Overdelegation: tezpay_configuration.OverdelegationConfigurationV0{
+		Overdelegation: mavpay_configuration.OverdelegationConfigurationV0{
 			IsProtectionEnabled: true,
 		},
-		PayoutConfiguration: tezpay_configuration.PayoutConfigurationV0{
+		PayoutConfiguration: mavpay_configuration.PayoutConfigurationV0{
 			WalletMode:                 enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			PayoutMode:                 enums.PAYOUT_MODE_IDEAL,
 			BalanceCheckMode:           enums.PROTOCOL_BALANCE_CHECK_MODE,
@@ -143,24 +143,24 @@ func genrateSample() *tezpay_configuration.ConfigurationV0 {
 				"args": ["--kind", "<kind>", "<data>"],
 			}`),
 		},
-		IncomeRecipients: tezpay_configuration.IncomeRecipientsV0{
+		IncomeRecipients: mavpay_configuration.IncomeRecipientsV0{
 			Bonds: map[string]float64{
-				"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM": 0.455,
+				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.455,
 				"tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE": 0.545,
 			},
 			Fees: map[string]float64{
-				"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM": 0.455,
+				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.455,
 				"tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE": 0.545,
 			},
 			Donate:      &donate,
 			DonateFees:  &donateFees,
 			DonateBonds: &donateBonds,
 			Donations: map[string]float64{
-				"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM": 0.10,
-				"tz1UGkfyrT9yBt6U5PV7Qeui3pt3a8jffoWv": 0.90,
+				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.10,
+				"mv1V4h45W3p4e1sjSBvRkK2uYbvkTnSuHg8g": 0.90,
 			},
 		},
-		Extensions: []tezpay_configuration.ExtensionConfigurationV0{
+		Extensions: []mavpay_configuration.ExtensionConfigurationV0{
 			common.ExtensionDefinition{
 				Name:    "log-extension",
 				Command: "python3",
@@ -195,19 +195,19 @@ func GenerateSampleHJson() {
 	_ = os.WriteFile("docs/configuration/config.sample.hjson", sample, 0644)
 }
 
-func genrateStarter() *tezpay_configuration.ConfigurationV0 {
-	return &tezpay_configuration.ConfigurationV0{
+func genrateStarter() *mavpay_configuration.ConfigurationV0 {
+	return &mavpay_configuration.ConfigurationV0{
 		Version:  0,
-		BakerPKH: tezos.InvalidAddress,
-		Delegators: tezpay_configuration.DelegatorsConfigurationV0{
-			Requirements: tezpay_configuration.DelegatorRequirementsV0{
+		BakerPKH: mavryk.InvalidAddress,
+		Delegators: mavpay_configuration.DelegatorsConfigurationV0{
+			Requirements: mavpay_configuration.DelegatorRequirementsV0{
 				MinimumBalance: float64(10),
 			},
 		},
-		Overdelegation: tezpay_configuration.OverdelegationConfigurationV0{
+		Overdelegation: mavpay_configuration.OverdelegationConfigurationV0{
 			IsProtectionEnabled: true,
 		},
-		PayoutConfiguration: tezpay_configuration.PayoutConfigurationV0{
+		PayoutConfiguration: mavpay_configuration.PayoutConfigurationV0{
 			WalletMode:       enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			BalanceCheckMode: enums.PROTOCOL_BALANCE_CHECK_MODE,
 			PayoutMode:       enums.PAYOUT_MODE_ACTUAL,
@@ -225,9 +225,9 @@ func GenerateStarterHJson() {
 	_ = hjson.Unmarshal(defaultMarshaled, &node)
 
 	node.Cm.InsideFirst = "\n#=====================================================================================================\n" +
-		"# This is tezpay starter configuration template. Please refer to https://docs.tez.capital/tezpay/\n" +
-		"# - for default configuration (list of default values) see https://docs.tez.capital/tezpay/configuration/examples/default/.\n" +
-		"# - for sample of all available fields see https://docs.tez.capital/tezpay/configuration/examples/sample/.\n" +
+		"# This is mavpay starter configuration template. Please refer to https://mavpay.mavryk.org/mavpay/\n" +
+		"# - for default configuration (list of default values) see https://mavpay.mavryk.org/mavpay/configuration/examples/default/.\n" +
+		"# - for sample of all available fields see https://mavpay.mavryk.org/mavpay/configuration/examples/sample/.\n" +
 		"#=====================================================================================================\n"
 
 	node.DeleteKey("network")

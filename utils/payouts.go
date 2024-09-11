@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 )
 
@@ -66,13 +66,13 @@ func RejectPayoutsByKind(payouts []common.PayoutRecipe, kinds []enums.EPayoutKin
 	})
 }
 
-func FilterPayoutsByType(payouts []common.PayoutRecipe, t tezos.AddressType) []common.PayoutRecipe {
+func FilterPayoutsByType(payouts []common.PayoutRecipe, t mavryk.AddressType) []common.PayoutRecipe {
 	return lo.Filter(payouts, func(payout common.PayoutRecipe, _ int) bool {
 		return payout.Recipient.Type() == t
 	})
 }
 
-func RejectPayoutsByType(payouts []common.PayoutRecipe, t tezos.AddressType) []common.PayoutRecipe {
+func RejectPayoutsByType(payouts []common.PayoutRecipe, t mavryk.AddressType) []common.PayoutRecipe {
 	return lo.Filter(payouts, func(payout common.PayoutRecipe, _ int) bool {
 		return payout.Recipient.Type() != t
 	})
@@ -96,7 +96,7 @@ func OnlyInvalidPayouts(payouts []common.PayoutRecipe) []common.PayoutRecipe {
 	})
 }
 
-func FilterReportsByBaker(payouts []common.PayoutReport, t tezos.Address) []common.PayoutReport {
+func FilterReportsByBaker(payouts []common.PayoutReport, t mavryk.Address) []common.PayoutReport {
 	return lo.Filter(payouts, func(payout common.PayoutReport, _ int) bool {
 		return payout.Baker.Equal(t)
 	})
@@ -125,11 +125,11 @@ func FilterRecipesByReports(payouts []common.PayoutRecipe, reports []common.Payo
 
 	for _, report := range reports {
 		addr := report.Delegator.String()
-		if report.Delegator.Equal(tezos.ZeroAddress) {
+		if report.Delegator.Equal(mavryk.ZeroAddress) {
 			addr = report.Recipient.String()
 		}
 		payoutId := payoutId{report.Kind, report.TxKind, report.FAContract.String(), report.FATokenId.String(), addr}
-		if collector != nil && !report.OpHash.Equal(tezos.ZeroOpHash) {
+		if collector != nil && !report.OpHash.Equal(mavryk.ZeroOpHash) {
 			if _, ok := validOpHashes[report.OpHash.String()]; ok {
 				paidOut[payoutId] = report
 				continue
@@ -157,7 +157,7 @@ func FilterRecipesByReports(payouts []common.PayoutRecipe, reports []common.Payo
 
 	return lo.Filter(payouts, func(payout common.PayoutRecipe, _ int) bool {
 		addr := payout.Delegator.String()
-		if payout.Delegator.Equal(tezos.ZeroAddress) {
+		if payout.Delegator.Equal(mavryk.ZeroAddress) {
 			addr = payout.Recipient.String()
 		}
 		payoutId := payoutId{payout.Kind, payout.TxKind, payout.FAContract.String(), payout.FATokenId.String(), addr}

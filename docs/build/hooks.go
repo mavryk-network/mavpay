@@ -6,34 +6,34 @@ import (
 	"os"
 	"time"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/core/generate"
 	"github.com/mavryk-network/mavpay/core/prepare"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 func GenerateHookSampleData() {
 	payoutCandidate := generate.PayoutCandidateWithBondAmountAndFee{
 		PayoutCandidateWithBondAmount: generate.PayoutCandidateWithBondAmount{
 			PayoutCandidate: generate.PayoutCandidate{
-				Source:                       tezos.ZeroAddress,
-				Recipient:                    tezos.ZeroAddress,
+				Source:                       mavryk.ZeroAddress,
+				Recipient:                    mavryk.ZeroAddress,
 				FeeRate:                      5.0,
-				DelegatedBalance:             tezos.NewZ(1000000000),
-				StakedBalance:                tezos.NewZ(1000000000),
+				DelegatedBalance:             mavryk.NewZ(1000000000),
+				StakedBalance:                mavryk.NewZ(1000000000),
 				IsInvalid:                    true,
 				IsEmptied:                    true,
 				IsBakerPayingTxFee:           true,
 				IsBakerPayingAllocationTxFee: true,
 				InvalidBecause:               "reason",
 			},
-			BondsAmount: tezos.NewZ(1000000000),
+			BondsAmount: mavryk.NewZ(1000000000),
 			TxKind:      "fa1",
-			FATokenId:   tezos.NewZ(10),
-			FAContract:  tezos.ZeroContract,
+			FATokenId:   mavryk.NewZ(10),
+			FAContract:  mavryk.ZeroContract,
 		},
-		Fee: tezos.NewZ(1000000000),
+		Fee: mavryk.NewZ(1000000000),
 	}
 
 	acg := generate.AfterCandidateGeneratedHookData{
@@ -46,7 +46,7 @@ func GenerateHookSampleData() {
 		Candidates: []generate.PayoutCandidateWithBondAmount{payoutCandidate.PayoutCandidateWithBondAmount},
 	}
 	acb := generate.CheckBalanceHookData{
-		SkipTezCheck: true,
+		SkipMavCheck: true,
 		Message:      "This message is used to carry errors from hook to the caller.",
 		IsSufficient: true,
 		Payouts:      []generate.PayoutCandidateWithBondAmountAndFee{payoutCandidate},
@@ -72,31 +72,31 @@ func GenerateHookSampleData() {
 	apg := generate.AfterPayoutsBlueprintGeneratedHookData{
 		Cycle: 1,
 		Payouts: []common.PayoutRecipe{
-			simulatedCandidate.ToPayoutRecipe(tezos.ZeroAddress, 1, enums.PAYOUT_KIND_DELEGATOR_REWARD),
+			simulatedCandidate.ToPayoutRecipe(mavryk.ZeroAddress, 1, enums.PAYOUT_KIND_DELEGATOR_REWARD),
 		},
 		Summary: common.CyclePayoutSummary{
 			Cycle:              1,
 			Delegators:         2,
 			PaidDelegators:     1,
-			OwnStakedBalance:   tezos.NewZ(1000000000),
-			EarnedFees:         tezos.NewZ(1000000000),
-			EarnedRewards:      tezos.NewZ(1000000000),
-			DistributedRewards: tezos.NewZ(1000000000),
-			BondIncome:         tezos.NewZ(1000000000),
-			FeeIncome:          tezos.NewZ(1000000000),
-			IncomeTotal:        tezos.NewZ(1000000000),
-			DonatedBonds:       tezos.NewZ(1000000000),
-			DonatedFees:        tezos.NewZ(1000000000),
-			DonatedTotal:       tezos.NewZ(1000000000),
+			OwnStakedBalance:   mavryk.NewZ(1000000000),
+			EarnedFees:         mavryk.NewZ(1000000000),
+			EarnedRewards:      mavryk.NewZ(1000000000),
+			DistributedRewards: mavryk.NewZ(1000000000),
+			BondIncome:         mavryk.NewZ(1000000000),
+			FeeIncome:          mavryk.NewZ(1000000000),
+			IncomeTotal:        mavryk.NewZ(1000000000),
+			DonatedBonds:       mavryk.NewZ(1000000000),
+			DonatedFees:        mavryk.NewZ(1000000000),
+			DonatedTotal:       mavryk.NewZ(1000000000),
 			Timestamp:          t,
 		},
 	}
 
 	app := prepare.AfterPayoutsPreapered{
 		ValidPayouts: []common.PayoutRecipe{
-			simulatedCandidate.ToPayoutRecipe(tezos.ZeroAddress, 1, enums.PAYOUT_KIND_DELEGATOR_REWARD),
+			simulatedCandidate.ToPayoutRecipe(mavryk.ZeroAddress, 1, enums.PAYOUT_KIND_DELEGATOR_REWARD),
 		},
-		ReportsOfPastSuccesfulPayouts: common.NewSuccessBatchResult([]common.PayoutRecipe{simulatedCandidate.ToPayoutRecipe(tezos.ZeroAddress, 1, enums.PAYOUT_KIND_DELEGATOR_REWARD)}, tezos.ZeroOpHash).ToReports(),
+		ReportsOfPastSuccesfulPayouts: common.NewSuccessBatchResult([]common.PayoutRecipe{simulatedCandidate.ToPayoutRecipe(mavryk.ZeroAddress, 1, enums.PAYOUT_KIND_DELEGATOR_REWARD)}, mavryk.ZeroOpHash).ToReports(),
 	}
 
 	result := "\n"

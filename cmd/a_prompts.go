@@ -34,8 +34,8 @@ func assertRequireConfirmation(msg string) {
 
 func checkForNewVersionAvailable() (bool, string) {
 	slog.Debug("checking for new version")
-	// https://api.github.com/repos/tez-capital/tezpay/releases/latest
-	resp, err := http.Get(fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", constants.TEZPAY_REPOSITORY))
+	// https://api.github.com/repos/mavryk-network/mavpay/releases/latest
+	resp, err := http.Get(fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", constants.MAVPAY_REPOSITORY))
 	if err != nil {
 		slog.Debug("⚠️ failed to check latest version", "error", err.Error())
 		return false, ""
@@ -73,9 +73,9 @@ func checkForNewVersionAvailable() (bool, string) {
 
 func promptIfNewVersionAvailable() {
 	if available, latestVersion := checkForNewVersionAvailable(); available {
-		err := requireConfirmation(fmt.Sprintf("You are not running latest version of tezpay (new version : '%s', current version: '%s').\n Do you want to continue anyway?", latestVersion, constants.VERSION))
+		err := requireConfirmation(fmt.Sprintf("You are not running latest version of mavpay (new version : '%s', current version: '%s').\n Do you want to continue anyway?", latestVersion, constants.VERSION))
 		if errors.Is(err, constants.ErrUserNotConfirmed) {
-			slog.Info("new version available", "url", fmt.Sprintf("https://github.com/%s/releases", constants.TEZPAY_REPOSITORY))
+			slog.Info("new version available", "url", fmt.Sprintf("https://github.com/%s/releases", constants.MAVPAY_REPOSITORY))
 			os.Exit(1)
 		}
 	}

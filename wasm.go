@@ -8,15 +8,15 @@ import (
 	"log/slog"
 	"syscall/js"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/core"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 func main() {
-	slog.Info("tezpay wasm loaded", "version", constants.VERSION)
+	slog.Info("mavpay wasm loaded", "version", constants.VERSION)
 }
 
 //export generate_payouts
@@ -27,7 +27,7 @@ func generate_payouts(key js.Value, cycle int64, configurationJs js.Value) (js.V
 		return js.Null(), err
 	}
 
-	bakerKey, err := tezos.ParseKey(key.String())
+	bakerKey, err := mavryk.ParseKey(key.String())
 	if err != nil {
 		return js.Null(), err
 	}

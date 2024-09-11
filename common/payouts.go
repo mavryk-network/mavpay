@@ -218,14 +218,14 @@ func (pr *PayoutRecipe) ToTableRowData() []string {
 	return []string{
 		ShortenAddress(pr.Delegator),
 		ShortenAddress(pr.Recipient),
-		MutezToTezS(pr.DelegatedBalance.Int64()),
+		MumavToMavS(pr.DelegatedBalance.Int64()),
 		string(pr.Kind),
 		ShortenAddress(pr.FAContract),
 		ToStringEmptyIfZero(pr.FATokenId.Int64()),
 		FormatAmount(pr.TxKind, pr.Amount.Int64()),
 		FloatToPercentage(pr.FeeRate),
-		MutezToTezS(pr.Fee.Int64()),
-		MutezToTezS(pr.GetTransactionFee()),
+		MumavToMavS(pr.Fee.Int64()),
+		MumavToMavS(pr.GetTransactionFee()),
 		pr.Note,
 	}
 }
@@ -251,7 +251,7 @@ func GetRecipesTotals(recipes []PayoutRecipe) []string {
 	totalFee := int64(0)
 	totalTx := int64(0)
 	for _, recipe := range recipes {
-		if recipe.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if recipe.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			totalAmount += recipe.Amount.Int64()
 		}
 		totalFee += recipe.Fee.Int64()
@@ -264,10 +264,10 @@ func GetRecipesTotals(recipes []PayoutRecipe) []string {
 		"",
 		"",
 		"",
-		MutezToTezS(totalAmount),
+		MumavToMavS(totalAmount),
 		"",
-		MutezToTezS(totalFee),
-		MutezToTezS(totalTx),
+		MumavToMavS(totalFee),
+		MumavToMavS(totalTx),
 		"",
 	}
 }

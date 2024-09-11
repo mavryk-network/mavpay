@@ -1,18 +1,18 @@
-# Tezpay Payout Fixer extension
+# Mavpay Payout Fixer extension
 
 Compares the payouts reports with the payouts based on config and inject compensation transactions to fix the difference.
 
 ## Installation
 
 1. Download the extension from the [releases page](https://github.com/mavryk-network/mavpay/releases) based on your platform.
-2. Place it into directory where you have tezpay installed.
-3. Add the extension to your tezpay configuration
+2. Place it into directory where you have mavpay installed.
+3. Add the extension to your mavpay configuration
 ```yaml
 ...
 	extensions: [
 		{
 			name: payout-fixer
-			command: "./tezpay-payout-fixer" // or .exe based on your platform
+			command: "./mavpay-payout-fixer" // or .exe based on your platform
 			kind: stdio
 			hooks: [
 				after_payouts_prepared:rw
@@ -21,12 +21,12 @@ Compares the payouts reports with the payouts based on config and inject compens
 	]
 ...
 ```
-1. Run pay `tezpay pay --cycle <cycle>`
+1. Run pay `mavpay pay --cycle <cycle>`
 
 ## Notes
 
 - Does not affect generation result. Actual changes are visible before the payout when you are prompted to confirm the payouts. (hint: you can use --dry-run)
   - NOTE: dry run uses separate folder structure for reports, use `mkdir -p reports/dry && cp -r reports/<cycle> /reports/dry/<cycle>` to copy the reports to the dry run folder.
 - We do not recommend to run it in continual mode, use only when paying out manually.
-- Creates log file `tezpay-fixer.log` where it lists all the changes made.
+- Creates log file `mavpay-fixer.log` where it lists all the changes made.
 - Can be used to fix any kind of payout issue - e.g. missing payouts, wrong payouts after incorrect config, etc.

@@ -1,5 +1,5 @@
 {
-  tezpay_config_version: 0
+  mavpay_config_version: 0
   baker: ""
   payouts: {
     wallet_mode: local-private-key
@@ -19,10 +19,10 @@
   }
   income_recipients: {}
   network: {
-    rpc_url: https://eu.rpc.tez.capital/
-    tzkt_url: https://api.tzkt.io/
-    protocol_rewards_url: https://protocol-rewards.tez.capital/
-    explorer: https://tzkt.io/
+    rpc_url: https://rpc.mavryk.network/
+    mvkt_url: https://api.mavryk.network/
+    protocol_rewards_url: https://protocol-rewards.mavryk.network/
+    explorer: https://mvkt.io/
   }
   overdelegation: {
     protect: true

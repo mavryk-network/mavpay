@@ -38,14 +38,14 @@ func (pr *PayoutReport) ToTableRowData() []string {
 	return []string{
 		ShortenAddress(pr.Delegator),
 		ShortenAddress(pr.Recipient),
-		MutezToTezS(pr.DelegatedBalance.Int64()),
+		MumavToMavS(pr.DelegatedBalance.Int64()),
 		string(pr.Kind),
 		ShortenAddress(pr.FAContract),
 		ToStringEmptyIfZero(pr.FATokenId.Int64()),
 		FormatAmount(pr.TxKind, pr.Amount.Int64()),
 		FloatToPercentage(pr.FeeRate),
-		MutezToTezS(pr.Fee.Int64()),
-		MutezToTezS(pr.GetTransactionFee()),
+		MumavToMavS(pr.Fee.Int64()),
+		MumavToMavS(pr.GetTransactionFee()),
 		pr.OpHash.String(),
 		pr.Note,
 	}
@@ -71,7 +71,7 @@ func (pr *PayoutReport) GetTableHeaders() []string {
 func GetReportsTotals(reports []PayoutReport) []string {
 	var totalAmount, totalFee, totalTxFee int64
 	for _, report := range reports {
-		if report.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if report.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			totalAmount += report.Amount.Int64()
 		}
 		totalFee += report.Fee.Int64()
@@ -84,10 +84,10 @@ func GetReportsTotals(reports []PayoutReport) []string {
 		"",
 		"",
 		"",
-		MutezToTezS(totalAmount),
+		MumavToMavS(totalAmount),
 		"",
-		MutezToTezS(totalFee),
-		MutezToTezS(totalTxFee),
+		MumavToMavS(totalFee),
+		MumavToMavS(totalTxFee),
 		"",
 		"",
 	}

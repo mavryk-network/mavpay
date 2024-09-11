@@ -1,4 +1,4 @@
-package tzkt
+package mvkt
 
 import (
 	"bytes"
@@ -13,11 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 
 	"github.com/samber/lo"
 )
@@ -35,7 +35,7 @@ type splitDelegator struct {
 	Emptied bool `json:"emptied,omitempty"`
 }
 
-type tzktBakersCycleData struct {
+type mvktBakersCycleData struct {
 	BakingPower              int64 `json:"bakingPower"`
 	OwnDelegatedBalance      int64 `json:"ownDelegatedBalance"`
 	ExternalDelegatedBalance int64 `json:"externalDelegatedBalance"`
@@ -75,14 +75,14 @@ type Client struct {
 	balanceCheckMode   enums.EBalanceCheckMode
 }
 
-type TzktClientOptions struct {
+type MvktClientOptions struct {
 	BalanceCheckMode enums.EBalanceCheckMode
 	HttpClient       *http.Client
 }
 
-func InitClient(rootUrl string, protocolRewardsUrl string, options *TzktClientOptions) (*Client, error) {
+func InitClient(rootUrl string, protocolRewardsUrl string, options *MvktClientOptions) (*Client, error) {
 	if options == nil {
-		options = &TzktClientOptions{
+		options = &MvktClientOptions{
 			BalanceCheckMode: enums.PROTOCOL_BALANCE_CHECK_MODE,
 		}
 	}
@@ -139,7 +139,7 @@ func (client *Client) GetFromProtocolRewards(ctx context.Context, path string) (
 	return resp, nil
 }
 
-func unmarshallTzktResponse[T any](resp *http.Response, result *T) error {
+func unmarshallMvktResponse[T any](resp *http.Response, result *T) error {
 	defer resp.Body.Close()
 	err := json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
@@ -148,7 +148,7 @@ func unmarshallTzktResponse[T any](resp *http.Response, result *T) error {
 	return nil
 }
 
-// https://api.tzkt.io/v1/rewards/split/${baker}/${cycle}?limit=${limit}&offset=${offset}
+// https://api.mavryk.network/v1/rewards/split/${baker}/${cycle}?limit=${limit}&offset=${offset}
 func (client *Client) getDelegatorsCycleData(ctx context.Context, baker []byte, cycle int64, limit int32, offset int) ([]splitDelegator, error) {
 	u := fmt.Sprintf("v1/rewards/split/%s/%d?limit=%d&offset=%d", baker, cycle, limit, offset)
 	slog.Debug("getting delegators data", "baker", baker, "cycle", cycle, "url", u)
@@ -156,8 +156,8 @@ func (client *Client) getDelegatorsCycleData(ctx context.Context, baker []byte, 
 	if err != nil {
 		return nil, errors.Join(constants.ErrCycleDataFetchFailed, err)
 	}
-	data := &tzktBakersCycleData{}
-	err = unmarshallTzktResponse(resp, data)
+	data := &mvktBakersCycleData{}
+	err = unmarshallMvktResponse(resp, data)
 	if err != nil {
 		return nil, err
 	}
@@ -172,14 +172,14 @@ func (client *Client) getBakerData(ctx context.Context, baker []byte) (*bakerDat
 		return nil, errors.Join(constants.ErrCycleDataFetchFailed, err)
 	}
 	data := &bakerData{}
-	err = unmarshallTzktResponse(resp, data)
+	err = unmarshallMvktResponse(resp, data)
 	if err != nil {
 		return nil, err
 	}
 	return data, nil
 }
 
-func (client *Client) getCycleData(ctx context.Context, baker []byte, cycle int64) (*tzktBakersCycleData, error) {
+func (client *Client) getCycleData(ctx context.Context, baker []byte, cycle int64) (*mvktBakersCycleData, error) {
 	u := fmt.Sprintf("v1/rewards/split/%s/%d?limit=0", baker, cycle)
 	slog.Debug("getting cycle data", "baker", baker, "cycle", cycle, "url", u)
 	resp, err := client.Get(ctx, u)
@@ -189,15 +189,15 @@ func (client *Client) getCycleData(ctx context.Context, baker []byte, cycle int6
 	if resp.StatusCode == 204 {
 		return nil, errors.Join(constants.ErrNoCycleDataAvailable, fmt.Errorf("baker: %s", baker))
 	}
-	tzktBakerCycleData := &tzktBakersCycleData{}
-	err = unmarshallTzktResponse(resp, tzktBakerCycleData)
+	mvktBakerCycleData := &mvktBakersCycleData{}
+	err = unmarshallMvktResponse(resp, mvktBakerCycleData)
 	if err != nil {
 		return nil, err
 	}
-	return tzktBakerCycleData, nil
+	return mvktBakerCycleData, nil
 }
 
-func (client *Client) getProtocolRewardsCycleData(ctx context.Context, baker []byte, cycle int64) (*tzktBakersCycleData, error) {
+func (client *Client) getProtocolRewardsCycleData(ctx context.Context, baker []byte, cycle int64) (*mvktBakersCycleData, error) {
 	u := fmt.Sprintf("v1/rewards/split/%s/%d", baker, cycle)
 	slog.Debug("getting protocol rewards cycle data", "baker", baker, "cycle", cycle, "url", u)
 	resp, err := client.GetFromProtocolRewards(ctx, u)
@@ -211,12 +211,12 @@ func (client *Client) getProtocolRewardsCycleData(ctx context.Context, baker []b
 	if statusClass != 2 {
 		return nil, errors.Join(constants.ErrCycleDataProtocolRewardsFetchFailed, fmt.Errorf("status code: %d", resp.StatusCode))
 	}
-	tzktBakerCycleData := &tzktBakersCycleData{}
-	err = unmarshallTzktResponse(resp, tzktBakerCycleData)
+	mvktBakerCycleData := &mvktBakersCycleData{}
+	err = unmarshallMvktResponse(resp, mvktBakerCycleData)
 	if err != nil {
 		return nil, err
 	}
-	return tzktBakerCycleData, nil
+	return mvktBakerCycleData, nil
 }
 
 func (client *Client) getFirstBlockCycleAfterTimestamp(ctx context.Context, timestamp time.Time) (int64, error) {
@@ -238,7 +238,7 @@ func (client *Client) getFirstBlockCycleAfterTimestamp(ctx context.Context, time
 	return cycles[0], nil
 }
 
-// https://api.tzkt.io/v1/blocks?select=cycle,level&limit=1&timestamp.lt=2020-02-20T02:40:57Z
+// https://api.mavryk.network/v1/blocks?select=cycle,level&limit=1&timestamp.lt=2020-02-20T02:40:57Z
 func (client *Client) GetCyclesInDateRange(ctx context.Context, startDate time.Time, endDate time.Time) ([]int64, error) {
 	firstCycle, err := client.getFirstBlockCycleAfterTimestamp(ctx, startDate)
 	if err != nil {
@@ -256,16 +256,16 @@ func (client *Client) GetCyclesInDateRange(ctx context.Context, startDate time.T
 	return cycles, nil
 }
 
-// https://api.tzkt.io/v1/rewards/split/${baker}/${cycle}?limit=0
-func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cycle int64) (bakersCycleData *common.BakersCycleData, err error) {
+// https://api.mavryk.network/v1/rewards/split/${baker}/${cycle}?limit=0
+func (client *Client) GetCycleData(ctx context.Context, baker mavryk.Address, cycle int64) (bakersCycleData *common.BakersCycleData, err error) {
 
 	bakerAddr, _ := baker.MarshalText()
 
-	tzktBakerData, err := client.getBakerData(ctx, bakerAddr)
+	mvktBakerData, err := client.getBakerData(ctx, bakerAddr)
 	if err != nil {
 		return nil, err
 	}
-	tzktBakerCycleData, err := client.getCycleData(ctx, bakerAddr, cycle)
+	mvktBakerCycleData, err := client.getCycleData(ctx, bakerAddr, cycle)
 	if err != nil {
 		return nil, err
 	}
@@ -293,21 +293,21 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 
 	precision := int64(10000)
 
-	var blockDelegatedRewards, endorsingDelegatedRewards, delegationShare tezos.Z
-	firstAiActivatedCycle := constants.FIRST_PARIS_AI_ACTIVATED_CYCLE
+	var blockDelegatedRewards, endorsingDelegatedRewards, delegationShare mavryk.Z
+	firstAiActivatedCycle := constants.FIRST_BOREAS_AI_ACTIVATED_CYCLE
 	if cycle >= firstAiActivatedCycle || strings.Contains(client.rootUrl.Host, "ghostnet") {
-		blockDelegatedRewards = tezos.NewZ(tzktBakerCycleData.BlockRewardsDelegated)
-		endorsingDelegatedRewards = tezos.NewZ(tzktBakerCycleData.EndorsementRewardsDelegated)
-		delegationShare = tezos.NewZ(tzktBakerCycleData.BakingPower - tzktBakerCycleData.OwnStakedBalance - tzktBakerCycleData.ExternalStakedBalance).Mul64(precision).Div64(tzktBakerCycleData.BakingPower)
+		blockDelegatedRewards = mavryk.NewZ(mvktBakerCycleData.BlockRewardsDelegated)
+		endorsingDelegatedRewards = mavryk.NewZ(mvktBakerCycleData.EndorsementRewardsDelegated)
+		delegationShare = mavryk.NewZ(mvktBakerCycleData.BakingPower - mvktBakerCycleData.OwnStakedBalance - mvktBakerCycleData.ExternalStakedBalance).Mul64(precision).Div64(mvktBakerCycleData.BakingPower)
 	} else {
-		blockDelegatedRewards = tezos.NewZ(tzktBakerCycleData.BlockRewardsLiquid).Add64(tzktBakerCycleData.BlockRewardsStakedOwn)
-		endorsingDelegatedRewards = tezos.NewZ(tzktBakerCycleData.EndorsementRewardsLiquid).Add64(tzktBakerCycleData.EndorsementRewardsStakedOwn)
-		delegationShare = tezos.NewZ(1)
+		blockDelegatedRewards = mavryk.NewZ(mvktBakerCycleData.BlockRewardsLiquid).Add64(mvktBakerCycleData.BlockRewardsStakedOwn)
+		endorsingDelegatedRewards = mavryk.NewZ(mvktBakerCycleData.EndorsementRewardsLiquid).Add64(mvktBakerCycleData.EndorsementRewardsStakedOwn)
+		delegationShare = mavryk.NewZ(1)
 		precision = 1
 	}
 
-	blockDelegatedFees := delegationShare.Mul64(tzktBakerCycleData.BlockFees).Div64(precision)
-	blockStakingFees := tezos.NewZ(tzktBakerCycleData.BlockFees).Sub(blockDelegatedFees)
+	blockDelegatedFees := delegationShare.Mul64(mvktBakerCycleData.BlockFees).Div64(precision)
+	blockStakingFees := mavryk.NewZ(mvktBakerCycleData.BlockFees).Sub(blockDelegatedFees)
 
 	if client.balanceCheckMode == enums.PROTOCOL_BALANCE_CHECK_MODE {
 		protocolRewardsCycleData, err := client.getProtocolRewardsCycleData(ctx, bakerAddr, cycle)
@@ -315,11 +315,11 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 			return nil, err
 		}
 
-		tzktBakerCycleData.OwnDelegatedBalance = protocolRewardsCycleData.OwnDelegatedBalance
-		tzktBakerCycleData.ExternalDelegatedBalance = protocolRewardsCycleData.ExternalDelegatedBalance
-		tzktBakerCycleData.OwnStakedBalance = protocolRewardsCycleData.OwnStakedBalance
-		tzktBakerCycleData.ExternalStakedBalance = protocolRewardsCycleData.ExternalStakedBalance
-		tzktBakerCycleData.DelegatorsCount = protocolRewardsCycleData.DelegatorsCount
+		mvktBakerCycleData.OwnDelegatedBalance = protocolRewardsCycleData.OwnDelegatedBalance
+		mvktBakerCycleData.ExternalDelegatedBalance = protocolRewardsCycleData.ExternalDelegatedBalance
+		mvktBakerCycleData.OwnStakedBalance = protocolRewardsCycleData.OwnStakedBalance
+		mvktBakerCycleData.ExternalStakedBalance = protocolRewardsCycleData.ExternalStakedBalance
+		mvktBakerCycleData.DelegatorsCount = protocolRewardsCycleData.DelegatorsCount
 
 		delegatorsMap := make(map[string]splitDelegator, len(protocolRewardsCycleData.Delegators))
 		for _, delegator := range protocolRewardsCycleData.Delegators {
@@ -327,17 +327,17 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 		}
 
 		// TODO: remove this when we confirm all works as expected
-		var bakingPower tezos.Z
-		delegatedPower := tezos.NewZ(tzktBakerCycleData.OwnDelegatedBalance).Add64(tzktBakerCycleData.ExternalDelegatedBalance)
+		var bakingPower mavryk.Z
+		delegatedPower := mavryk.NewZ(mvktBakerCycleData.OwnDelegatedBalance).Add64(mvktBakerCycleData.ExternalDelegatedBalance)
 		switch {
 		case cycle > 750: // 751 is first cycle with baking power based on new staking model -> delegationPower is halved
-			maximumDelegated := tezos.NewZ(tzktBakerCycleData.OwnStakedBalance).Mul64(9)
+			maximumDelegated := mavryk.NewZ(mvktBakerCycleData.OwnStakedBalance).Mul64(9)
 			if maximumDelegated.IsLess(delegatedPower) {
 				delegatedPower = maximumDelegated
 			}
 
-			externalStakedBalance := tezos.NewZ(tzktBakerCycleData.ExternalStakedBalance)
-			maximumExternalStaked := tezos.NewZ(tzktBakerCycleData.OwnStakedBalance).Mul64(5)
+			externalStakedBalance := mavryk.NewZ(mvktBakerCycleData.ExternalStakedBalance)
+			maximumExternalStaked := mavryk.NewZ(mvktBakerCycleData.OwnStakedBalance).Mul64(5)
 			if maximumExternalStaked.IsLess(externalStakedBalance) {
 				diff := externalStakedBalance.Sub(maximumExternalStaked)
 				externalStakedBalance = maximumExternalStaked
@@ -347,15 +347,15 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 			// halve delegation power
 			delegatedPower = delegatedPower.Div64(2)
 
-			stakedPower := tezos.NewZ(tzktBakerCycleData.OwnStakedBalance).Add(externalStakedBalance)
+			stakedPower := mavryk.NewZ(mvktBakerCycleData.OwnStakedBalance).Add(externalStakedBalance)
 
 			// we do not check maximum staking power, because overstake is automatically moved to delegation by protocol-rewards
 			bakingPower = stakedPower.Add(delegatedPower)
 		default:
-			bakingPower = tezos.NewZ(tzktBakerCycleData.OwnStakedBalance).
-				Add64(tzktBakerCycleData.ExternalStakedBalance).
+			bakingPower = mavryk.NewZ(mvktBakerCycleData.OwnStakedBalance).
+				Add64(mvktBakerCycleData.ExternalStakedBalance).
 				Add(delegatedPower)
-			maximumBakingPower := tezos.NewZ(tzktBakerCycleData.OwnStakedBalance).Mul64(10)
+			maximumBakingPower := mavryk.NewZ(mvktBakerCycleData.OwnStakedBalance).Mul64(10)
 			if maximumBakingPower.IsLess(bakingPower) {
 				bakingPower = maximumBakingPower
 			}
@@ -368,9 +368,9 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 			return agg
 		}, 0)
 
-		if utils.Abs(bakingPower.Int64()-tzktBakerCycleData.BakingPower) > numberOfStakers { // up to numberOfStakers difference in mutez is allowed - rounding deviations from staking_numerator/staking_denominator
-			slog.Error("bakingPower mismatch", "bakingPower", bakingPower, "tzktBakerCycleData.BakingPower", tzktBakerCycleData.BakingPower)
-			return nil, errors.Join(constants.ErrCycleDataProtocolRewardsMismatch, fmt.Errorf("bakingPower: %d, tzktBakerCycleData.BakingPower: %d, diff: %d", bakingPower.Int64(), tzktBakerCycleData.BakingPower, bakingPower.Int64()-tzktBakerCycleData.BakingPower))
+		if utils.Abs(bakingPower.Int64()-mvktBakerCycleData.BakingPower) > numberOfStakers { // up to numberOfStakers difference in mumav is allowed - rounding deviations from staking_numerator/staking_denominator
+			slog.Error("bakingPower mismatch", "bakingPower", bakingPower, "mvktBakerCycleData.BakingPower", mvktBakerCycleData.BakingPower)
+			return nil, errors.Join(constants.ErrCycleDataProtocolRewardsMismatch, fmt.Errorf("bakingPower: %d, mvktBakerCycleData.BakingPower: %d, diff: %d", bakingPower.Int64(), mvktBakerCycleData.BakingPower, bakingPower.Int64()-mvktBakerCycleData.BakingPower))
 		}
 		// TODO: end remove this when we confirm all works as expected
 		collectedDelegators = lo.Map(collectedDelegators, func(delegator splitDelegator, _ int) splitDelegator {
@@ -391,32 +391,32 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 	}
 
 	return &common.BakersCycleData{
-		DelegatorsCount:                  tzktBakerCycleData.DelegatorsCount,
-		OwnDelegatedBalance:              tezos.NewZ(tzktBakerCycleData.OwnDelegatedBalance),
-		ExternalDelegatedBalance:         tezos.NewZ(tzktBakerCycleData.ExternalDelegatedBalance),
+		DelegatorsCount:                  mvktBakerCycleData.DelegatorsCount,
+		OwnDelegatedBalance:              mavryk.NewZ(mvktBakerCycleData.OwnDelegatedBalance),
+		ExternalDelegatedBalance:         mavryk.NewZ(mvktBakerCycleData.ExternalDelegatedBalance),
 		BlockDelegatedRewards:            blockDelegatedRewards,
-		IdealBlockDelegatedRewards:       blockDelegatedRewards.Add(delegationShare.Mul64(tzktBakerCycleData.MissedBlockRewards).Div64(precision)),
+		IdealBlockDelegatedRewards:       blockDelegatedRewards.Add(delegationShare.Mul64(mvktBakerCycleData.MissedBlockRewards).Div64(precision)),
 		EndorsementDelegatedRewards:      endorsingDelegatedRewards,
-		IdealEndorsementDelegatedRewards: endorsingDelegatedRewards.Add(delegationShare.Mul64(tzktBakerCycleData.MissedEndorsementRewards).Div64(precision)),
+		IdealEndorsementDelegatedRewards: endorsingDelegatedRewards.Add(delegationShare.Mul64(mvktBakerCycleData.MissedEndorsementRewards).Div64(precision)),
 		BlockDelegatedFees:               blockDelegatedFees,
 
-		StakersCount:                  tzktBakerCycleData.StakersCount,
-		OwnStakedBalance:              tezos.NewZ(tzktBakerCycleData.OwnStakedBalance),
-		ExternalStakedBalance:         tezos.NewZ(tzktBakerCycleData.ExternalStakedBalance),
-		BlockStakingRewardsEdge:       tezos.NewZ(tzktBakerCycleData.BlockRewardsStakedEdge),
-		EndorsementStakingRewardsEdge: tezos.NewZ(tzktBakerCycleData.EndorsementRewardsStakedEdge),
+		StakersCount:                  mvktBakerCycleData.StakersCount,
+		OwnStakedBalance:              mavryk.NewZ(mvktBakerCycleData.OwnStakedBalance),
+		ExternalStakedBalance:         mavryk.NewZ(mvktBakerCycleData.ExternalStakedBalance),
+		BlockStakingRewardsEdge:       mavryk.NewZ(mvktBakerCycleData.BlockRewardsStakedEdge),
+		EndorsementStakingRewardsEdge: mavryk.NewZ(mvktBakerCycleData.EndorsementRewardsStakedEdge),
 		BlockStakingFees:              blockStakingFees,
 
-		FrozenDepositLimit: tezos.NewZ(tzktBakerData.FrozenDepositLimit),
+		FrozenDepositLimit: mavryk.NewZ(mvktBakerData.FrozenDepositLimit),
 		Delegators: lo.Map(collectedDelegators, func(delegator splitDelegator, _ int) common.Delegator {
-			addr, err := tezos.ParseAddress(delegator.Address)
+			addr, err := mavryk.ParseAddress(delegator.Address)
 			if err != nil {
 				panic(err)
 			}
 			return common.Delegator{
 				Address:          addr,
-				DelegatedBalance: tezos.NewZ(delegator.DelegatedBalance),
-				StakedBalance:    tezos.NewZ(delegator.StakedBalance),
+				DelegatedBalance: mavryk.NewZ(delegator.DelegatedBalance),
+				StakedBalance:    mavryk.NewZ(delegator.StakedBalance),
 				Emptied:          delegator.Emptied,
 			}
 		}),
@@ -424,8 +424,8 @@ func (client *Client) GetCycleData(ctx context.Context, baker tezos.Address, cyc
 
 }
 
-// https://api.tzkt.io/v1/operations/transactions/onyUK7ZnQHzeNYbWSLL4zVATBtvLLk5GpPDv3VfoQPLtsBCjPX1/status
-func (client *Client) WasOperationApplied(ctx context.Context, opHash tezos.OpHash) (common.OperationStatus, error) {
+// https://api.mavryk.network/v1/operations/transactions/onyUK7ZnQHzeNYbWSLL4zVATBtvLLk5GpPDv3VfoQPLtsBCjPX1/status
+func (client *Client) WasOperationApplied(ctx context.Context, opHash mavryk.OpHash) (common.OperationStatus, error) {
 	op, _ := opHash.MarshalText()
 
 	path := fmt.Sprintf("v1/operations/transactions/%s/status", op)

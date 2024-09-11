@@ -4,11 +4,11 @@ import (
 	"errors"
 	"time"
 
-	"blockwatch.cc/tzgo/tezos"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/mavryk-network/mvgo/rpc"
 	"github.com/samber/lo"
 )
@@ -40,7 +40,7 @@ func InitSimpleColletor() *SimpleColletor {
 }
 
 func (engine *SimpleColletor) GetId() string {
-	return "DefaultRpcAndTzktColletor"
+	return "DefaultRpcAndMvktColletor"
 }
 
 func (engine *SimpleColletor) RefreshParams() error {
@@ -51,7 +51,7 @@ func (engine *SimpleColletor) SetOpts(opts *SimpleCollectorOpts) {
 	engine.opts = opts
 }
 
-func (engine *SimpleColletor) IsRevealed(address tezos.Address) (bool, error) {
+func (engine *SimpleColletor) IsRevealed(address mavryk.Address) (bool, error) {
 	return true, nil
 }
 
@@ -68,16 +68,16 @@ func (engine *SimpleColletor) GetLastCompletedCycle() (int64, error) {
 	return cycle - 1, err
 }
 
-func (engine *SimpleColletor) GetCycleStakingData(baker tezos.Address, cycle int64) (*common.BakersCycleData, error) {
+func (engine *SimpleColletor) GetCycleStakingData(baker mavryk.Address, cycle int64) (*common.BakersCycleData, error) {
 	return &common.BakersCycleData{
-		OwnStakedBalance:            tezos.NewZ(50_000).Mul64(constants.MUTEZ_FACTOR),
-		OwnDelegatedBalance:         tezos.NewZ(50_000).Mul64(constants.MUTEZ_FACTOR),
-		ExternalDelegatedBalance:    tezos.NewZ(1_000_000).Mul64(constants.MUTEZ_FACTOR),
-		BlockDelegatedRewards:       tezos.NewZ(100).Mul64(constants.MUTEZ_FACTOR),
-		EndorsementDelegatedRewards: tezos.NewZ(50).Mul64(constants.MUTEZ_FACTOR),
-		FrozenDepositLimit:          tezos.NewZ(50_000).Mul64(constants.MUTEZ_FACTOR),
+		OwnStakedBalance:            mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
+		OwnDelegatedBalance:         mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
+		ExternalDelegatedBalance:    mavryk.NewZ(1_000_000).Mul64(constants.MUMAV_FACTOR),
+		BlockDelegatedRewards:       mavryk.NewZ(100).Mul64(constants.MUMAV_FACTOR),
+		EndorsementDelegatedRewards: mavryk.NewZ(50).Mul64(constants.MUMAV_FACTOR),
+		FrozenDepositLimit:          mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
 		DelegatorsCount:             2,
-		BlockDelegatedFees:          tezos.NewZ(25).Mul64(constants.MUTEZ_FACTOR),
+		BlockDelegatedFees:          mavryk.NewZ(25).Mul64(constants.MUMAV_FACTOR),
 		// TODO:
 		Delegators: []common.Delegator{},
 	}, nil
@@ -87,7 +87,7 @@ func (engine *SimpleColletor) GetCyclesInDateRange(startDate time.Time, endDate 
 	return []int64{500, 501}, nil
 }
 
-func (engine *SimpleColletor) WasOperationApplied(op tezos.OpHash) (common.OperationStatus, error) {
+func (engine *SimpleColletor) WasOperationApplied(op mavryk.OpHash) (common.OperationStatus, error) {
 	return common.OPERATION_STATUS_APPLIED, nil
 }
 
@@ -95,8 +95,8 @@ func (engine *SimpleColletor) CreateCycleMonitor(options common.CycleMonitorOpti
 	return nil, constants.ErrNotImplemented
 }
 
-func (engine *SimpleColletor) GetBranch(offset int64) (hash tezos.BlockHash, err error) {
-	return tezos.ZeroBlockHash, nil
+func (engine *SimpleColletor) GetBranch(offset int64) (hash mavryk.BlockHash, err error) {
+	return mavryk.ZeroBlockHash, nil
 }
 
 func (engine *SimpleColletor) GetExpectedTxCosts() int64 {
@@ -104,7 +104,7 @@ func (engine *SimpleColletor) GetExpectedTxCosts() int64 {
 	op.WithTTL(constants.MAX_OPERATION_TTL)
 	op.WithTransfer(GetRandomAddress(), 100000)
 	gasUsed := engine.opts.UsedMilliGas / 1000
-	op.Contents[len(op.Contents)-1].WithLimits(tezos.Limits{
+	op.Contents[len(op.Contents)-1].WithLimits(mavryk.Limits{
 		GasLimit:     gasUsed,
 		StorageLimit: engine.opts.StorageBurn + engine.opts.AllocationBurn,
 	})
@@ -113,7 +113,7 @@ func (engine *SimpleColletor) GetExpectedTxCosts() int64 {
 	return txFee + engine.opts.AllocationBurn + engine.opts.StorageBurn
 }
 
-func (engine *SimpleColletor) Simulate(o *codec.Op, publicKey tezos.Key) (*rpc.Receipt, error) {
+func (engine *SimpleColletor) Simulate(o *codec.Op, publicKey mavryk.Key) (*rpc.Receipt, error) {
 	if engine.opts.SingleOnly && len(o.Contents) > 3 {
 		return nil, errors.New("failed to batch estimate")
 	}
@@ -147,7 +147,7 @@ func (engine *SimpleColletor) Simulate(o *codec.Op, publicKey tezos.Key) (*rpc.R
 									},
 								},
 								PaidStorageSizeDiff: 0,
-								Status:              tezos.OpStatusApplied,
+								Status:              mavryk.OpStatusApplied,
 							},
 						},
 					},
@@ -165,7 +165,7 @@ func (engine *SimpleColletor) Simulate(o *codec.Op, publicKey tezos.Key) (*rpc.R
 							Generic: rpc.Generic{
 								Metadata: rpc.OperationMetadata{
 									Result: rpc.OperationResult{
-										Status: tezos.OpStatusFailed,
+										Status: mavryk.OpStatusFailed,
 										Errors: []rpc.OperationError{
 											{
 												GenericError: rpc.GenericError{
@@ -184,7 +184,7 @@ func (engine *SimpleColletor) Simulate(o *codec.Op, publicKey tezos.Key) (*rpc.R
 	}
 
 	return &rpc.Receipt{
-		Block: tezos.ZeroBlockHash,
+		Block: mavryk.ZeroBlockHash,
 		List:  0,
 		Pos:   0,
 		Op: &rpc.Operation{
@@ -193,12 +193,12 @@ func (engine *SimpleColletor) Simulate(o *codec.Op, publicKey tezos.Key) (*rpc.R
 	}, nil
 }
 
-func (engine *SimpleColletor) GetBalance(addr tezos.Address) (tezos.Z, error) {
-	return tezos.NewZ(100).Mul64(constants.MUTEZ_FACTOR), nil
+func (engine *SimpleColletor) GetBalance(addr mavryk.Address) (mavryk.Z, error) {
+	return mavryk.NewZ(100).Mul64(constants.MUMAV_FACTOR), nil
 }
 
 func (engine *SimpleColletor) SendAnalytics(bakerId string, version string) {}
 
-func (engine *SimpleColletor) GetCurrentProtocol() (tezos.ProtocolHash, error) {
-	return tezos.ZeroProtocolHash, nil
+func (engine *SimpleColletor) GetCurrentProtocol() (mavryk.ProtocolHash, error) {
+	return mavryk.ZeroProtocolHash, nil
 }
