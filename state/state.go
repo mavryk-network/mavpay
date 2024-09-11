@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 )
 
 var (

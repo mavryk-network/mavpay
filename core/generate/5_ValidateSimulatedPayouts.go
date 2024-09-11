@@ -1,9 +1,9 @@
 package generate
 
 import (
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func ValidateSimulatedPayouts(ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) (result *PayoutGenerationContext, err error) {
@@ -27,7 +27,7 @@ func ValidateSimulatedPayouts(ctx *PayoutGenerationContext, options *common.Gene
 		if candidate.IsInvalid {
 			ctx.StageData.BakerFeesAmount = ctx.StageData.BakerFeesAmount.Add(candidate.BondsAmount)
 			candidate.Fee = candidate.Fee.Add(candidate.BondsAmount)
-			candidate.BondsAmount = tezos.Zero
+			candidate.BondsAmount = mavryk.Zero
 		}
 		return result
 	})

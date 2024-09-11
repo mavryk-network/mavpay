@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 
-	"github.com/trilitech/tzgo/rpc"
+	"github.com/mavryk-network/mvgo/rpc"
 )
 
 // returns true if all errors are nil

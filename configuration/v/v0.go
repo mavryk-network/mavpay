@@ -1,13 +1,13 @@
-package tezpay_configuration
+package mavpay_configuration
 
 import (
 	"encoding/json"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/notifications"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/notifications"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type IncomeRecipientsV0 struct {
@@ -20,31 +20,31 @@ type IncomeRecipientsV0 struct {
 }
 
 type DelegatorRequirementsV0 struct {
-	MinimumBalance                        float64                   `json:"minimum_balance,omitempty" comment:"Minimum balance of tez a delegator has to have to be considered for payout"`
+	MinimumBalance                        float64                   `json:"minimum_balance,omitempty" comment:"Minimum balance of mav a delegator has to have to be considered for payout"`
 	BellowMinimumBalanceRewardDestination *enums.ERewardDestination `json:"below_minimum_reward_destination,omitempty" comment:"Reward destination for delegators with balance below the minimum balance (possible values: 'none', 'everyone')"`
 }
 
 type DelegatorOverrideV0 struct {
-	Recipient                    tezos.Address `json:"recipient,omitempty" comment:"Redirects payout to the recipient 'address'"`
-	Fee                          *float64      `json:"fee,omitempty" comment:"Overrides the fee for the delegator"`
-	MinimumBalance               float64       `json:"minimum_balance,omitempty" comment:"Overrides the minimum balance requirement for the delegator"`
-	IsBakerPayingTxFee           *bool         `json:"baker_pays_transaction_fee,omitempty" comment:"Overrides the baker paying the transaction fee"`
-	IsBakerPayingAllocationTxFee *bool         `json:"baker_pays_allocation_fee,omitempty" comment:"Overrides the baker paying the allocation transaction fee"`
-	MaximumBalance               *float64      `json:"maximum_balance,omitempty" comment:"The maximum balance for the delegator (for overdelegation situation you can limit how much of a delegator balance is taken into account)"`
+	Recipient                    mavryk.Address `json:"recipient,omitempty" comment:"Redirects payout to the recipient 'address'"`
+	Fee                          *float64       `json:"fee,omitempty" comment:"Overrides the fee for the delegator"`
+	MinimumBalance               float64        `json:"minimum_balance,omitempty" comment:"Overrides the minimum balance requirement for the delegator"`
+	IsBakerPayingTxFee           *bool          `json:"baker_pays_transaction_fee,omitempty" comment:"Overrides the baker paying the transaction fee"`
+	IsBakerPayingAllocationTxFee *bool          `json:"baker_pays_allocation_fee,omitempty" comment:"Overrides the baker paying the allocation transaction fee"`
+	MaximumBalance               *float64       `json:"maximum_balance,omitempty" comment:"The maximum balance for the delegator (for overdelegation situation you can limit how much of a delegator balance is taken into account)"`
 }
 
 type DelegatorsConfigurationV0 struct {
 	Requirements DelegatorRequirementsV0        `json:"requirements,omitempty" comment:"Requirements delegators have to meet"`
-	Prefilter    []tezos.Address                `json:"prefilter,omitempty" comment:"List of only delegator addresses to consider, if empty all delegators are considered"`
-	Ignore       []tezos.Address                `json:"ignore,omitempty" comment:"List of delegator addresses to ignore - wont be included in reward set, rewards will be redistributed"`
+	Prefilter    []mavryk.Address               `json:"prefilter,omitempty" comment:"List of only delegator addresses to consider, if empty all delegators are considered"`
+	Ignore       []mavryk.Address               `json:"ignore,omitempty" comment:"List of delegator addresses to ignore - wont be included in reward set, rewards will be redistributed"`
 	Overrides    map[string]DelegatorOverrideV0 `json:"overrides,omitempty" comment:"Overrides for specific delegators"`
-	FeeOverrides map[string][]tezos.Address     `json:"fee_overrides,omitempty" comment:"Shortcuts for overriding fees for specific delegators"`
+	FeeOverrides map[string][]mavryk.Address    `json:"fee_overrides,omitempty" comment:"Shortcuts for overriding fees for specific delegators"`
 }
 
-type TezosNetworkConfigurationV0 struct {
+type MavrykNetworkConfigurationV0 struct {
 	// RpcUrl represents the URL to the RPC node.
 	RpcUrl                 string `json:"rpc_url,omitempty" comment:"Url to rpc endpoint"`
-	TzktUrl                string `json:"tzkt_url,omitempty" comment:"Url to tzkt endpoint"`
+	MvktUrl                string `json:"mvkt_url,omitempty" comment:"Url to mvkt endpoint"`
 	ProtocolRewardsUrl     string `json:"protocol_rewards_url,omitempty" comment:"Url to protocol rewards endpoint"`
 	Explorer               string `json:"explorer,omitempty" comment:"Url to block explorer"`
 	DoNotPaySmartContracts bool   `json:"ignore_kt,omitempty" comment:"if true, smart contracts will not be paid out (used for testing)"`
@@ -58,7 +58,7 @@ type OverdelegationConfigurationV0 struct {
 type PayoutConfigurationV0 struct {
 	WalletMode                 enums.EWalletMode       `json:"wallet_mode" comment:"wallet mode to use for signing transactions, can be 'local-private-key' or 'remote-signer'"`
 	PayoutMode                 enums.EPayoutMode       `json:"payout_mode" comment:"payout mode to use, can be 'actual' or 'ideal'"`
-	BalanceCheckMode           enums.EBalanceCheckMode `json:"balance_check_mode" comment:"balance check mode to use, can be 'protocol' or 'tzkt'"`
+	BalanceCheckMode           enums.EBalanceCheckMode `json:"balance_check_mode" comment:"balance check mode to use, can be 'protocol' or 'mvkt'"`
 	Fee                        float64                 `json:"fee,omitempty" comment:"fee to charge delegators for the payout (portion of the reward as decimal, e.g. 0.075 for 7.5%)" validate:"required,min=0,max=1"`
 	IsPayingTxFee              bool                    `json:"baker_pays_transaction_fee,omitempty" comment:"if true, baker pays the transaction fee"`
 	IsPayingAllocationTxFee    bool                    `json:"baker_pays_allocation_fee,omitempty" comment:"if true, baker pays the allocation transaction fee"`
@@ -76,12 +76,12 @@ type PayoutConfigurationV0 struct {
 type ExtensionConfigurationV0 = common.ExtensionDefinition
 
 type ConfigurationV0 struct {
-	Version                    uint                          `json:"tezpay_config_version" comment:"version of the configuration file"`
-	BakerPKH                   tezos.Address                 `json:"baker" comment:"baker's public key hash"`
+	Version                    uint                          `json:"mavpay_config_version" comment:"version of the configuration file"`
+	BakerPKH                   mavryk.Address                `json:"baker" comment:"baker's public key hash"`
 	PayoutConfiguration        PayoutConfigurationV0         `json:"payouts" comment:"payout configuration"`
 	Delegators                 DelegatorsConfigurationV0     `json:"delegators,omitempty" comment:"delegators configuration"`
 	IncomeRecipients           IncomeRecipientsV0            `json:"income_recipients,omitempty" comment:"income recipients configuration"`
-	Network                    TezosNetworkConfigurationV0   `json:"network,omitempty" comment:"tezos network configuration"`
+	Network                    MavrykNetworkConfigurationV0  `json:"network,omitempty" comment:"mavryk network configuration"`
 	Overdelegation             OverdelegationConfigurationV0 `json:"overdelegation,omitempty" comment:"overdelegation protection configuration"`
 	NotificationConfigurations []json.RawMessage             `json:"notifications,omitempty" comment:"notification configurations"`
 	Extensions                 []ExtensionConfigurationV0    `json:"extensions,omitempty" comment:"extensions (for custom functionality)"`
@@ -105,18 +105,18 @@ func GetDefaultV0() ConfigurationV0 {
 
 	return ConfigurationV0{
 		Version:  0,
-		BakerPKH: tezos.InvalidKey.Address(),
+		BakerPKH: mavryk.InvalidKey.Address(),
 		Delegators: DelegatorsConfigurationV0{
 			Requirements: DelegatorRequirementsV0{
 				MinimumBalance:                        constants.DEFAULT_DELEGATOR_MINIMUM_BALANCE,
 				BellowMinimumBalanceRewardDestination: &delegatorBellowMinimumBalanceRewardDestination,
 			},
 			Overrides: make(map[string]DelegatorOverrideV0),
-			Ignore:    make([]tezos.Address, 0),
+			Ignore:    make([]mavryk.Address, 0),
 		},
-		Network: TezosNetworkConfigurationV0{
+		Network: MavrykNetworkConfigurationV0{
 			RpcUrl:                 constants.DEFAULT_RPC_URL,
-			TzktUrl:                constants.DEFAULT_TZKT_URL,
+			MvktUrl:                constants.DEFAULT_MVKT_URL,
 			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			Explorer:               constants.DEFAULT_EXPLORER_URL,
 			DoNotPaySmartContracts: false,

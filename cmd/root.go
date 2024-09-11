@@ -6,15 +6,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	signer_engines "github.com/tez-capital/tezpay/engines/signer"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	signer_engines "github.com/mavryk-network/mavpay/engines/signer"
 
 	"log/slog"
 
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 const (
@@ -60,9 +60,9 @@ func setupTextLogger(level slog.Level) {
 
 var (
 	RootCmd = &cobra.Command{
-		Use:   "tezpay",
-		Short: "TEZPAY",
-		Long: fmt.Sprintf(`TEZPAY %s - the tezos reward distributor
+		Use:   "mavpay",
+		Short: "MAVPAY",
+		Long: fmt.Sprintf(`MAVPAY %s - the mavryk reward distributor
 Copyright © %d alis.is
 `, constants.VERSION, time.Now().Year()),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {

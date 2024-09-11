@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/tez-capital/tezpay/cmd"
+	"github.com/mavryk-network/mavpay/cmd"
 )
 
 func main() {

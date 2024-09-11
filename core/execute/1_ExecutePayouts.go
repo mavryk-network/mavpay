@@ -6,12 +6,12 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func druRunExecutePayoutBatch(ctx *PayoutExecutionContext, logger *slog.Logger, batchId string, batch common.RecipeBatch) *common.BatchResult {
@@ -31,7 +31,7 @@ func druRunExecutePayoutBatch(ctx *PayoutExecutionContext, logger *slog.Logger, 
 	logger.Info("waiting for confirmation", "op_reference", utils.GetOpReference(opExecCtx.GetOpHash(), ctx.GetConfiguration().Network.Explorer), "op_hash", opExecCtx.GetOpHash(), "phase", "batch_waiting_for_confirmation")
 	time.Sleep(4 * time.Second)
 	logger.Info("batch successful", "phase", "batch_execution_finished")
-	return common.NewSuccessBatchResult(batch, tezos.ZeroOpHash)
+	return common.NewSuccessBatchResult(batch, mavryk.ZeroOpHash)
 }
 
 func executePayoutBatch(ctx *PayoutExecutionContext, logger *slog.Logger, batchId string, batch common.RecipeBatch) *common.BatchResult {
@@ -138,9 +138,9 @@ func executePayouts(ctx *PayoutExecutionContext, options *common.ExecutePayoutsO
 
 	ctx.protectedSection.Stop()
 
-	paidDelegators := lo.Reduce(validPayoutReports, func(agg []tezos.Address, report common.PayoutReport, _ int) []tezos.Address {
+	paidDelegators := lo.Reduce(validPayoutReports, func(agg []mavryk.Address, report common.PayoutReport, _ int) []mavryk.Address {
 		return append(agg, report.Delegator)
-	}, []tezos.Address{})
+	}, []mavryk.Address{})
 	paidDelegators = lo.Uniq(paidDelegators)
 	ctx.StageData.PaidDelegators = len(paidDelegators)
 	return ctx

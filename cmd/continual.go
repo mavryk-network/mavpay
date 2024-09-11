@@ -8,15 +8,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/core"
+	reporter_engines "github.com/mavryk-network/mavpay/engines/reporter"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/core"
-	reporter_engines "github.com/tez-capital/tezpay/engines/reporter"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 var (
@@ -162,8 +162,8 @@ var continualCmd = &cobra.Command{
 			}
 		}
 
-		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToTezCapital() {
-			assertRequireConfirmation("⚠️  With your current configuration you are not going to donate to tez.capital.😔 Do you want to proceed?")
+		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToMavCapital() {
+			assertRequireConfirmation("⚠️  With your current configuration you are not going to donate to mavrykdynamics.com. 😔 Do you want to proceed?")
 		}
 
 		monitor := assertRunWithResultAndErrorMessage(func() (common.CycleMonitor, error) {
@@ -191,12 +191,12 @@ var continualCmd = &cobra.Command{
 
 		startupProtocol := GetProtocolWithRetry(collector)
 		if !config.Network.IgnoreProtocolChanges {
-			slog.Info("Continual mode started in safe mode. In the event of a protocol change, TezPay will stop processing payouts and you will be notified.")
+			slog.Info("Continual mode started in safe mode. In the event of a protocol change, MavPay will stop processing payouts and you will be notified.")
 		}
 		defer func() {
 			notifyAdmin(config, fmt.Sprintf("Continual payouts stopped on cycle #%d", lastProcessedCycle+1))
 		}()
-		notifyAdmin(config, fmt.Sprintf("Continual payouts started on cycle #%d (tezpay %s, protocol %s)", lastProcessedCycle+1, constants.VERSION, startupProtocol))
+		notifyAdmin(config, fmt.Sprintf("Continual payouts started on cycle #%d (mavpay %s, protocol %s)", lastProcessedCycle+1, constants.VERSION, startupProtocol))
 		for {
 			if lastProcessedCycle >= onchainCompletedCycle {
 				slog.Info("waiting for next cycle to complete", "phase", "waiting_for_next_cycle")
@@ -229,7 +229,7 @@ var continualCmd = &cobra.Command{
 
 			if !notifiedNewVersionAvailable {
 				if available, latest := checkForNewVersionAvailable(); available {
-					notifyAdmin(config, fmt.Sprintf("New tezpay version available - %s", latest))
+					notifyAdmin(config, fmt.Sprintf("New mavpay version available - %s", latest))
 					notifiedNewVersionAvailable = true
 				}
 			}

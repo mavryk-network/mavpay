@@ -1,10 +1,10 @@
 package core
 
 import (
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/core/execute"
-	"github.com/tez-capital/tezpay/core/generate"
-	"github.com/tez-capital/tezpay/core/prepare"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/core/execute"
+	"github.com/mavryk-network/mavpay/core/generate"
+	"github.com/mavryk-network/mavpay/core/prepare"
 )
 
 type PayoutContext interface {

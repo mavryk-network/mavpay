@@ -3,14 +3,14 @@ package utils
 import (
 	"net/url"
 
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 // all buffers and additional costs should be added through txExtra
-func EstimateContentFee(content codec.Operation, gasUsed int64, params *tezos.Params) int64 {
+func EstimateContentFee(content codec.Operation, gasUsed int64, params *mavryk.Params) int64 {
 	// we add deserialization buffer to gas limit because it is substracted for all tx before broadcast and added to the first tx limit
 	fee := codec.CalculateMinFee(content, gasUsed, true, params)
 	for content.Limits().Fee != fee {
@@ -30,7 +30,7 @@ func EstimateTransactionFee(op *codec.Op, gasUsage []int64, txExtra int64) int64
 	return fee + txExtra
 }
 
-func CalculateStorageLimit(costs tezos.Costs) int64 {
+func CalculateStorageLimit(costs mavryk.Costs) int64 {
 	limit := costs.StorageUsed
 	if costs.AllocationBurn > 0 {
 		limit += constants.ALLOCATION_STORAGE
@@ -38,7 +38,7 @@ func CalculateStorageLimit(costs tezos.Costs) int64 {
 	return limit
 }
 
-func GetOpReference(opHash tezos.OpHash, explorer string) string {
+func GetOpReference(opHash mavryk.OpHash, explorer string) string {
 	reference := opHash.String()
 	if explorer != "" {
 		reference, _ = url.JoinPath(explorer, opHash.String())

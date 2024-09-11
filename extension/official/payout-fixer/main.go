@@ -8,10 +8,10 @@ import (
 	"os"
 
 	"github.com/alis-is/jsonrpc2/rpc"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/core/prepare"
-	"github.com/tez-capital/tezpay/extension"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/core/prepare"
+	"github.com/mavryk-network/mavpay/extension"
 )
 
 type rwCloser struct {
@@ -24,7 +24,7 @@ func (rw rwCloser) Close() error {
 }
 
 func appendToFile(data []byte) error {
-	f, err := os.OpenFile("tezpay-fixer.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile("mavpay-fixer.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}

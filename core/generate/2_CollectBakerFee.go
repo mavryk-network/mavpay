@@ -1,12 +1,12 @@
 package generate
 
 import (
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type OnFeesCollectionHookData = struct {
@@ -31,8 +31,8 @@ func CollectBakerFee(ctx *PayoutGenerationContext, options *common.GeneratePayou
 			}
 		}
 
-		if candidateWithBondsAmount.TxKind != enums.PAYOUT_TX_KIND_TEZ {
-			logger.Debug("skipping fee collection for non tezos payout", "delegate", candidateWithBondsAmount.Source, "tx_kind", candidateWithBondsAmount.TxKind)
+		if candidateWithBondsAmount.TxKind != enums.PAYOUT_TX_KIND_MAV {
+			logger.Debug("skipping fee collection for non mavryk payout", "delegate", candidateWithBondsAmount.Source, "tx_kind", candidateWithBondsAmount.TxKind)
 			return PayoutCandidateWithBondAmountAndFee{
 				PayoutCandidateWithBondAmount: candidateWithBondsAmount,
 			}
@@ -60,9 +60,9 @@ func CollectBakerFee(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	}
 	candidatesWithBondsAndFees = hookData.Candidates
 
-	collectedFees := lo.Reduce(candidatesWithBondsAndFees, func(agg tezos.Z, candidateWithBondsAmountAndFee PayoutCandidateWithBondAmountAndFee, _ int) tezos.Z {
+	collectedFees := lo.Reduce(candidatesWithBondsAndFees, func(agg mavryk.Z, candidateWithBondsAmountAndFee PayoutCandidateWithBondAmountAndFee, _ int) mavryk.Z {
 		return agg.Add(candidateWithBondsAmountAndFee.Fee)
-	}, tezos.Zero)
+	}, mavryk.Zero)
 
 	feesDonate := utils.GetZPortion(collectedFees, configuration.IncomeRecipients.DonateFees)
 	ctx.StageData.BakerFeesAmount = collectedFees.Sub(feesDonate)

@@ -1,11 +1,11 @@
 package generate
 
 import (
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/core/estimate"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/core/estimate"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 func CollectTransactionFees(ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) (result *PayoutGenerationContext, err error) {
@@ -41,7 +41,7 @@ func CollectTransactionFees(ctx *PayoutGenerationContext, options *common.Genera
 	})
 
 	simulatedPayouts := lo.Map(simulatioResults, func(result estimate.EstimateResult[*PayoutCandidateWithBondAmountAndFee], _ int) PayoutCandidateSimulated {
-		if result.Transaction.IsInvalid { // we don't collect fees from non-tez payouts
+		if result.Transaction.IsInvalid { // we don't collect fees from non-mav payouts
 			return PayoutCandidateSimulated{
 				PayoutCandidateWithBondAmountAndFee: *result.Transaction,
 			}
@@ -59,7 +59,7 @@ func CollectTransactionFees(ctx *PayoutGenerationContext, options *common.Genera
 			PayoutCandidateWithBondAmountAndFee: *result.Transaction,
 			SimulationResult:                    result.Result,
 		}
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			if !candidate.IsBakerPayingTxFee {
 				candidate.BondsAmount = candidate.BondsAmount.Sub64(candidate.SimulationResult.GetOperationFeesWithoutAllocation())
 				candidate.TxFeeCollected = true

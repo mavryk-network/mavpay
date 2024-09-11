@@ -3,10 +3,10 @@ package common
 import (
 	"time"
 
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/signer"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/mvgo/signer"
 )
 
 type OperationStatus string
@@ -23,40 +23,40 @@ type CollectorEngine interface {
 	RefreshParams() error
 	GetCurrentCycleNumber() (int64, error)
 	GetLastCompletedCycle() (int64, error)
-	GetCycleStakingData(baker tezos.Address, cycle int64) (*BakersCycleData, error)
+	GetCycleStakingData(baker mavryk.Address, cycle int64) (*BakersCycleData, error)
 	GetCyclesInDateRange(startDate time.Time, endDate time.Time) ([]int64, error)
-	WasOperationApplied(opHash tezos.OpHash) (OperationStatus, error)
-	GetBranch(offset int64) (tezos.BlockHash, error)
-	Simulate(o *codec.Op, publicKey tezos.Key) (*rpc.Receipt, error)
-	GetBalance(pkh tezos.Address) (tezos.Z, error)
+	WasOperationApplied(opHash mavryk.OpHash) (OperationStatus, error)
+	GetBranch(offset int64) (mavryk.BlockHash, error)
+	Simulate(o *codec.Op, publicKey mavryk.Key) (*rpc.Receipt, error)
+	GetBalance(pkh mavryk.Address) (mavryk.Z, error)
 	CreateCycleMonitor(options CycleMonitorOptions) (CycleMonitor, error)
 	SendAnalytics(bakerId string, version string)
-	GetCurrentProtocol() (tezos.ProtocolHash, error)
-	IsRevealed(addr tezos.Address) (bool, error)
+	GetCurrentProtocol() (mavryk.ProtocolHash, error)
+	IsRevealed(addr mavryk.Address) (bool, error)
 }
 
 type SignerEngine interface {
 	GetId() string
 	Sign(op *codec.Op) error
-	GetPKH() tezos.Address
-	GetKey() tezos.Key
+	GetPKH() mavryk.Address
+	GetKey() mavryk.Key
 	GetSigner() signer.Signer
 }
 
 type OpResult interface {
-	GetOpHash() tezos.OpHash
+	GetOpHash() mavryk.OpHash
 	WaitForApply() error
 }
 
 type TransactorEngine interface {
 	GetId() string
 	RefreshParams() error
-	Complete(op *codec.Op, key tezos.Key) error
+	Complete(op *codec.Op, key mavryk.Key) error
 	Dispatch(op *codec.Op, opts *rpc.CallOptions) (OpResult, error)
-	Broadcast(op *codec.Op) (tezos.OpHash, error)
+	Broadcast(op *codec.Op) (mavryk.OpHash, error)
 	Send(op *codec.Op, opts *rpc.CallOptions) (*rpc.Receipt, error)
 	GetLimits() (*OperationLimits, error)
-	WaitOpConfirmation(opHash tezos.OpHash, ttl int64, confirmations int64) (*rpc.Receipt, error)
+	WaitOpConfirmation(opHash mavryk.OpHash, ttl int64, confirmations int64) (*rpc.Receipt, error)
 }
 
 type NotificatorEngine interface {

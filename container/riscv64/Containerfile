@@ -1,5 +1,5 @@
 FROM alpine:edge
-LABEL org.opencontainers.image.source = "https://github.com/tez-capital/tezpay"
+LABEL org.opencontainers.image.source = "https://github.com/mavryk-network/mavpay"
 
 RUN apk add wget
 
@@ -16,9 +16,9 @@ fi\n' > /usr/local/bin/auth_wget && chmod +x /usr/local/bin/auth_wget
 
 # Use auth_wget for downloading files with optional authentication
 RUN auth_wget https://raw.githubusercontent.com/alis-is/eli/main/install.sh -O /tmp/install.sh && sh /tmp/install.sh
-WORKDIR /tezpay-bin
-RUN auth_wget https://raw.githubusercontent.com/tez-capital/tezpay/main/install.sh -O /tmp/install.sh && sh /tmp/install.sh
-WORKDIR /tezpay
+WORKDIR /mavpay-bin
+RUN auth_wget https://raw.githubusercontent.com/mavryk-network/mavpay/main/install.sh -O /tmp/install.sh && sh /tmp/install.sh
+WORKDIR /mavpay
 
-ENTRYPOINT [ "/tezpay-bin/tezpay" ]
+ENTRYPOINT [ "/mavpay-bin/mavpay" ]
 CMD ["continual"]

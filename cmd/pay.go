@@ -7,15 +7,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/core"
+	reporter_engines "github.com/mavryk-network/mavpay/engines/reporter"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/core"
-	reporter_engines "github.com/tez-capital/tezpay/engines/reporter"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 var payCmd = &cobra.Command{
@@ -38,8 +38,8 @@ var payCmd = &cobra.Command{
 		})
 		stdioReporter := reporter_engines.NewStdioReporter(config)
 
-		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToTezCapital() {
-			assertRequireConfirmation("⚠️  With your current configuration you are not going to donate to tez.capital.😔 Do you want to proceed?")
+		if !state.Global.IsDonationPromptDisabled() && !config.IsDonatingToMavCapital() {
+			assertRequireConfirmation("⚠️  With your current configuration you are not going to donate to mavrykdynamics.com. 😔 Do you want to proceed?")
 		}
 
 		var generationResult *common.CyclePayoutBlueprint

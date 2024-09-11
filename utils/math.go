@@ -3,22 +3,22 @@ package utils
 import (
 	"math"
 
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type FloatConstraint interface {
 	float32 | float64
 }
 
-func getZPortion[T FloatConstraint](val tezos.Z, portion T) tezos.Z {
+func getZPortion[T FloatConstraint](val mavryk.Z, portion T) mavryk.Z {
 	// percentage with 4 decimals
 	portionFromVal := int64(math.Floor(float64(portion) * 10000))
 	return val.Mul64(portionFromVal).Div64(10000)
 }
 
-func GetZPortion[T FloatConstraint](val tezos.Z, portion T) tezos.Z {
+func GetZPortion[T FloatConstraint](val mavryk.Z, portion T) mavryk.Z {
 	if portion <= 0 {
-		return tezos.Zero
+		return mavryk.Zero
 	}
 	if portion >= 1 {
 		return val
@@ -27,7 +27,7 @@ func GetZPortion[T FloatConstraint](val tezos.Z, portion T) tezos.Z {
 }
 
 func IsPortionWithin0n1[T FloatConstraint](portion T) bool {
-	total := tezos.NewZ(1000000)
+	total := mavryk.NewZ(1000000)
 	zPortion := getZPortion(total, portion)
 	totalSubZPortion := total.Sub(zPortion)
 	return !zPortion.IsNeg() && !totalSubZPortion.IsNeg()

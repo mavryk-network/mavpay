@@ -7,17 +7,17 @@ import (
 
 	"log/slog"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
-	"github.com/tez-capital/tezpay/utils"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type CheckBalanceHookData struct {
-	SkipTezCheck bool                                  `json:"skip_tez_check"`
+	SkipMavCheck bool                                  `json:"skip_mav_check"`
 	IsSufficient bool                                  `json:"is_sufficient"`
 	Message      string                                `json:"message"`
 	Payouts      []PayoutCandidateWithBondAmountAndFee `json:"payouts"`
@@ -32,7 +32,7 @@ func checkBalanceWithHook(data *CheckBalanceHookData) error {
 }
 
 func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGenerationContext) error {
-	if data.SkipTezCheck { // skip tez check for cases when pervious hook already checked it
+	if data.SkipMavCheck { // skip mav check for cases when pervious hook already checked it
 		return nil
 	}
 	payableBalance, err := ctx.GetCollector().GetBalance(ctx.PayoutKey.Address())
@@ -53,12 +53,12 @@ func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGeneration
 	// add all bonds, fees and donations destinations
 	totalPayouts = totalPayouts + len(configuration.IncomeRecipients.Bonds) + len(configuration.IncomeRecipients.Fees) + utils.Max(len(configuration.IncomeRecipients.Donations), 1)
 
-	requiredbalance := lo.Reduce(data.Payouts, func(agg tezos.Z, candidate PayoutCandidateWithBondAmountAndFee, _ int) tezos.Z {
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+	requiredbalance := lo.Reduce(data.Payouts, func(agg mavryk.Z, candidate PayoutCandidateWithBondAmountAndFee, _ int) mavryk.Z {
+		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			return agg.Add(candidate.BondsAmount)
 		}
 		return agg
-	}, tezos.Zero)
+	}, mavryk.Zero)
 	// bonds * bondsPortionToBeForwarded
 	bondsToBeForwarded := ctx.StageData.BakerBondsAmount.Mul64(int64(bondsPortionToBeForwarded * 1000000)).Div64(1000000)
 	// fees * feesPortionToBeForwarded
@@ -66,7 +66,7 @@ func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGeneration
 
 	// add bonds,fees and donations to required balance
 	requiredbalance = requiredbalance.Add(bondsToBeForwarded).Add(feesToBeForwarded).Add(ctx.StageData.DonateBondsAmount)
-	requiredbalance = requiredbalance.Add(tezos.NewZ(constants.PAYOUT_FEE_BUFFER).Mul64(int64(totalPayouts)))
+	requiredbalance = requiredbalance.Add(mavryk.NewZ(constants.PAYOUT_FEE_BUFFER).Mul64(int64(totalPayouts)))
 
 	diff := payableBalance.Sub(requiredbalance)
 	if diff.IsNeg() || diff.IsZero() {
@@ -133,7 +133,7 @@ func CheckSufficientBalance(ctx *PayoutGenerationContext, options *common.Genera
 			return checkBalanceWithHook(data)
 		},
 		func(data *CheckBalanceHookData) error {
-			logger.Debug("checking tez balance with collector")
+			logger.Debug("checking mav balance with collector")
 			return checkBalanceWithCollector(data, ctx)
 		},
 	}

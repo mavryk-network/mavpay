@@ -1,8 +1,8 @@
 package mock
 
-import "github.com/trilitech/tzgo/tezos"
+import "github.com/mavryk-network/mvgo/mavryk"
 
-func GetRandomAddress() tezos.Address {
-	k, _ := tezos.GenerateKey(tezos.KeyTypeEd25519)
+func GetRandomAddress() mavryk.Address {
+	k, _ := mavryk.GenerateKey(mavryk.KeyTypeEd25519)
 	return k.Address()
 }

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 )
 
 func LoadNotificatior(kind NotificatorKind, configuration []byte) (common.NotificatorEngine, error) {

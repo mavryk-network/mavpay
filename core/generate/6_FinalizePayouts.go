@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/core/estimate"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/core/estimate"
+	"github.com/mavryk-network/mvgo/mavryk"
 
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/utils"
 )
 
-func getDistributionPayouts(logger *slog.Logger, kind enums.EPayoutKind, distributionDefinition map[string]float64, amount tezos.Z, ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) ([]common.PayoutRecipe, error) {
+func getDistributionPayouts(logger *slog.Logger, kind enums.EPayoutKind, distributionDefinition map[string]float64, amount mavryk.Z, ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) ([]common.PayoutRecipe, error) {
 	totalPercentage := lo.Reduce(lo.Values(distributionDefinition), func(agg float64, entry float64, _ int) float64 {
 		return agg + entry
 	}, float64(0))
@@ -30,10 +30,10 @@ func getDistributionPayouts(logger *slog.Logger, kind enums.EPayoutKind, distrib
 			Baker:   ctx.GetConfiguration().BakerPKH,
 			Cycle:   options.Cycle,
 			Kind:    kind,
-			TxKind:  enums.PAYOUT_TX_KIND_TEZ,
+			TxKind:  enums.PAYOUT_TX_KIND_MAV,
 			IsValid: true,
 		}
-		recipient, err := tezos.ParseAddress(recipient)
+		recipient, err := mavryk.ParseAddress(recipient)
 		if err != nil {
 			recipe.IsValid = false
 			recipe.Note = string(enums.INVALID_INVALID_ADDRESS)
@@ -106,7 +106,7 @@ func FinalizePayouts(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	// donations
 	donationDistributionDefinition := configuration.IncomeRecipients.Donations
 	if len(donationDistributionDefinition) == 0 && configuration.IncomeRecipients.DonateBonds+configuration.IncomeRecipients.DonateFees > 0 { // inject default destination
-		logger.Debug("no donation destination found, donating to tez.capital")
+		logger.Debug("no donation destination found, donating to mavrykdynamics.com")
 		donationDistributionDefinition = map[string]float64{
 			constants.DEFAULT_DONATION_ADDRESS: 100,
 		}

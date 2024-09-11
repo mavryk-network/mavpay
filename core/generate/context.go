@@ -3,9 +3,9 @@ package generate
 import (
 	"log/slog"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type StageData struct {
@@ -17,10 +17,10 @@ type StageData struct {
 	PayoutBlueprint                       *common.CyclePayoutBlueprint
 
 	Payouts           []common.PayoutRecipe
-	BakerBondsAmount  tezos.Z
-	DonateBondsAmount tezos.Z
-	BakerFeesAmount   tezos.Z
-	DonateFeesAmount  tezos.Z
+	BakerBondsAmount  mavryk.Z
+	DonateBondsAmount mavryk.Z
+	BakerFeesAmount   mavryk.Z
+	DonateFeesAmount  mavryk.Z
 	PaidDelegators    int
 
 	// protocol, signature etc.
@@ -33,13 +33,13 @@ type PayoutGenerationContext struct {
 
 	StageData *StageData
 
-	PayoutKey tezos.Key
+	PayoutKey mavryk.Key
 
 	logger *slog.Logger
 }
 
 func NewPayoutGenerationContext(configuration *configuration.RuntimeConfiguration, engineContext *common.GeneratePayoutsEngineContext) (*PayoutGenerationContext, error) {
-	slog.Debug("tezpay payout context initialization")
+	slog.Debug("mavpay payout context initialization")
 	if err := engineContext.Validate(); err != nil {
 		return nil, err
 	}

@@ -1,18 +1,18 @@
 package generate
 
 import (
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type PayoutCandidate struct {
-	Source                       tezos.Address              `json:"source,omitempty"`
-	Recipient                    tezos.Address              `json:"recipient,omitempty"`
+	Source                       mavryk.Address             `json:"source,omitempty"`
+	Recipient                    mavryk.Address             `json:"recipient,omitempty"`
 	FeeRate                      float64                    `json:"fee_rate,omitempty"`
-	StakedBalance                tezos.Z                    `json:"staked_balance,omitempty"`
-	DelegatedBalance             tezos.Z                    `json:"delegated_balance,omitempty"`
+	StakedBalance                mavryk.Z                   `json:"staked_balance,omitempty"`
+	DelegatedBalance             mavryk.Z                   `json:"delegated_balance,omitempty"`
 	IsInvalid                    bool                       `json:"is_invalid,omitempty"`
 	IsEmptied                    bool                       `json:"is_emptied,omitempty"`
 	IsBakerPayingTxFee           bool                       `json:"is_baker_paying_tx_fee,omitempty"`
@@ -24,7 +24,7 @@ type PayoutCandidate struct {
 	AllocationFeeCollected bool `json:"allocation_fee_collected,omitempty"`
 }
 
-func (candidate *PayoutCandidate) GetDelegatedBalance() tezos.Z {
+func (candidate *PayoutCandidate) GetDelegatedBalance() mavryk.Z {
 	return candidate.DelegatedBalance
 }
 
@@ -44,13 +44,13 @@ func (candidate *PayoutCandidate) ToValidationContext(ctx *PayoutGenerationConte
 
 type PayoutCandidateWithBondAmount struct {
 	PayoutCandidate
-	BondsAmount tezos.Z                      `json:"bonds_amount,omitempty"`
+	BondsAmount mavryk.Z                     `json:"bonds_amount,omitempty"`
 	TxKind      enums.EPayoutTransactionKind `json:"tx_kind,omitempty"`
-	FATokenId   tezos.Z                      `json:"fa_token_id,omitempty"` // required only if fa12 or fa2
-	FAContract  tezos.Address                `json:"fa_contract"`           // required only if fa12 or fa2
+	FATokenId   mavryk.Z                     `json:"fa_token_id,omitempty"` // required only if fa12 or fa2
+	FAContract  mavryk.Address               `json:"fa_contract"`           // required only if fa12 or fa2
 }
 
-func (candidate *PayoutCandidateWithBondAmount) GetDestination() tezos.Address {
+func (candidate *PayoutCandidateWithBondAmount) GetDestination() mavryk.Address {
 	return candidate.Recipient
 }
 
@@ -58,15 +58,15 @@ func (candidate *PayoutCandidateWithBondAmount) GetTxKind() enums.EPayoutTransac
 	return candidate.TxKind
 }
 
-func (candidate *PayoutCandidateWithBondAmount) GetFATokenId() tezos.Z {
+func (candidate *PayoutCandidateWithBondAmount) GetFATokenId() mavryk.Z {
 	return candidate.FATokenId
 }
 
-func (candidate *PayoutCandidateWithBondAmount) GetFAContract() tezos.Address {
+func (candidate *PayoutCandidateWithBondAmount) GetFAContract() mavryk.Address {
 	return candidate.FAContract
 }
 
-func (candidate *PayoutCandidateWithBondAmount) GetAmount() tezos.Z {
+func (candidate *PayoutCandidateWithBondAmount) GetAmount() mavryk.Z {
 	return candidate.BondsAmount
 }
 
@@ -76,7 +76,7 @@ func (candidate *PayoutCandidateWithBondAmount) GetFeeRate() float64 {
 
 type PayoutCandidateWithBondAmountAndFee struct {
 	PayoutCandidateWithBondAmount
-	Fee tezos.Z `json:"fee,omitempty"`
+	Fee mavryk.Z `json:"fee,omitempty"`
 }
 
 func (candidate *PayoutCandidateWithBondAmountAndFee) ToValidationContext(ctx *PayoutGenerationContext) PresimPayoutCandidateValidationContext {
@@ -104,7 +104,7 @@ func (candidate *PayoutCandidateSimulated) ToValidationContext(config *configura
 	}
 }
 
-func (payout *PayoutCandidateSimulated) ToPayoutRecipe(baker tezos.Address, cycle int64, kind enums.EPayoutKind) common.PayoutRecipe {
+func (payout *PayoutCandidateSimulated) ToPayoutRecipe(baker mavryk.Address, cycle int64, kind enums.EPayoutKind) common.PayoutRecipe {
 	note := ""
 	if payout.IsInvalid {
 		kind = enums.PAYOUT_KIND_INVALID
@@ -142,7 +142,7 @@ func DelegatorToPayoutCandidate(delegator common.Delegator, configuration *confi
 	IsBakerPayingAllocationTxFee := configuration.PayoutConfiguration.IsPayingAllocationTxFee
 
 	if delegatorOverride, ok := delegatorOverrides[string(pkh)]; ok {
-		if !delegatorOverride.Recipient.Equal(tezos.InvalidAddress) {
+		if !delegatorOverride.Recipient.Equal(mavryk.InvalidAddress) {
 			payoutRecipient = delegatorOverride.Recipient
 		}
 		if delegatorOverride.Fee != nil {

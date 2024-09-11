@@ -3,9 +3,9 @@ package common
 import (
 	"fmt"
 
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 func FormatAmount(kind enums.EPayoutTransactionKind, amount int64) string {
@@ -18,16 +18,16 @@ func FormatAmount(kind enums.EPayoutTransactionKind, amount int64) string {
 	case enums.PAYOUT_TX_KIND_FA2:
 		return fmt.Sprintf("%d FA2", amount)
 	default:
-		return MutezToTezS(amount)
+		return MumavToMavS(amount)
 	}
 }
 
-func MutezToTezS(amount int64) string {
+func MumavToMavS(amount int64) string {
 	if amount == 0 {
 		return ""
 	}
-	tez := float64(amount) / constants.MUTEZ_FACTOR
-	return fmt.Sprintf("%f TEZ", tez)
+	mav := float64(amount) / constants.MUMAV_FACTOR
+	return fmt.Sprintf("%f MAV", mav)
 }
 
 func FloatToPercentage(f float64) string {
@@ -37,8 +37,8 @@ func FloatToPercentage(f float64) string {
 	return fmt.Sprintf("%.2f%%", f*100)
 }
 
-func ShortenAddress(taddr tezos.Address) string {
-	if taddr.Equal(tezos.ZeroAddress) || taddr.Equal(tezos.InvalidAddress) {
+func ShortenAddress(taddr mavryk.Address) string {
+	if taddr.Equal(mavryk.ZeroAddress) || taddr.Equal(mavryk.InvalidAddress) {
 		return ""
 	}
 	addr := taddr.String()

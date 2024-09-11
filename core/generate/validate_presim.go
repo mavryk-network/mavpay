@@ -3,8 +3,8 @@ package generate
 import (
 	"log/slog"
 
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants/enums"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants/enums"
 )
 
 type PresimPayoutCandidate = PayoutCandidateWithBondAmountAndFee
@@ -44,7 +44,7 @@ func ValidateTxKind(candidate *PresimPayoutCandidate, _ *configuration.RuntimeCo
 	switch candidate.TxKind {
 	case enums.PAYOUT_TX_KIND_FA1_2:
 	case enums.PAYOUT_TX_KIND_FA2:
-	case enums.PAYOUT_TX_KIND_TEZ:
+	case enums.PAYOUT_TX_KIND_MAV:
 	default:
 		candidate.IsInvalid = true
 		candidate.InvalidBecause = enums.INVALID_UNSUPPORTED_TX_KIND

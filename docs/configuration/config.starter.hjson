@@ -1,12 +1,12 @@
 {
 #=====================================================================================================
-# This is tezpay starter configuration template. Please refer to https://docs.tez.capital/tezpay/
-# - for default configuration (list of default values) see https://docs.tez.capital/tezpay/configuration/examples/default/.
-# - for sample of all available fields see https://docs.tez.capital/tezpay/configuration/examples/sample/.
+# This is mavpay starter configuration template. Please refer to https://mavpay.mavryk.org/mavpay/
+# - for default configuration (list of default values) see https://mavpay.mavryk.org/mavpay/configuration/examples/default/.
+# - for sample of all available fields see https://mavpay.mavryk.org/mavpay/configuration/examples/sample/.
 #=====================================================================================================
 
   # version of the configuration file
-  tezpay_config_version: 0
+  mavpay_config_version: 0
 
   # baker's public key hash
   baker: your-baker-address
@@ -14,7 +14,7 @@
   # payout configuration
   payouts: {
 
-    # balance check mode to use, can be 'protocol' or 'tzkt'
+    # balance check mode to use, can be 'protocol' or 'mvkt'
     balance_check_mode: protocol
 
     # fee to charge delegators for the payout (portion of the reward as decimal, e.g. 0.075 for 7.5%)
@@ -28,7 +28,7 @@
   delegators: {
     # Requirements delegators have to meet
     requirements: {
-      # Minimum balance of tez a delegator has to have to be considered for payout
+      # Minimum balance of mav a delegator has to have to be considered for payout
       minimum_balance: 10
     }
   }

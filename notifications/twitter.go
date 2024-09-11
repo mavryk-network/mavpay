@@ -10,8 +10,8 @@ import (
 
 	"github.com/dghubble/oauth1"
 	twitter "github.com/g8rswimmer/go-twitter/v2"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 )
 
 type twitterNotificatorConfiguration struct {
@@ -33,7 +33,7 @@ type authorize struct{}
 func (a authorize) Add(req *http.Request) {}
 
 const (
-	DEFAULT_TWITTER_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle <Cycle> to <Delegators> delegators and donated <DonatedTotal> using #tezpay on the #tezos blockchain."
+	DEFAULT_TWITTER_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle <Cycle> to <Delegators> delegators and donated <DonatedTotal> using #mavpay on the #mavryk blockchain."
 )
 
 func InitTwitterNotificator(configurationBytes []byte) (*TwitterNotificator, error) {

@@ -1,12 +1,12 @@
 package common
 
 import (
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/contract"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/tezos"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/contract"
+	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/mvgo/rpc"
 )
 
 type OpExecutionContext struct {
@@ -23,9 +23,9 @@ func InitOpExecutionContext(op *codec.Op, transactor TransactorEngine) *OpExecut
 	}
 }
 
-func (ctx *OpExecutionContext) GetOpHash() tezos.OpHash {
+func (ctx *OpExecutionContext) GetOpHash() mavryk.OpHash {
 	if ctx.result == nil {
-		return tezos.ZeroOpHash
+		return mavryk.ZeroOpHash
 	}
 	return ctx.result.GetOpHash()
 }
@@ -48,16 +48,16 @@ func (ctx *OpExecutionContext) WaitForApply() error {
 
 type TransferArgs interface {
 	GetTxKind() enums.EPayoutTransactionKind
-	GetFAContract() tezos.Address
-	GetFATokenId() tezos.Z
-	GetDestination() tezos.Address
-	GetAmount() tezos.Z
+	GetFAContract() mavryk.Address
+	GetFATokenId() mavryk.Z
+	GetDestination() mavryk.Address
+	GetAmount() mavryk.Z
 }
 
-func InjectTransferContents(op *codec.Op, source tezos.Address, p TransferArgs) error {
+func InjectTransferContents(op *codec.Op, source mavryk.Address, p TransferArgs) error {
 	switch p.GetTxKind() {
 	case enums.PAYOUT_TX_KIND_FA1_2:
-		if p.GetFAContract().Equal(tezos.ZeroAddress) || p.GetFAContract().Equal(tezos.InvalidAddress) {
+		if p.GetFAContract().Equal(mavryk.ZeroAddress) || p.GetFAContract().Equal(mavryk.InvalidAddress) {
 			return constants.ErrOperationInvalidContractAddress
 		}
 		args := contract.NewFA1TransferArgs().WithTransfer(source, p.GetDestination(), p.GetAmount()).
@@ -65,7 +65,7 @@ func InjectTransferContents(op *codec.Op, source tezos.Address, p TransferArgs) 
 			WithDestination(p.GetFAContract())
 		op.WithContents(args.Encode())
 	case enums.PAYOUT_TX_KIND_FA2:
-		if p.GetFAContract().Equal(tezos.ZeroAddress) || p.GetFAContract().Equal(tezos.InvalidAddress) {
+		if p.GetFAContract().Equal(mavryk.ZeroAddress) || p.GetFAContract().Equal(mavryk.InvalidAddress) {
 			return constants.ErrOperationInvalidContractAddress
 		}
 		args := contract.NewFA2TransferArgs().WithTransfer(source, p.GetDestination(), p.GetFATokenId(), p.GetAmount()).
@@ -78,7 +78,7 @@ func InjectTransferContents(op *codec.Op, source tezos.Address, p TransferArgs) 
 	return nil
 }
 
-func InjectTransferContentsWithLimits(op *codec.Op, source tezos.Address, p TransferArgs, limits tezos.Limits) error {
+func InjectTransferContentsWithLimits(op *codec.Op, source mavryk.Address, p TransferArgs, limits mavryk.Limits) error {
 	err := InjectTransferContents(op, source, p)
 	if err != nil {
 		return err
@@ -87,7 +87,7 @@ func InjectTransferContentsWithLimits(op *codec.Op, source tezos.Address, p Tran
 	return nil
 }
 
-func InjectLimits(op *codec.Op, limits []tezos.Limits) error {
+func InjectLimits(op *codec.Op, limits []mavryk.Limits) error {
 	if len(limits) == 0 {
 		return nil
 	}

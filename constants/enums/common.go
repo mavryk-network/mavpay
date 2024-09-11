@@ -84,7 +84,7 @@ func (kind EPayoutKind) ToPriority() int {
 type EPayoutTransactionKind string
 
 const (
-	PAYOUT_TX_KIND_TEZ   EPayoutTransactionKind = "tez"
+	PAYOUT_TX_KIND_MAV   EPayoutTransactionKind = "mav"
 	PAYOUT_TX_KIND_FA1_2 EPayoutTransactionKind = "fa1"
 	PAYOUT_TX_KIND_FA2   EPayoutTransactionKind = "fa2"
 )
@@ -114,5 +114,5 @@ type EBalanceCheckMode string
 
 var (
 	PROTOCOL_BALANCE_CHECK_MODE = EBalanceCheckMode("protocol")
-	TZKT_BALANCE_CHECK_MODE     = EBalanceCheckMode("tzkt")
+	MVKT_BALANCE_CHECK_MODE     = EBalanceCheckMode("mvkt")
 )
