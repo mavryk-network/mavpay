@@ -3,10 +3,10 @@ package generate
 import (
 	"testing"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/stretchr/testify/assert"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 func TestDelegatorToPayoutCandidate(t *testing.T) {
@@ -14,34 +14,34 @@ func TestDelegatorToPayoutCandidate(t *testing.T) {
 
 	config := configuration.GetDefaultRuntimeConfiguration()
 
-	maximumBalance := tezos.NewZ(100000000)
+	maximumBalance := mavryk.NewZ(100000000)
 	config.Delegators.Overrides = map[string]configuration.RuntimeDelegatorOverride{
-		"tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM": {
+		"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": {
 			MaximumBalance: &maximumBalance,
 		},
-		"tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE": {
+		"mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb": {
 			MaximumBalance: &maximumBalance,
 		},
 	}
 
 	delegators := []common.Delegator{
 		{
-			Address:          tezos.MustParseAddress("tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM"),
-			DelegatedBalance: tezos.NewZ(100000000),
+			Address:          mavryk.MustParseAddress("mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3"),
+			DelegatedBalance: mavryk.NewZ(100000000),
 		},
 		{
-			Address:          tezos.MustParseAddress("tz1hZvgjekGo7DmQjWh7XnY5eLQD8wNYPczE"),
-			DelegatedBalance: tezos.NewZ(200000000),
+			Address:          mavryk.MustParseAddress("mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb"),
+			DelegatedBalance: mavryk.NewZ(200000000),
 		},
 	}
 
 	delegator := delegators[0]
 	candidate := DelegatorToPayoutCandidate(delegator, &config)
-	assert.True(candidate.GetDelegatedBalance().Equal(tezos.MinZ(delegator.DelegatedBalance, maximumBalance)))
+	assert.True(candidate.GetDelegatedBalance().Equal(mavryk.MinZ(delegator.DelegatedBalance, maximumBalance)))
 
 	delegator = delegators[1]
 	candidate = DelegatorToPayoutCandidate(delegator, &config)
-	assert.True(candidate.GetDelegatedBalance().Equal(tezos.MinZ(delegator.DelegatedBalance, maximumBalance)))
+	assert.True(candidate.GetDelegatedBalance().Equal(mavryk.MinZ(delegator.DelegatedBalance, maximumBalance)))
 
 	config.Delegators.Overrides = map[string]configuration.RuntimeDelegatorOverride{}
 

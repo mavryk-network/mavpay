@@ -3,8 +3,8 @@ package cmd
 import (
 	"log/slog"
 
+	"github.com/mavryk-network/mavpay/notifications"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/notifications"
 )
 
 var notificationTestCmd = &cobra.Command{

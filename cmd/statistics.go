@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/mavryk-network/mavpay/common"
+	reporter_engines "github.com/mavryk-network/mavpay/engines/reporter"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/common"
-	reporter_engines "github.com/tez-capital/tezpay/engines/reporter"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 var statisticsCmd = &cobra.Command{

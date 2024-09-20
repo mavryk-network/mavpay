@@ -4,11 +4,11 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/configuration"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/state"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type PayoutCandidateValidation func(candidate *PayoutCandidate, configuration *configuration.RuntimeConfiguration, overrides *configuration.RuntimeDelegatorOverride, ctx *PayoutGenerationContext)
@@ -44,7 +44,7 @@ func (validationContext *PayoutValidationContext) Validate(validators ...PayoutC
 
 // validations
 func ValidateRecipient(candidate *PayoutCandidate, _ *configuration.RuntimeConfiguration, _ *configuration.RuntimeDelegatorOverride, _ *PayoutGenerationContext) {
-	if candidate.Recipient.Equal(tezos.InvalidAddress) {
+	if candidate.Recipient.Equal(mavryk.InvalidAddress) {
 		candidate.IsInvalid = true
 		candidate.InvalidBecause = enums.INVALID_INVALID_ADDRESS
 	}
@@ -72,14 +72,14 @@ func ValidateEmptied(candidate *PayoutCandidate, configuration *configuration.Ru
 }
 
 func ValidateIsPrefiltered(candidate *PayoutCandidate, configuration *configuration.RuntimeConfiguration, _ *configuration.RuntimeDelegatorOverride, _ *PayoutGenerationContext) {
-	if len(configuration.Delegators.Prefilter) > 0 && !lo.ContainsBy(configuration.Delegators.Prefilter, func(addr tezos.Address) bool { return addr.Equal(candidate.Source) }) {
+	if len(configuration.Delegators.Prefilter) > 0 && !lo.ContainsBy(configuration.Delegators.Prefilter, func(addr mavryk.Address) bool { return addr.Equal(candidate.Source) }) {
 		candidate.IsInvalid = true
 		candidate.InvalidBecause = enums.INVALID_DELEGATOR_PREFILTERED
 	}
 }
 
 func ValidateIsIgnored(candidate *PayoutCandidate, configuration *configuration.RuntimeConfiguration, _ *configuration.RuntimeDelegatorOverride, _ *PayoutGenerationContext) {
-	if lo.ContainsBy(configuration.Delegators.Ignore, func(addr tezos.Address) bool { return addr.Equal(candidate.Source) }) {
+	if lo.ContainsBy(configuration.Delegators.Ignore, func(addr mavryk.Address) bool { return addr.Equal(candidate.Source) }) {
 		candidate.IsInvalid = true
 		candidate.InvalidBecause = enums.INVALID_DELEGATOR_IGNORED
 	}

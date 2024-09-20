@@ -9,8 +9,8 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
 )
 
 type rwCloser struct {

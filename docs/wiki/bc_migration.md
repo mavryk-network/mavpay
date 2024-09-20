@@ -1,26 +1,26 @@
 # Migrating from BC
 
-⚠️⚠️ **ledger wallet mode is not supported by `tezpay` yet** ⚠️⚠️
+⚠️⚠️ **ledger wallet mode is not supported by `mavpay` yet** ⚠️⚠️
 
-`tezpay` is able to build its config from preexisting BC configuration. So all you have to do is to use your old BC config and let `tezpay` to migrate it.
+`mavpay` is able to build its config from preexisting BC configuration. So all you have to do is to use your old BC config and let `mavpay` to migrate it.
 
 Your configuration gets migrated automatically on `pay` or `generate-payouts`. Old BC configuration will be saved to `config.backup.hjson`
 
-You can run `tezpay` same way as BC - `tezpay pay --cycle=540` or `tezpay pay` for last completed cycle 😉
+You can run `mavpay` same way as BC - `mavpay pay --cycle=540` or `mavpay pay` for last completed cycle 😉
 
-NOTE: *During BC migration `tezpay` injects 5% donation to your new `config.hjson` to support `tezpay` development. This is entirely optional. Set it as you see fit.*
+NOTE: *During BC migration `mavpay` injects 5% donation to your new `config.hjson` to support `mavpay` development. This is entirely optional. Set it as you see fit.*
 
 ## If you operate remote signer
 
-`tezpay` does not touch configuration of your signers. To use remote signer with `tezpay` you have to change `public_key` to `pkh` in your `remote_signer.hjson`
+`mavpay` does not touch configuration of your signers. To use remote signer with `mavpay` you have to change `public_key` to `pkh` in your `remote_signer.hjson`
 
 For example:
 ```hjson
-public_key: tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM
+public_key: mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3
 url: http://127.0.0.1:2222
 ```
 becomes:
 ```hjson
-pkh: tz1P6WKJu2rcbxKiKRZHKQKmKrpC9TfW1AwM
+pkh: mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3
 url: http://127.0.0.1:2222
 ```

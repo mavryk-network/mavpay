@@ -3,12 +3,12 @@ package prepare
 import (
 	"log/slog"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/core/estimate"
+	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/core/estimate"
-	"github.com/tez-capital/tezpay/utils"
 )
 
 func AccumulatePayouts(ctx *PayoutPrepareContext, options *common.PreparePayoutsOptions) (*PayoutPrepareContext, error) {
@@ -68,7 +68,7 @@ func AccumulatePayouts(ctx *PayoutPrepareContext, options *common.PreparePayouts
 		}
 
 		candidate := result.Transaction
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			if !candidate.TxFeeCollected {
 				candidate.Amount = candidate.Amount.Add64(candidate.OpLimits.GetOperationFeesWithoutAllocation() - result.Result.GetOperationFeesWithoutAllocation())
 			}

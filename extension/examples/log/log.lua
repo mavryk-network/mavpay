@@ -1,7 +1,7 @@
 --[[
 This is an example of a eli (Lua) extension.
 It logs all requests and responses to a file.
-Path to log file is specified in tezpay configuration.
+Path to log file is specified in mavpay configuration.
 
 extensions: [
 	{

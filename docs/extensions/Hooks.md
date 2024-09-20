@@ -9,8 +9,8 @@ This hook is capable of mutating data.
   "cycle": 580,
   "candidates": [
     {
-      "source": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -32,8 +32,8 @@ This hook is capable of mutating data.
   "cycle": 580,
   "candidates": [
     {
-      "source": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -56,13 +56,13 @@ This hook is capable of mutating data.
 This hook is NOT capable of mutating data.
 ```json
 {
-  "skip_tez_check": true,
+  "skip_mav_check": true,
   "is_sufficient": true,
   "message": "This message is used to carry errors from hook to the caller.",
   "payouts": [
     {
-      "source": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -89,8 +89,8 @@ This hook is capable of mutating data.
   "cycle": 580,
   "candidates": [
     {
-      "source": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -117,10 +117,10 @@ This hook is NOT capable of mutating data *currently*.
   "cycles": 1,
   "payouts": [
     {
-      "baker": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
-      "delegator": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "baker": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "delegator": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "cycle": 1,
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "kind": "invalid",
       "tx_kind": "fa1",
       "fa_token_id": "10",
@@ -170,10 +170,10 @@ This hook is capable of mutating data *currently*.
   "recipes": null,
   "payouts": [
     {
-      "baker": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
-      "delegator": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "baker": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "delegator": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "cycle": 1,
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "kind": "invalid",
       "tx_kind": "fa1",
       "fa_token_id": "10",
@@ -197,16 +197,16 @@ This hook is capable of mutating data *currently*.
   "reports_of_past_succesful_payouts": [
     {
       "id": "fd8d0230c9d70458",
-      "baker": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "baker": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "timestamp": "2024-09-07T09:25:23.379448699Z",
       "cycle": 1,
       "kind": "invalid",
       "tx_kind": "fa1",
       "contract": "KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT",
       "token_id": "10",
-      "delegator": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "delegator": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "delegator_balance": "1000000000",
-      "recipient": "tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU",
+      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
       "amount": "1000000000",
       "fee_rate": 5,
       "fee": "1000000000",

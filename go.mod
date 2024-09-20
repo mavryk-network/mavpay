@@ -1,4 +1,4 @@
-module github.com/tez-capital/tezpay
+module github.com/mavryk-network/mavpay
 
 go 1.22
 
@@ -16,11 +16,11 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/hjson/hjson-go/v4 v4.4.0
 	github.com/jedib0t/go-pretty/v6 v6.5.9
+	github.com/mavryk-network/mvgo v1.19.3
 	github.com/nikoksr/notify v0.41.0
 	github.com/samber/lo v1.39.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
-	github.com/trilitech/tzgo v1.19.3
 	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -38,7 +38,6 @@ require (
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect

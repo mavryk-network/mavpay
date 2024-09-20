@@ -8,10 +8,10 @@ import (
 	"strings"
 
 	"github.com/hjson/hjson-go/v4"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/state"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/state"
 )
 
 func Load(kind string) (common.SignerEngine, error) {

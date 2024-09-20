@@ -3,8 +3,8 @@ package common
 import (
 	"testing"
 
+	"github.com/mavryk-network/mavpay/constants"
 	"github.com/stretchr/testify/assert"
-	"github.com/tez-capital/tezpay/constants"
 )
 
 type dummyCycleMonitor struct {

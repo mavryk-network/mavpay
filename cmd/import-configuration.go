@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mavryk-network/mavpay/configuration/seed"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/state"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/configuration/seed"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/state"
 	"golang.org/x/exp/slices"
 )
 
@@ -26,11 +26,11 @@ var generateConfigurationCmd = &cobra.Command{
 		return string(item)
 	}), ", ") + `
 
-	To import configuration from supported sources copy configuration file to directory where you plan to store tezpay configuration and run command with source file path as argument.
+	To import configuration from supported sources copy configuration file to directory where you plan to store mavpay configuration and run command with source file path as argument.
 
 	Example:
-		tezpay import-configuration bc ./bc.json
-		tezpay import-configuration trd ./trd.yaml
+		mavpay import-configuration bc ./bc.json
+		mavpay import-configuration trd ./trd.yaml
 `,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if err := cobra.MinimumNArgs(2)(cmd, args); err != nil {

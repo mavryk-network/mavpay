@@ -9,9 +9,9 @@ import (
 	"os"
 
 	"github.com/alis-is/jsonrpc2/rpc"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
 )
 
 type rwCloser struct {

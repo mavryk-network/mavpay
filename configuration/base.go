@@ -7,20 +7,19 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/trilitech/tzgo/tezos"
-
 	"github.com/hjson/hjson-go/v4"
+	"github.com/mavryk-network/mavpay/common"
+	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	tezpay_configuration "github.com/tez-capital/tezpay/configuration/v"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/state"
 )
 
-func FloatAmountToMutez(amount float64) tezos.Z {
-	mutez := amount * constants.MUTEZ_FACTOR
-	return tezos.NewZ(int64(math.Floor(mutez)))
+func FloatAmountToMumav(amount float64) mavryk.Z {
+	mumav := amount * constants.MUMAV_FACTOR
+	return mavryk.NewZ(int64(math.Floor(mumav)))
 }
 
 func preprocessDonationMap(donations map[string]float64) map[string]float64 {
@@ -51,16 +50,16 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 		}
 	}
 
-	delegatorOverrides := lo.MapEntries(configuration.Delegators.Overrides, func(k string, delegatorOverride tezpay_configuration.DelegatorOverrideV0) (string, RuntimeDelegatorOverride) {
-		var stakeLimit *tezos.Z = nil
+	delegatorOverrides := lo.MapEntries(configuration.Delegators.Overrides, func(k string, delegatorOverride mavpay_configuration.DelegatorOverrideV0) (string, RuntimeDelegatorOverride) {
+		var stakeLimit *mavryk.Z = nil
 		if delegatorOverride.MaximumBalance != nil {
-			sl := FloatAmountToMutez(*delegatorOverride.MaximumBalance)
+			sl := FloatAmountToMumav(*delegatorOverride.MaximumBalance)
 			stakeLimit = &sl
 		}
 		return k, RuntimeDelegatorOverride{
 			Recipient:                    delegatorOverride.Recipient,
 			Fee:                          delegatorOverride.Fee,
-			MinimumBalance:               FloatAmountToMutez(delegatorOverride.MinimumBalance),
+			MinimumBalance:               FloatAmountToMumav(delegatorOverride.MinimumBalance),
 			IsBakerPayingTxFee:           delegatorOverride.IsBakerPayingTxFee,
 			IsBakerPayingAllocationTxFee: delegatorOverride.IsBakerPayingAllocationTxFee,
 			MaximumBalance:               stakeLimit,
@@ -156,7 +155,7 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 			Fee:                        configuration.PayoutConfiguration.Fee,
 			IsPayingTxFee:              configuration.PayoutConfiguration.IsPayingTxFee,
 			IsPayingAllocationTxFee:    configuration.PayoutConfiguration.IsPayingAllocationTxFee,
-			MinimumAmount:              FloatAmountToMutez(configuration.PayoutConfiguration.MinimumAmount),
+			MinimumAmount:              FloatAmountToMumav(configuration.PayoutConfiguration.MinimumAmount),
 			IgnoreEmptyAccounts:        configuration.PayoutConfiguration.IgnoreEmptyAccounts,
 			TxGasLimitBuffer:           gasLimitBuffer,
 			TxDeserializationGasBuffer: deserializaGasBuffer,
@@ -168,7 +167,7 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 		},
 		Delegators: RuntimeDelegatorsConfiguration{
 			Requirements: RuntimeDelegatorRequirements{
-				MinimumBalance:                        FloatAmountToMutez(configuration.Delegators.Requirements.MinimumBalance),
+				MinimumBalance:                        FloatAmountToMumav(configuration.Delegators.Requirements.MinimumBalance),
 				BellowMinimumBalanceRewardDestination: delegatorBellowMinimumBalanceRewardDestination,
 			},
 			Overrides: delegatorOverrides,
@@ -186,7 +185,7 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 		Overdelegation: configuration.Overdelegation,
 		NotificationConfigurations: lo.Map(configuration.NotificationConfigurations, func(item json.RawMessage, index int) RuntimeNotificatorConfiguration {
 			var isValid bool
-			var notificatorConfigurationBase tezpay_configuration.NotificatorConfigurationBase
+			var notificatorConfigurationBase mavpay_configuration.NotificatorConfigurationBase
 			if err := json.Unmarshal(item, &notificatorConfigurationBase); err != nil {
 				slog.Warn("invalid notificator configuration", "error", err.Error())
 			}

@@ -3,29 +3,29 @@ package common
 import (
 	"time"
 
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 type PayoutReport struct {
 	Id               string                       `json:"id" csv:"id"`
-	Baker            tezos.Address                `json:"baker" csv:"baker"`
+	Baker            mavryk.Address               `json:"baker" csv:"baker"`
 	Timestamp        time.Time                    `json:"timestamp" csv:"timestamp"`
 	Cycle            int64                        `json:"cycle" csv:"cycle"`
 	Kind             enums.EPayoutKind            `json:"kind,omitempty" csv:"kind"`
 	TxKind           enums.EPayoutTransactionKind `json:"tx_kind,omitempty" csv:"op_kind"`
-	FAContract       tezos.Address                `json:"contract,omitempty" csv:"contract"`
-	FATokenId        tezos.Z                      `json:"token_id,omitempty" csv:"token_id"`
-	Delegator        tezos.Address                `json:"delegator,omitempty" csv:"delegator"`
-	DelegatedBalance tezos.Z                      `json:"delegator_balance,omitempty" csv:"delegator_balance"`
-	StakedBalance    tezos.Z                      `json:"-" csv:"-"` // enable when relevant
-	Recipient        tezos.Address                `json:"recipient,omitempty" csv:"recipient"`
-	Amount           tezos.Z                      `json:"amount,omitempty" csv:"amount"`
+	FAContract       mavryk.Address               `json:"contract,omitempty" csv:"contract"`
+	FATokenId        mavryk.Z                     `json:"token_id,omitempty" csv:"token_id"`
+	Delegator        mavryk.Address               `json:"delegator,omitempty" csv:"delegator"`
+	DelegatedBalance mavryk.Z                     `json:"delegator_balance,omitempty" csv:"delegator_balance"`
+	StakedBalance    mavryk.Z                     `json:"-" csv:"-"` // enable when relevant
+	Recipient        mavryk.Address               `json:"recipient,omitempty" csv:"recipient"`
+	Amount           mavryk.Z                     `json:"amount,omitempty" csv:"amount"`
 	FeeRate          float64                      `json:"fee_rate,omitempty" csv:"fee_rate"`
-	Fee              tezos.Z                      `json:"fee,omitempty" csv:"fee"`
+	Fee              mavryk.Z                     `json:"fee,omitempty" csv:"fee"`
 	TransactionFee   int64                        `json:"tx_fee,omitempty" csv:"tx_fee"`
-	OpHash           tezos.OpHash                 `json:"op_hash,omitempty" csv:"op_hash"`
+	OpHash           mavryk.OpHash                `json:"op_hash,omitempty" csv:"op_hash"`
 	IsSuccess        bool                         `json:"success" csv:"success"`
 	Note             string                       `json:"note,omitempty" csv:"note"`
 }
@@ -38,14 +38,14 @@ func (pr *PayoutReport) ToTableRowData() []string {
 	return []string{
 		ShortenAddress(pr.Delegator),
 		ShortenAddress(pr.Recipient),
-		MutezToTezS(pr.DelegatedBalance.Int64()),
+		MumavToMavS(pr.DelegatedBalance.Int64()),
 		string(pr.Kind),
 		ShortenAddress(pr.FAContract),
 		ToStringEmptyIfZero(pr.FATokenId.Int64()),
 		FormatAmount(pr.TxKind, pr.Amount.Int64()),
 		FloatToPercentage(pr.FeeRate),
-		MutezToTezS(pr.Fee.Int64()),
-		MutezToTezS(pr.GetTransactionFee()),
+		MumavToMavS(pr.Fee.Int64()),
+		MumavToMavS(pr.GetTransactionFee()),
 		pr.OpHash.String(),
 		pr.Note,
 	}
@@ -71,7 +71,7 @@ func (pr *PayoutReport) GetTableHeaders() []string {
 func GetReportsTotals(reports []PayoutReport) []string {
 	var totalAmount, totalFee, totalTxFee int64
 	for _, report := range reports {
-		if report.TxKind == enums.PAYOUT_TX_KIND_TEZ {
+		if report.TxKind == enums.PAYOUT_TX_KIND_MAV {
 			totalAmount += report.Amount.Int64()
 		}
 		totalFee += report.Fee.Int64()
@@ -84,10 +84,10 @@ func GetReportsTotals(reports []PayoutReport) []string {
 		"",
 		"",
 		"",
-		MutezToTezS(totalAmount),
+		MumavToMavS(totalAmount),
 		"",
-		MutezToTezS(totalFee),
-		MutezToTezS(totalTxFee),
+		MumavToMavS(totalFee),
+		MumavToMavS(totalTxFee),
 		"",
 		"",
 	}

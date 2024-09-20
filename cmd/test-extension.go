@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/extension"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/constants/enums"
-	"github.com/tez-capital/tezpay/extension"
 )
 
 type testHookData struct {

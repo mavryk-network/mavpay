@@ -8,21 +8,21 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mvgo/codec"
+	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/mvgo/rpc"
 	"github.com/spf13/cobra"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
-	"github.com/trilitech/tzgo/codec"
-	"github.com/trilitech/tzgo/rpc"
-	"github.com/trilitech/tzgo/tezos"
 )
 
 var transferCmd = &cobra.Command{
-	Use:   "transfer <destination> <amount tez>",
-	Short: "transfers tez to specified address",
-	Long:  "transfers tez to specified address from payout wallet",
+	Use:   "transfer <destination> <amount mav>",
+	Short: "transfers mav to specified address",
+	Long:  "transfers mav to specified address from payout wallet",
 	Run: func(cmd *cobra.Command, args []string) {
 		_, _, signer, transactor := assertRunWithResult(loadConfigurationEnginesExtensions, EXIT_CONFIGURATION_LOAD_FAILURE).Unwrap()
-		mutez, _ := cmd.Flags().GetBool(MUTEZ_FLAG)
+		mumav, _ := cmd.Flags().GetBool(MUMAV_FLAG)
 
 		if len(args)%2 != 0 {
 			slog.Error("invalid number of arguments (expects pairs of destination and amount)")
@@ -35,7 +35,7 @@ var transferCmd = &cobra.Command{
 		op := codec.NewOp().WithSource(signer.GetPKH())
 		op.WithTTL(constants.MAX_OPERATION_TTL)
 		for i := 0; i < len(args); i += 2 {
-			destination, err := tezos.ParseAddress(args[i])
+			destination, err := mavryk.ParseAddress(args[i])
 			if err != nil {
 				slog.Error("invalid destination address", "address", args[i], "error", err.Error())
 				os.Exit(EXIT_IVNALID_ARGS)
@@ -46,20 +46,20 @@ var transferCmd = &cobra.Command{
 				slog.Error("invalid amount", "amount", args[i+1], "error", err.Error())
 				os.Exit(EXIT_IVNALID_ARGS)
 			}
-			if !mutez {
-				amount *= constants.MUTEZ_FACTOR
+			if !mumav {
+				amount *= constants.MUMAV_FACTOR
 			}
 
-			mutez := int64(math.Floor(amount))
-			total += mutez
+			mumav := int64(math.Floor(amount))
+			total += mumav
 			destinations = append(destinations, destination.String())
-			op.WithTransfer(destination, mutez)
+			op.WithTransfer(destination, mumav)
 		}
 
-		if err := requireConfirmation(fmt.Sprintf("do you really want to transfer %s to %s", common.MutezToTezS(total), strings.Join(destinations, ", "))); err != nil {
+		if err := requireConfirmation(fmt.Sprintf("do you really want to transfer %s to %s", common.MumavToMavS(total), strings.Join(destinations, ", "))); err != nil {
 			os.Exit(EXIT_OPERTION_CANCELED)
 		}
-		slog.Info("transferring tez", "total", common.MutezToTezS(total), "destinations", strings.Join(destinations, ", "), "confirmations_required", constants.DEFAULT_REQUIRED_CONFIRMATIONS)
+		slog.Info("transferring mav", "total", common.MumavToMavS(total), "destinations", strings.Join(destinations, ", "), "confirmations_required", constants.DEFAULT_REQUIRED_CONFIRMATIONS)
 		opts := rpc.DefaultOptions
 		opts.Confirmations = constants.DEFAULT_REQUIRED_CONFIRMATIONS
 		opts.Signer = signer.GetSigner()
@@ -78,7 +78,7 @@ var transferCmd = &cobra.Command{
 }
 
 func init() {
-	transferCmd.Flags().Bool(MUTEZ_FLAG, false, "amount in mutez")
+	transferCmd.Flags().Bool(MUMAV_FLAG, false, "amount in mumav")
 	transferCmd.Flags().Bool(CONFIRM_FLAG, false, "automatically confirms transfer")
 	RootCmd.AddCommand(transferCmd)
 }

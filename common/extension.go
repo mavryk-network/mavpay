@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tez-capital/tezpay/constants/enums"
+	"github.com/mavryk-network/mavpay/constants/enums"
 )
 
 type extensionHook struct {

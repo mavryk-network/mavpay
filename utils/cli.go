@@ -8,9 +8,9 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/samber/lo"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants/enums"
 )
 
 const (
@@ -195,17 +195,17 @@ func PrintCycleSummary(summary common.CyclePayoutSummary, header string) {
 	summaryTable.SetOutputMirror(os.Stdout)
 	summaryTable.SetTitle(header)
 	summaryTable.Style().Title.Align = text.AlignCenter
-	summaryTable.AppendRow(table.Row{"Earned Fees", common.MutezToTezS(summary.EarnedFees.Int64())}, table.RowConfig{AutoMerge: false})
-	summaryTable.AppendRow(table.Row{"Earned Rewards", common.MutezToTezS(summary.EarnedRewards.Int64())}, table.RowConfig{AutoMerge: false})
-	summaryTable.AppendRow(table.Row{"Distributed Rewards", common.MutezToTezS(summary.DistributedRewards.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Earned Fees", common.MumavToMavS(summary.EarnedFees.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Earned Rewards", common.MumavToMavS(summary.EarnedRewards.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Distributed Rewards", common.MumavToMavS(summary.DistributedRewards.Int64())}, table.RowConfig{AutoMerge: false})
 	summaryTable.AppendSeparator()
-	summaryTable.AppendRow(table.Row{"Donated Bonds", common.MutezToTezS(summary.DonatedBonds.Int64())}, table.RowConfig{AutoMerge: false})
-	summaryTable.AppendRow(table.Row{"Donated Fees", common.MutezToTezS(summary.DonatedFees.Int64())}, table.RowConfig{AutoMerge: false})
-	summaryTable.AppendRow(table.Row{"Donated Total", common.MutezToTezS(summary.DonatedTotal.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Donated Bonds", common.MumavToMavS(summary.DonatedBonds.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Donated Fees", common.MumavToMavS(summary.DonatedFees.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Donated Total", common.MumavToMavS(summary.DonatedTotal.Int64())}, table.RowConfig{AutoMerge: false})
 	summaryTable.AppendSeparator()
-	summaryTable.AppendRow(table.Row{"Bond Income", common.MutezToTezS(summary.BondIncome.Int64())}, table.RowConfig{AutoMerge: false})
-	summaryTable.AppendRow(table.Row{"Fee Income", common.MutezToTezS(summary.FeeIncome.Int64())}, table.RowConfig{AutoMerge: false})
-	summaryTable.AppendRow(table.Row{"Income Total", common.MutezToTezS(summary.IncomeTotal.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Bond Income", common.MumavToMavS(summary.BondIncome.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Fee Income", common.MumavToMavS(summary.FeeIncome.Int64())}, table.RowConfig{AutoMerge: false})
+	summaryTable.AppendRow(table.Row{"Income Total", common.MumavToMavS(summary.IncomeTotal.Int64())}, table.RowConfig{AutoMerge: false})
 	summaryTable.Render()
 }
 

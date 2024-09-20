@@ -3,14 +3,14 @@ package generate
 import (
 	"os"
 
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 )
 
 func SendAnalytics(ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) (*PayoutGenerationContext, error) {
 	configuration := ctx.GetConfiguration()
 
-	if os.Getenv("DISABLE_TEZPAY_ANALYTICS") == "true" {
+	if os.Getenv("DISABLE_MAVPAY_ANALYTICS") == "true" {
 		return ctx, nil
 	}
 

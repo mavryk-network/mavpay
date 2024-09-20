@@ -8,9 +8,9 @@ import (
 	"log/slog"
 	"net"
 
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 	"github.com/nikoksr/notify/service/mail"
-	"github.com/tez-capital/tezpay/common"
-	"github.com/tez-capital/tezpay/constants"
 )
 
 type EmailNotificatorConfiguration struct {
@@ -30,7 +30,7 @@ type EmailNotificator struct {
 }
 
 const (
-	DEFAULT_EMAIL_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle <Cycle> to <Delegators> delegators and donated <DonatedTotal> using #tezpay on the #tezos blockchain."
+	DEFAULT_EMAIL_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle <Cycle> to <Delegators> delegators and donated <DonatedTotal> using #mavpay on the #mavryk blockchain."
 )
 
 func InitEmailNotificator(configurationBytes []byte) (*EmailNotificator, error) {
