@@ -9,8 +9,8 @@ This hook is capable of mutating data.
   "cycle": 580,
   "candidates": [
     {
-      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "source": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -32,8 +32,8 @@ This hook is capable of mutating data.
   "cycle": 580,
   "candidates": [
     {
-      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "source": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -61,8 +61,8 @@ This hook is NOT capable of mutating data.
   "message": "This message is used to carry errors from hook to the caller.",
   "payouts": [
     {
-      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "source": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -89,8 +89,8 @@ This hook is capable of mutating data.
   "cycle": 580,
   "candidates": [
     {
-      "source": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "source": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "fee_rate": 5,
       "staked_balance": "1000000000",
       "delegated_balance": "1000000000",
@@ -117,10 +117,10 @@ This hook is NOT capable of mutating data *currently*.
   "cycles": 1,
   "payouts": [
     {
-      "baker": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "delegator": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "baker": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "delegator": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "cycle": 1,
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "kind": "invalid",
       "tx_kind": "fa1",
       "fa_token_id": "10",
@@ -170,10 +170,10 @@ This hook is capable of mutating data *currently*.
   "recipes": null,
   "payouts": [
     {
-      "baker": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "delegator": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "baker": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "delegator": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "cycle": 1,
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "kind": "invalid",
       "tx_kind": "fa1",
       "fa_token_id": "10",
@@ -196,17 +196,17 @@ This hook is capable of mutating data *currently*.
   "invalid_payouts": null,
   "reports_of_past_succesful_payouts": [
     {
-      "id": "fd8d0230c9d70458",
-      "baker": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
-      "timestamp": "2024-09-07T09:25:23.379448699Z",
+      "id": "1a542a408c174c55",
+      "baker": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
+      "timestamp": "2024-09-20T08:42:39.481174077Z",
       "cycle": 1,
       "kind": "invalid",
       "tx_kind": "fa1",
       "contract": "KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT",
       "token_id": "10",
-      "delegator": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "delegator": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "delegator_balance": "1000000000",
-      "recipient": "mv1QiogZoD9f7o83b3BMWK977KHxw3zhN7cJ",
+      "recipient": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
       "amount": "1000000000",
       "fee_rate": 5,
       "fee": "1000000000",
