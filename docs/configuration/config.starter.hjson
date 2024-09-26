@@ -1,8 +1,8 @@
 {
 #=====================================================================================================
-# This is mavpay starter configuration template. Please refer to https://mavpay.mavryk.org/mavpay/
-# - for default configuration (list of default values) see https://mavpay.mavryk.org/mavpay/configuration/examples/default/.
-# - for sample of all available fields see https://mavpay.mavryk.org/mavpay/configuration/examples/sample/.
+# This is mavpay starter configuration template. Please refer to https://bake.mavryk.org/mavpay/
+# - for default configuration (list of default values) see https://bake.mavryk.org/mavpay/configuration/examples/default/.
+# - for sample of all available fields see https://bake.mavryk.org/mavpay/configuration/examples/sample/.
 #=====================================================================================================
 
   # version of the configuration file

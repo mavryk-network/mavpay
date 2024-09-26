@@ -225,9 +225,9 @@ func GenerateStarterHJson() {
 	_ = hjson.Unmarshal(defaultMarshaled, &node)
 
 	node.Cm.InsideFirst = "\n#=====================================================================================================\n" +
-		"# This is mavpay starter configuration template. Please refer to https://mavpay.mavryk.org/mavpay/\n" +
-		"# - for default configuration (list of default values) see https://mavpay.mavryk.org/mavpay/configuration/examples/default/.\n" +
-		"# - for sample of all available fields see https://mavpay.mavryk.org/mavpay/configuration/examples/sample/.\n" +
+		"# This is mavpay starter configuration template. Please refer to https://bake.mavryk.org/mavpay/\n" +
+		"# - for default configuration (list of default values) see https://bake.mavryk.org/mavpay/configuration/examples/default/.\n" +
+		"# - for sample of all available fields see https://bake.mavryk.org/mavpay/configuration/examples/sample/.\n" +
 		"#=====================================================================================================\n"
 
 	node.DeleteKey("network")
