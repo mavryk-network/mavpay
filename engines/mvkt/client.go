@@ -295,7 +295,7 @@ func (client *Client) GetCycleData(ctx context.Context, baker mavryk.Address, cy
 
 	var blockDelegatedRewards, endorsingDelegatedRewards, delegationShare mavryk.Z
 	firstAiActivatedCycle := constants.FIRST_BOREAS_AI_ACTIVATED_CYCLE
-	if cycle >= firstAiActivatedCycle || strings.Contains(client.rootUrl.Host, "ghostnet") {
+	if cycle >= firstAiActivatedCycle || strings.Contains(client.rootUrl.Host, "basenet") {
 		blockDelegatedRewards = mavryk.NewZ(mvktBakerCycleData.BlockRewardsDelegated)
 		endorsingDelegatedRewards = mavryk.NewZ(mvktBakerCycleData.EndorsementRewardsDelegated)
 		delegationShare = mavryk.NewZ(mvktBakerCycleData.BakingPower - mvktBakerCycleData.OwnStakedBalance - mvktBakerCycleData.ExternalStakedBalance).Mul64(precision).Div64(mvktBakerCycleData.BakingPower)

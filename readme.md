@@ -1,10 +1,7 @@
 # MAVPAY
 <p align="center"><img width="100" src="https://raw.githubusercontent.com/mavryk-network/mavpay/main/assets/logo.png" alt="MAVPAY logo"></p>
 
-Hey👋 I am PayBuddy close friend of your BakeBuddy 👨‍🍳 you likely know. I am determined to provide you best experience with your baker payouts.
-Because of that I prepared something special for you - MAVPAY.
-
-See [Command Reference](https://mavpay.mavryk.org/mavpay/reference/) for details about commands. 
+See [Command Reference](https://bake.mavryk.org/mavpay/reference/) for details about commands. 
 
 ⚠️ **This repo is in active development and hasn't been security audited. Use at your own risk.** ⚠️
 
