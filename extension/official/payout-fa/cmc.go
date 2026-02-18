@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type cmcResponse struct {

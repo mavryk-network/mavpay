@@ -7,7 +7,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type IncomeRecipientsV0 struct {
@@ -115,7 +115,7 @@ func GetDefaultV0() ConfigurationV0 {
 			Overrides: make(map[string]DelegatorOverrideV0),
 			Ignore:    make([]mavryk.Address, 0),
 		},
-		Network: MavosNetworkConfigurationV0{
+		Network: MavrykNetworkConfigurationV0{
 			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,
 			Explorer:               constants.DEFAULT_EXPLORER_URL,

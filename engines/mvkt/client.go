@@ -16,7 +16,7 @@ import (
 	"github.com/hashicorp/go-version"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 
 	"github.com/samber/lo"
 )

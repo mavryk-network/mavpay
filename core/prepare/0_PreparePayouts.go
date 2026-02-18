@@ -11,13 +11,8 @@ import (
 	"github.com/mavryk-network/mavpay/extension"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/samber/lo"
-	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mavpay/constants/enums"
-	"github.com/mavryk-network/mavpay/extension"
-	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func buildOpForEstimation[T common.TransferArgs](ctx *PayoutPrepareContext, batch []T, injectBurnTransactions bool) (*codec.Op, error) {

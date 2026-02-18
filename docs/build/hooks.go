@@ -9,7 +9,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/core/generate"
 	"github.com/mavryk-network/mavpay/core/prepare"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func GenerateHookSampleData() {

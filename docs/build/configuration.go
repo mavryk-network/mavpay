@@ -9,7 +9,7 @@ import (
 	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func GenerateDefaultHJson() {
@@ -71,7 +71,7 @@ func genrateSample() *mavpay_configuration.ConfigurationV0 {
 			Ignore:    []mavryk.Address{mavryk.ZeroAddress, mavryk.BurnAddress},
 			Prefilter: []mavryk.Address{mavryk.MustParseAddress("mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3"), mavryk.MustParseAddress("mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb")},
 		},
-		Network: mavpay_configuration.MavosNetworkConfigurationV0{
+		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
 			RpcUrl:                 "https://rpc.mavryk.network",
 			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,

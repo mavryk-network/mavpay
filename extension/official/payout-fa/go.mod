@@ -4,8 +4,8 @@ go 1.25.0
 
 require (
 	github.com/alis-is/jsonrpc2 v0.0.0-20250810072930-5096354c2def
+	github.com/mavryk-network/gomavryk v1.20.0-gomavryk
 	github.com/mavryk-network/mavpay v0.0.0-20250208102828-493ace72d030
-	github.com/mavryk-network/mvgo v1.24.1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 

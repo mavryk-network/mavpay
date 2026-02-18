@@ -4,7 +4,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func ValidateRecipe(ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) (result *PayoutGenerationContext, err error) {

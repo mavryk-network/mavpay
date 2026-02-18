@@ -1,7 +1,7 @@
 package common
 
 import (
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/samber/lo"
 )
 

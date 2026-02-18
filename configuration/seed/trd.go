@@ -12,7 +12,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"gopkg.in/yaml.v3"
 )
 
@@ -282,7 +282,7 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 			FeeOverrides: feeOverrides,
 			Ignore:       ignores,
 		},
-		Network: mavpay_configuration.MavosNetworkConfigurationV0{
+		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
 			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,
 			DoNotPaySmartContracts: false,

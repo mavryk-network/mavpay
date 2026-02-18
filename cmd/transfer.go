@@ -10,9 +10,9 @@ import (
 
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/mavryk"
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/mavryk"
+	"github.com/mavryk-network/gomavryk/rpc"
 	"github.com/spf13/cobra"
 )
 

@@ -2,7 +2,7 @@ package mock
 
 import (
 	signer_engines "github.com/mavryk-network/mavpay/engines/signer"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func InitSimpleSigner() *signer_engines.InMemorySigner {

@@ -4,11 +4,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/mavryk-network/mavpay/notifications"
 	"github.com/spf13/cobra"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/notifications"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 var notificationTestCmd = &cobra.Command{

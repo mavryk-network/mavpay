@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 func isClientSynced(ctx context.Context, client *rpc.Client) bool {

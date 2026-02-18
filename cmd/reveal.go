@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 var revealCmd = &cobra.Command{

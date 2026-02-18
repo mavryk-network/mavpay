@@ -13,8 +13,6 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/nikoksr/notify/service/mail"
 	"github.com/samber/lo"
-	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mavpay/constants"
 )
 
 type EmailNotificatorConfiguration struct {

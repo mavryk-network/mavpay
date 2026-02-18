@@ -12,13 +12,7 @@ import (
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/spf13/cobra"
-	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mavpay/core"
 	reporter_engines "github.com/mavryk-network/mavpay/engines/reporter"
-	"github.com/mavryk-network/mavpay/extension"
-	"github.com/mavryk-network/mavpay/state"
-	"github.com/mavryk-network/mavpay/utils"
 )
 
 var generatePayoutsCmd = &cobra.Command{

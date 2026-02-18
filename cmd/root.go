@@ -15,8 +15,6 @@ import (
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/spf13/cobra"
-	"github.com/mavryk-network/mavpay/state"
-	"github.com/mavryk-network/mavpay/utils"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 

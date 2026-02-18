@@ -34,7 +34,7 @@ require (
 	github.com/nikoksr/notify v1.5.0 // indirect
 	github.com/samber/lo v1.52.0 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	github.com/mavryk-network/mvgo v1.24.1 // indirect
+	github.com/mavryk-network/gomavryk v1.20.0-gomavryk // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.69.0 // indirect
 	golang.org/x/crypto v0.47.0 // indirect

@@ -11,8 +11,6 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/nikoksr/notify/service/telegram"
 	"github.com/samber/lo"
-	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mavpay/constants"
 	"golang.org/x/exp/slog"
 )
 

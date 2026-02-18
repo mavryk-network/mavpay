@@ -9,7 +9,7 @@ import (
 	"math"
 
 	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 

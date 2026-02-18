@@ -16,11 +16,11 @@ require (
 	github.com/hashicorp/go-version v1.8.0
 	github.com/hjson/hjson-go/v4 v4.5.0
 	github.com/jedib0t/go-pretty/v6 v6.7.8
+	github.com/mavryk-network/gomavryk v1.20.0-gomavryk
 	github.com/nikoksr/notify v1.5.0
 	github.com/samber/lo v1.52.0
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
-	github.com/mavryk-network/mvgo v1.20.0-gomavryk
 	golang.org/x/exp v0.0.0-20260112195511-716be5621a96
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1

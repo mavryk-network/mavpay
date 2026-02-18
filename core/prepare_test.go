@@ -9,9 +9,9 @@ import (
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/test/mock"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/rpc"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/rpc"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type mockPrepareCollector struct {

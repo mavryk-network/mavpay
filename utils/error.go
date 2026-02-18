@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 // returns true if all errors are nil

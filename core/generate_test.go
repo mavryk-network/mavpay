@@ -11,7 +11,7 @@ import (
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/test/mock"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type mockGenerateCollector struct {

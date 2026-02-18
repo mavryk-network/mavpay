@@ -7,7 +7,7 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type NotificationKind string
@@ -37,7 +37,7 @@ func PopulateMessageTemplate(messageTempalte string, summary *common.PayoutSumma
 
 	for i := 0; i < v.NumField(); i++ {
 		val := fmt.Sprintf("%v", v.Field(i).Interface())
-		if typeOfS.Field(i).Type.Name() == "Z" && strings.Contains(typeOfS.Field(i).Type.PkgPath(), "mvgo/mavryk") {
+		if typeOfS.Field(i).Type.Name() == "Z" && strings.Contains(typeOfS.Field(i).Type.PkgPath(), "gomavryk/mavryk") {
 			val = fmt.Sprintf("%v", common.MumavToMavS(v.Field(i).Interface().(mavryk.Z).Int64()))
 		}
 		if typeOfS.Field(i).Name == "Cycles" {

@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"math"
 
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type Exchanger interface {

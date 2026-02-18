@@ -4,8 +4,8 @@ import (
 	"net/url"
 
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/samber/lo"
 )
 

@@ -10,12 +10,9 @@ import (
 
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/samber/lo"
-	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mavpay/constants/enums"
-	"github.com/mavryk-network/mvgo/base58"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/base58"
 )
 
 type OpLimits struct {
