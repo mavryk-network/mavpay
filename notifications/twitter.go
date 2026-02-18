@@ -33,7 +33,7 @@ type authorize struct{}
 func (a authorize) Add(req *http.Request) {}
 
 const (
-	DEFAULT_TWITTER_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle <Cycle> to <Delegators> delegators and donated <DonatedTotal> using #mavpay on the #mavryk blockchain."
+	DEFAULT_TWITTER_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle/s <Cycles> to <Delegators> delegators and donated <DonatedTotal> using #mavpay on the #mavryk blockchain."
 )
 
 func InitTwitterNotificator(configurationBytes []byte) (*TwitterNotificator, error) {
@@ -88,7 +88,7 @@ func ValidateTwitterConfiguration(configurationBytes []byte) error {
 	return nil
 }
 
-func (tn *TwitterNotificator) PayoutSummaryNotify(summary *common.CyclePayoutSummary, additionalData map[string]string) error {
+func (tn *TwitterNotificator) PayoutSummaryNotify(summary *common.PayoutSummary, additionalData map[string]string) error {
 	_, err := tn.client.CreateTweet(context.Background(), twitter.CreateTweetRequest{
 		Text: PopulateMessageTemplate(tn.messageTemplate, summary, additionalData),
 	})

@@ -7,10 +7,14 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"strings"
 
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/nikoksr/notify/service/mail"
+	"github.com/samber/lo"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/constants"
 )
 
 type EmailNotificatorConfiguration struct {
@@ -30,7 +34,7 @@ type EmailNotificator struct {
 }
 
 const (
-	DEFAULT_EMAIL_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycle <Cycle> to <Delegators> delegators and donated <DonatedTotal> using #mavpay on the #mavryk blockchain."
+	DEFAULT_EMAIL_MESSAGE_TEMPLATE = "A total of <DistributedRewards> was distributed for cycles <Cycles> to <Delegators> delegators and donated <DonatedTotal> using #mavpay on the #mavryk blockchain."
 )
 
 func InitEmailNotificator(configurationBytes []byte) (*EmailNotificator, error) {
@@ -79,8 +83,14 @@ func ValidateEmailConfiguration(configurationBytes []byte) error {
 	return nil
 }
 
-func (en *EmailNotificator) PayoutSummaryNotify(summary *common.CyclePayoutSummary, additionalData map[string]string) error {
-	return en.session.Send(context.Background(), fmt.Sprintf("Report of cycle #%d", summary.Cycle), PopulateMessageTemplate(en.messageTemplate, summary, additionalData))
+func (en *EmailNotificator) PayoutSummaryNotify(summary *common.PayoutSummary, additionalData map[string]string) error {
+	subject := fmt.Sprintf("Payout Summary for cycles %s", strings.Join(lo.Map(summary.Cycles, func(c int64, _ int) string {
+		return fmt.Sprintf("#%d", c)
+	}), ", "))
+	if len(summary.Cycles) == 1 {
+		subject = fmt.Sprintf("Payout Summary for cycle %d", summary.Cycles[0])
+	}
+	return en.session.Send(context.Background(), subject, PopulateMessageTemplate(en.messageTemplate, summary, additionalData))
 }
 
 func (en *EmailNotificator) AdminNotify(msg string) error {

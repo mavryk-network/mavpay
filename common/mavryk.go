@@ -13,19 +13,21 @@ type Delegator struct {
 }
 
 type BakersCycleData struct {
-	OwnDelegatedBalance              mavryk.Z
-	ExternalDelegatedBalance         mavryk.Z
-	BlockDelegatedRewards            mavryk.Z
-	IdealBlockDelegatedRewards       mavryk.Z
-	EndorsementDelegatedRewards      mavryk.Z
-	IdealEndorsementDelegatedRewards mavryk.Z
-	BlockDelegatedFees               mavryk.Z
-	DelegatorsCount                  int32
+	OwnDelegatedBalance               mavryk.Z
+	ExternalDelegatedBalance          mavryk.Z
+	BlockDelegatedRewards             mavryk.Z
+	IdealBlockDelegatedRewards        mavryk.Z
+	AttestationsDelegatedRewards      mavryk.Z
+	IdealAttestationsDelegatedRewards mavryk.Z
+	DalDelegatedRewards               mavryk.Z
+	IdealDalDelegatedRewards          mavryk.Z
+	BlockDelegatedFees                mavryk.Z
+	DelegatorsCount                   int32
 
 	OwnStakedBalance              mavryk.Z
 	ExternalStakedBalance         mavryk.Z
 	BlockStakingRewardsEdge       mavryk.Z
-	EndorsementStakingRewardsEdge mavryk.Z
+	AttestationStakingRewardsEdge mavryk.Z
 	BlockStakingFees              mavryk.Z
 	StakersCount                  int32
 
@@ -39,11 +41,11 @@ type ShareInfo struct {
 }
 
 func (cycleData *BakersCycleData) getActualDelegatedRewards() mavryk.Z {
-	return cycleData.BlockDelegatedFees.Add(cycleData.BlockDelegatedRewards).Add(cycleData.EndorsementDelegatedRewards)
+	return cycleData.BlockDelegatedRewards.Add(cycleData.AttestationsDelegatedRewards).Add(cycleData.DalDelegatedRewards).Add(cycleData.BlockDelegatedFees)
 }
 
 func (cycleData *BakersCycleData) getIdealDelegatedRewards() mavryk.Z {
-	return cycleData.IdealBlockDelegatedRewards.Add(cycleData.IdealEndorsementDelegatedRewards).Add(cycleData.BlockDelegatedFees)
+	return cycleData.IdealBlockDelegatedRewards.Add(cycleData.IdealAttestationsDelegatedRewards).Add(cycleData.IdealDalDelegatedRewards).Add(cycleData.BlockDelegatedFees)
 }
 
 // GetTotalDelegatedRewards returns the total rewards for the cycle based on payout mode

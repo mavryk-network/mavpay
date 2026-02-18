@@ -15,11 +15,16 @@ import (
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/utils"
 	"github.com/spf13/cobra"
+	"github.com/mavryk-network/mavpay/state"
+	"github.com/mavryk-network/mavpay/utils"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 const (
 	LOG_LEVEL_FLAG               = "log-level"
 	LOG_SERVER_FLAG              = "log-server"
+	LOG_FILE_FLAG                = "log-file"
+	NO_COLOR_FLAG                = "no-color"
 	PATH_FLAG                    = "path"
 	VERSION_FLAG                 = "version"
 	DISABLE_DONATION_PROMPT_FLAG = "disable-donation-prompt"
@@ -37,25 +42,53 @@ var (
 	}
 )
 
-func setupJsonLogger(level slog.Level, logServerAddress string) {
-	var target io.Writer
-	if logServerAddress != "" {
-		target = utils.NewMultiWriter(os.Stdout, utils.NewLogServer(logServerAddress))
-	} else {
-		target = os.Stdout
-	}
-	handler := slog.NewJSONHandler(target, &slog.HandlerOptions{Level: level})
-	slog.SetDefault(slog.New(handler))
-	if logServerAddress != "" {
-		slog.Info("log server started", "address", logServerAddress)
+func setupLumberjackLogger(logFile string) io.Writer {
+	return &lumberjack.Logger{
+		Filename:   logFile,
+		MaxSize:    10, // megabytes
+		MaxBackups: 3,
+		MaxAge:     28, // days
+		Compress:   true,
 	}
 }
 
-func setupTextLogger(level slog.Level) {
-	handler := utils.NewPrettyTextLogHandler(os.Stdout, utils.PrettyHandlerOptions{
-		HandlerOptions: slog.HandlerOptions{Level: level},
-	})
-	slog.SetDefault(slog.New(handler))
+func setupLogger(level slog.Level, logServerAddress string, logFile string, format string, noColor bool) {
+	var jsonWriters []io.Writer
+	if logServerAddress != "" {
+		jsonWriters = append(jsonWriters, utils.NewLogServer(logServerAddress))
+	}
+	if logFile != "" {
+		jsonWriters = append(jsonWriters, setupLumberjackLogger(logFile))
+	}
+
+	textWriters := []io.Writer{os.Stdout}
+
+	switch format {
+	case "json":
+		jsonWriters = append(jsonWriters, os.Stdout)
+	case "text":
+		textWriters = append(textWriters, os.Stdout)
+	}
+
+	handlers := make([]slog.Handler, 0, 2)
+	if len(textWriters) > 0 {
+		textHandler := utils.NewPrettyTextLogHandler(utils.NewMultiWriter(textWriters...), utils.PrettyHandlerOptions{
+			HandlerOptions: slog.HandlerOptions{Level: level},
+			NoColor:        noColor,
+		})
+		handlers = append(handlers, textHandler)
+	}
+
+	if len(jsonWriters) > 0 {
+		jsonHandler := slog.NewJSONHandler(utils.NewMultiWriter(jsonWriters...), &slog.HandlerOptions{Level: level})
+		handlers = append(handlers, jsonHandler)
+	}
+
+	slog.SetDefault(slog.New(utils.NewSlogMultiHandler(handlers...)))
+
+	if logServerAddress != "" {
+		slog.Info("log server started", "address", logServerAddress)
+	}
 }
 
 var (
@@ -68,22 +101,18 @@ Copyright © %d alis.is
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			format, _ := cmd.Flags().GetString(OUTPUT_FORMAT_FLAG)
 			disableDonationPrompt, _ := cmd.Flags().GetBool(DISABLE_DONATION_PROMPT_FLAG)
-			level, _ := cmd.Flags().GetString(LOG_LEVEL_FLAG)
+			logLevelFlag, _ := cmd.Flags().GetString(LOG_LEVEL_FLAG)
 			logServer, _ := cmd.Flags().GetString(LOG_SERVER_FLAG)
+			logFile, _ := cmd.Flags().GetString(LOG_FILE_FLAG)
 
-			switch format {
-			case "json":
-				setupJsonLogger(LOG_LEVEL_MAP[level], logServer)
-			case "text":
-				setupTextLogger(LOG_LEVEL_MAP[level])
-			default:
-				if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) == 0 {
-					setupJsonLogger(LOG_LEVEL_MAP[level], logServer)
-				} else {
-					setupTextLogger(LOG_LEVEL_MAP[level])
-				}
+			logLevel, ok := LOG_LEVEL_MAP[logLevelFlag]
+			if !ok {
+				slog.Error("invalid log level", "level", logLevelFlag)
+				os.Exit(EXIT_INVALID_LOG_LEVEL)
 			}
-			slog.Debug("logger configured", "format", format, "level", level)
+			noColor, _ := cmd.Flags().GetBool(NO_COLOR_FLAG)
+			setupLogger(logLevel, logServer, logFile, format, noColor)
+			slog.Debug("logger configured", "format", format, "level", logLevelFlag)
 
 			workingDirectory, _ := cmd.Flags().GetString(PATH_FLAG)
 			singerFlagData, _ := cmd.Flags().GetString(SIGNER_FLAG)
@@ -138,8 +167,10 @@ func init() {
 	RootCmd.Flags().Bool(VERSION_FLAG, false, "Prints version")
 	RootCmd.PersistentFlags().StringP(PATH_FLAG, "p", ".", "path to working directory")
 	RootCmd.PersistentFlags().StringP(OUTPUT_FORMAT_FLAG, "o", "auto", "Sets output log format (json/text/auto)")
-	RootCmd.PersistentFlags().StringP(LOG_LEVEL_FLAG, "l", "info", "Sets log level format (trace/debug/info/warn/error)")
+	RootCmd.PersistentFlags().StringP(LOG_LEVEL_FLAG, "l", "info", "Sets log level format (debug/info/warn/error)")
 	RootCmd.PersistentFlags().String(LOG_SERVER_FLAG, "", "launches log server at specified address")
+	RootCmd.PersistentFlags().String(LOG_FILE_FLAG, "", "Logs to file")
+	RootCmd.PersistentFlags().Bool(NO_COLOR_FLAG, false, "Disable color output")
 	RootCmd.PersistentFlags().String(SIGNER_FLAG, "", "Override signer")
 	RootCmd.PersistentFlags().Bool(SKIP_VERSION_CHECK_FLAG, false, "Skip version check")
 	RootCmd.PersistentFlags().Bool(DISABLE_DONATION_PROMPT_FLAG, false, "Disable donation prompt")

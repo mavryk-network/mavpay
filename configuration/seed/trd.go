@@ -282,10 +282,9 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 			FeeOverrides: feeOverrides,
 			Ignore:       ignores,
 		},
-		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
-			RpcUrl:                 constants.DEFAULT_RPC_URL,
+		Network: mavpay_configuration.MavosNetworkConfigurationV0{
+			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,
-			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			DoNotPaySmartContracts: false,
 		},
 		Overdelegation: mavpay_configuration.OverdelegationConfigurationV0{
@@ -298,7 +297,6 @@ func MigrateTrdv1ToTPv0(sourceBytes []byte) ([]byte, error) {
 			IgnoreEmptyAccounts:     !configuration.ReactivateZero,
 			WalletMode:              enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			PayoutMode:              enums.EPayoutMode(configuration.RewardsType),
-			BalanceCheckMode:        enums.PROTOCOL_BALANCE_CHECK_MODE,
 			MinimumAmount:           configuration.MinPayment,
 		},
 		NotificationConfigurations: notificationConfigurations,

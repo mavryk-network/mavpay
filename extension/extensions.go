@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alis-is/jsonrpc2/rpc"
+	rpc "github.com/alis-is/jsonrpc2"
 	"github.com/google/uuid"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
@@ -15,8 +15,9 @@ import (
 )
 
 type ExtensionStoreEnviromnent struct {
-	BakerPKH  string `json:"baker_pkh"`
-	PayoutPKH string `json:"payout_pkh"`
+	BakerPKH  string   `json:"baker_pkh"`
+	PayoutPKH string   `json:"payout_pkh"`
+	RpcPool   []string `json:"rpc_pool"`
 }
 
 type ExtensionStore struct {
@@ -75,7 +76,7 @@ func CloseExtensions() {
 	}
 }
 
-func ExecuteHook[TData rpc.ResultType](hook enums.EExtensionHook, version string, data *TData) error {
+func ExecuteHook[TData rpc.Result](hook enums.EExtensionHook, version string, data *TData) error {
 	if data == nil {
 		return constants.ErrExtensionHookMissingData
 	}

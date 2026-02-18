@@ -5,17 +5,17 @@ const (
 
 	MUMAV_FACTOR = 1000000
 
-	DELEGATION_CAPACITY_FACTOR = 9
+	DELEGATION_CAPACITY_FACTOR             = 9
+	LIMIT_OF_STAKING_OVER_BAKING_PRECISION = 1_000_000
 
 	DEFAULT_BAKER_FEE                     = float64(.05)
 	DEFAULT_DELEGATOR_MINIMUM_BALANCE     = float64(0)
 	DEFAULT_PAYOUT_MINIMUM_AMOUNT         = float64(0)
-	DEFAULT_RPC_URL                       = "https://rpc.mavryk.network/"
 	DEFAULT_MVKT_URL                      = "https://api.mavryk.network/"
-	DEFAULT_PROTOCOL_REWARDS_URL          = "https://protocol-rewards.mavryk.network/"
-	DEFAULT_EXPLORER_URL                  = "https://mvkt.io/"
+	DEFAULT_EXPLORER_URL                  = "https://nexus.mavryk.org/"
 	DEFAULT_REQUIRED_CONFIRMATIONS        = int64(2)
 	DEFAULT_TX_GAS_LIMIT_BUFFER           = int64(100)
+	DEFAULT_KT_TX_GAS_LIMIT_BUFFER        = int64(200)
 	DEFAULT_TX_DESERIALIZATION_GAS_BUFFER = int64(2) // just because of integer division
 	DEFAULT_TX_FEE_BUFFER                 = int64(0)
 	DEFAULT_KT_TX_FEE_BUFFER              = int64(0)
@@ -40,5 +40,15 @@ const (
 	DEFAULT_DONATION_ADDRESS    = "mv1V4h45W3p4e1sjSBvRkK2uYbvkTnSuHg8g"
 	DEFAULT_DONATION_PERCENTAGE = 0.05
 
-	FIRST_BOREAS_AI_ACTIVATED_CYCLE = int64(748)
+	// periodic payouts
+	MINIMUM_PAYOUT_INTERVAL_CYCLES = int64(1)
+	MAXIMUM_PAYOUT_INTERVAL_CYCLES = int64(365)
+
+	DRY_RUN_NOTE = "[DRY RUN]"
+)
+
+var (
+	DEFAULT_RPC_POOL = []string{
+		"https://rpc.mavryk.network/",
+	}
 )

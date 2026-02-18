@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"maps"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/fatih/color"
@@ -20,35 +21,32 @@ import (
 
 type PrettyHandlerOptions struct {
 	slog.HandlerOptions
+	NoColor bool
 }
 
 type PrettyTextLogHandler struct {
 	slog.Handler
 	l *log.Logger
 
-	attrs  map[string][]slog.Attr
-	groups []string
+	attrs   map[string][]slog.Attr
+	groups  []string
+	noColor bool
+}
+
+func isHiddenAttr(attr slog.Attr) bool {
+	_, found := slices.BinarySearch(constants.LOG_TOP_LEVEL_HIDDEN_FIELDS, attr.Key)
+	return found
 }
 
 func (h *PrettyTextLogHandler) Handle(ctx context.Context, r slog.Record) error {
 	level := r.Level.String() + ":"
-	switch r.Level {
-	case slog.LevelDebug:
-		level = color.MagentaString(level)
-	case slog.LevelInfo:
-		level = color.BlueString(level)
-	case slog.LevelWarn:
-		level = color.YellowString(level)
-	case slog.LevelError:
-		level = color.RedString(level)
-	}
-
 	fields := make(map[string]any, r.NumAttrs())
 
 	for groupId, group := range h.attrs {
 		for _, attr := range group {
 			if groupId == "" {
-				if _, found := slices.BinarySearch(constants.LOG_TOP_LEVEL_HIDDEN_FIELDS, attr.Key); found {
+				if isHiddenAttr(attr) {
+					delete(fields, attr.Key)
 					continue
 				}
 				fields[attr.Key] = attr.Value.Any()
@@ -65,23 +63,44 @@ func (h *PrettyTextLogHandler) Handle(ctx context.Context, r slog.Record) error 
 	}
 
 	r.Attrs(func(a slog.Attr) bool {
-		fields[a.Key] = a.Value.Any()
+		if !isHiddenAttr(a) {
+			switch {
+			case a.Key == "error" && a.Value.String() != "":
+				fields[a.Key] = strings.Split(a.Value.String(), "\n")
+			default:
+				fields[a.Key] = a.Value.Any()
+			}
+		}
 		return true
 	})
 
-	var fieldsSerialized []byte
+	var fieldsSerializedRaw []byte
 	if len(fields) != 0 {
 		var err error
-		fieldsSerialized, err = json.MarshalIndent(fields, "", "  ")
+		fieldsSerializedRaw, err = json.MarshalIndent(fields, "", "  ")
 		if err != nil {
 			slog.Error("failed to serialize fields", "error", err.Error())
 		}
 	}
 
 	timeStr := r.Time.Format("[15:04:05.000]")
-	msg := color.HiWhiteString(r.Message)
+	fieldsSerialized := string(fieldsSerializedRaw)
+	if !h.noColor {
+		fieldsSerialized = color.WhiteString(fieldsSerialized)
 
-	h.l.Println(timeStr, level, msg, color.WhiteString(string(fieldsSerialized)))
+		switch r.Level {
+		case slog.LevelDebug:
+			level = color.MagentaString(level)
+		case slog.LevelInfo:
+			level = color.BlueString(level)
+		case slog.LevelWarn:
+			level = color.YellowString(level)
+		case slog.LevelError:
+			level = color.RedString(level)
+		}
+	}
+
+	h.l.Println(timeStr, level, r.Message, fieldsSerialized)
 
 	return nil
 }
@@ -99,6 +118,7 @@ func (h *PrettyTextLogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 		l:       h.l,
 		attrs:   newAttrs,
 		groups:  slices.Clone(h.groups),
+		noColor: h.noColor,
 	}
 }
 
@@ -108,6 +128,7 @@ func (h *PrettyTextLogHandler) WithGroup(name string) slog.Handler {
 		l:       h.l,
 		attrs:   maps.Clone(h.attrs),
 		groups:  append(h.groups, name),
+		noColor: h.noColor,
 	}
 }
 
@@ -119,6 +140,7 @@ func NewPrettyTextLogHandler(
 		Handler: slog.NewJSONHandler(out, &opts.HandlerOptions),
 		l:       log.New(out, "", 0),
 		attrs:   make(map[string][]slog.Attr),
+		noColor: opts.NoColor,
 	}
 
 	return h
@@ -230,7 +252,11 @@ func NewLogServer(address string) *LogServer {
 	})
 
 	go func() {
-		app.Listen(address)
+		slog.Info("starting log server", "address", address)
+		err := app.Listen(address)
+		if err != nil {
+			slog.Error("log server failed", "error", err.Error())
+		}
 	}()
 
 	return logServer
@@ -253,5 +279,51 @@ func (m *MultiWriter) Write(p []byte) (n int, err error) {
 func NewMultiWriter(writers ...io.Writer) *MultiWriter {
 	return &MultiWriter{
 		writers: writers,
+	}
+}
+
+type SlogMultiHandler struct {
+	handlers []slog.Handler
+}
+
+func NewSlogMultiHandler(handlers ...slog.Handler) *SlogMultiHandler {
+	return &SlogMultiHandler{
+		handlers: handlers,
+	}
+}
+
+func (h *SlogMultiHandler) Handle(ctx context.Context, r slog.Record) error {
+	for _, handler := range h.handlers {
+		if !handler.Enabled(ctx, r.Level) {
+			continue
+		}
+		if err := handler.Handle(ctx, r); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h *SlogMultiHandler) Enabled(_ context.Context, level slog.Level) bool {
+	return true
+}
+
+func (h *SlogMultiHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	newHandlers := make([]slog.Handler, 0, len(h.handlers))
+	for _, handler := range h.handlers {
+		newHandlers = append(newHandlers, handler.WithAttrs(attrs))
+	}
+	return &SlogMultiHandler{
+		handlers: newHandlers,
+	}
+}
+
+func (h *SlogMultiHandler) WithGroup(name string) slog.Handler {
+	newHandlers := make([]slog.Handler, 0, len(h.handlers))
+	for _, handler := range h.handlers {
+		newHandlers = append(newHandlers, handler.WithGroup(name))
+	}
+	return &SlogMultiHandler{
+		handlers: newHandlers,
 	}
 }

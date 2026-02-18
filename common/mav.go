@@ -2,23 +2,39 @@ package common
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mvgo/mavryk"
 )
 
-func FormatAmount(kind enums.EPayoutTransactionKind, amount int64) string {
+func FormatMavAmount(amount int64) string {
+	if amount == 0 {
+		return ""
+	}
+	return MumavToMavS(amount)
+}
+
+func FormatTokenAmount(kind enums.EPayoutTransactionKind, amount int64, alias string, decimals int) string {
 	if amount == 0 {
 		return ""
 	}
 	switch kind {
 	case enums.PAYOUT_TX_KIND_FA1_2:
-		return fmt.Sprintf("%d FA1", amount)
+		amountFloat := float64(amount) / math.Pow10(decimals)
+		if alias != "" {
+			return fmt.Sprintf("%.*f %s", decimals, amountFloat, alias)
+		}
+		return fmt.Sprintf("%.*f FA1", decimals, amountFloat)
 	case enums.PAYOUT_TX_KIND_FA2:
-		return fmt.Sprintf("%d FA2", amount)
+		amountFloat := float64(amount) / math.Pow10(decimals)
+		if alias != "" {
+			return fmt.Sprintf("%.*f %s", decimals, amountFloat, alias)
+		}
+		return fmt.Sprintf("%.*f FA2", decimals, amountFloat)
 	default:
-		return MumavToMavS(amount)
+		return FormatMavAmount(amount)
 	}
 }
 

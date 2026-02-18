@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/alis-is/jsonrpc2/rpc"
+	rpc "github.com/alis-is/jsonrpc2"
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/extension"

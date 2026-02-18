@@ -11,6 +11,12 @@ import (
 	"github.com/mavryk-network/mvgo/mavryk"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
+	"github.com/mavryk-network/mavpay/common"
+	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mavpay/constants/enums"
+	"github.com/mavryk-network/mavpay/test/mock"
+	"github.com/mavryk-network/mavpay/utils"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 var (
@@ -43,6 +49,8 @@ var (
 			TxKind:      enums.PAYOUT_TX_KIND_FA1_2,
 		},
 	}
+	collector = mock.InitSimpleCollector()
+	config    = configuration.GetDefaultRuntimeConfiguration()
 )
 
 func adjustFee(ctx *PayoutGenerationContext, fee float64) {
@@ -123,7 +131,7 @@ func TestCollectBakerFees(t *testing.T) {
 			continue
 		}
 		assert.True(v.IsInvalid)
-		assert.Equal(v.InvalidBecause, enums.INVALID_PAYOUT_BELLOW_MINIMUM)
+		assert.Equal(v.InvalidBecause, enums.INVALID_NOT_ENOUGH_BONDS_FOR_BAKER_FEE)
 		collectedFee = collectedFee.Add(v.Fee)
 	}
 	totalBonds := lo.Reduce(ctx.StageData.PayoutCandidatesWithBondAmount, func(agg mavryk.Z, v PayoutCandidateWithBondAmount, _ int) mavryk.Z {

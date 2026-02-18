@@ -4,9 +4,9 @@
   payouts: {
     wallet_mode: local-private-key
     payout_mode: actual
-    balance_check_mode: protocol
     fee: 0.05
     transaction_gas_limit_buffer: 100
+    kt_transaction_gas_limit_buffer: 200
     transaction_deserialization_gas_buffer: 2
     minimum_delay_blocks: 500
     maximum_delay_blocks: 1500
@@ -19,10 +19,11 @@
   }
   income_recipients: {}
   network: {
-    rpc_url: https://rpc.mavryk.network/
+    rpc_pool: [
+      https://rpc.mavryk.network/
+    ]
     mvkt_url: https://api.mavryk.network/
-    protocol_rewards_url: https://protocol-rewards.mavryk.network/
-    explorer: https://mvkt.io/
+    explorer: https://nexus.mavryk.org/
   }
   overdelegation: {
     protect: true

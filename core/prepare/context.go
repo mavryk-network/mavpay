@@ -5,13 +5,16 @@ import (
 
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
+	"github.com/mavryk-network/mvgo/mavryk"
 )
 
 type StageData struct {
-	ValidPayouts                  []common.PayoutRecipe
-	InvalidPayouts                []common.PayoutRecipe
-	AccumulatedPayouts            []common.PayoutRecipe
+	Payouts                       []common.PayoutRecipe
+	AccumulatedPayouts            []*common.AccumulatedPayoutRecipe
+	InvalidRecipes                []common.PayoutRecipe
 	ReportsOfPastSuccesfulPayouts []common.PayoutReport
+	// protocol, signature etc.
+	BatchMetadataDeserializationGasLimit int64
 }
 
 type PayoutPrepareContext struct {
@@ -21,6 +24,8 @@ type PayoutPrepareContext struct {
 	StageData *StageData
 
 	PayoutBlueprints []*common.CyclePayoutBlueprint
+
+	PayoutKey mavryk.Key
 
 	logger *slog.Logger
 }
@@ -41,6 +46,7 @@ func NewPayoutPreparationContext(blueprints []*common.CyclePayoutBlueprint, conf
 		StageData: &StageData{},
 
 		PayoutBlueprints: blueprints,
+		PayoutKey:        engineContext.GetSigner().GetKey(),
 
 		logger: slog.Default().With("stage", "prepare"),
 	}, nil

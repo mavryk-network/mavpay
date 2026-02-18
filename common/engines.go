@@ -53,14 +53,12 @@ type TransactorEngine interface {
 	RefreshParams() error
 	Complete(op *codec.Op, key mavryk.Key) error
 	Dispatch(op *codec.Op, opts *rpc.CallOptions) (OpResult, error)
-	Broadcast(op *codec.Op) (mavryk.OpHash, error)
 	Send(op *codec.Op, opts *rpc.CallOptions) (*rpc.Receipt, error)
 	GetLimits() (*OperationLimits, error)
-	WaitOpConfirmation(opHash mavryk.OpHash, ttl int64, confirmations int64) (*rpc.Receipt, error)
 }
 
 type NotificatorEngine interface {
-	PayoutSummaryNotify(summary *CyclePayoutSummary, additionalData map[string]string) error
+	PayoutSummaryNotify(summary *PayoutSummary, additionalData map[string]string) error
 	AdminNotify(msg string) error
 	TestNotify() error
 }
@@ -74,13 +72,14 @@ type CycleMonitor interface {
 }
 
 type ReporterEngineOptions struct {
-	DryRun bool
+	DryRun     bool
+	IsReadOnly bool
 }
 
 type ReporterEngine interface {
 	GetExistingReports(cycle int64) ([]PayoutReport, error)
 	ReportPayouts(reports []PayoutReport) error
-	ReportInvalidPayouts(reports []PayoutRecipe) error
-	ReportCycleSummary(summary CyclePayoutSummary) error
+	ReportInvalidPayouts(reports []PayoutReport) error
+	ReportCycleSummary(cycle int64, summary CyclePayoutSummary) error
 	GetExistingCycleSummary(cycle int64) (*CyclePayoutSummary, error)
 }

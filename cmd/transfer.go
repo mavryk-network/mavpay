@@ -23,10 +23,11 @@ var transferCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, _, signer, transactor := assertRunWithResult(loadConfigurationEnginesExtensions, EXIT_CONFIGURATION_LOAD_FAILURE).Unwrap()
 		mumav, _ := cmd.Flags().GetBool(MUMAV_FLAG)
+		confirmed, _ := cmd.Flags().GetBool(CONFIRM_FLAG)
 
 		if len(args)%2 != 0 {
 			slog.Error("invalid number of arguments (expects pairs of destination and amount)")
-			os.Exit(EXIT_IVNALID_ARGS)
+			os.Exit(EXIT_INVALID_ARGS)
 		}
 		total := int64(0)
 
@@ -38,13 +39,13 @@ var transferCmd = &cobra.Command{
 			destination, err := mavryk.ParseAddress(args[i])
 			if err != nil {
 				slog.Error("invalid destination address", "address", args[i], "error", err.Error())
-				os.Exit(EXIT_IVNALID_ARGS)
+				os.Exit(EXIT_INVALID_ARGS)
 			}
 
 			amount, err := strconv.ParseFloat(args[i+1], 64)
 			if err != nil {
 				slog.Error("invalid amount", "amount", args[i+1], "error", err.Error())
-				os.Exit(EXIT_IVNALID_ARGS)
+				os.Exit(EXIT_INVALID_ARGS)
 			}
 			if !mumav {
 				amount *= constants.MUMAV_FACTOR
@@ -56,13 +57,17 @@ var transferCmd = &cobra.Command{
 			op.WithTransfer(destination, mumav)
 		}
 
-		if err := requireConfirmation(fmt.Sprintf("do you really want to transfer %s to %s", common.MumavToMavS(total), strings.Join(destinations, ", "))); err != nil {
+		switch {
+		case confirmed:
+		case requireConfirmation(fmt.Sprintf("do you really want to transfer %s to %s", common.MumavToMavS(total), strings.Join(destinations, ", "))) != nil:
 			os.Exit(EXIT_OPERTION_CANCELED)
 		}
+
 		slog.Info("transferring mav", "total", common.MumavToMavS(total), "destinations", strings.Join(destinations, ", "), "confirmations_required", constants.DEFAULT_REQUIRED_CONFIRMATIONS)
 		opts := rpc.DefaultOptions
 		opts.Confirmations = constants.DEFAULT_REQUIRED_CONFIRMATIONS
 		opts.Signer = signer.GetSigner()
+		opts.Sender = signer.GetPKH()
 
 		rcpt, err := transactor.Send(op, &opts)
 		if err != nil {

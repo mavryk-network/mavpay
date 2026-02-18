@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"math"
 	"os"
+	"slices"
 	"strconv"
 
 	"github.com/hjson/hjson-go/v4"
@@ -86,14 +87,15 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 	if payoutMode == "" {
 		payoutMode = enums.PAYOUT_MODE_ACTUAL
 	}
-	balanceCheckMode := configuration.PayoutConfiguration.BalanceCheckMode
-	if balanceCheckMode == "" {
-		balanceCheckMode = enums.PROTOCOL_BALANCE_CHECK_MODE
-	}
 
 	gasLimitBuffer := int64(constants.DEFAULT_TX_GAS_LIMIT_BUFFER)
 	if configuration.PayoutConfiguration.TxGasLimitBuffer != nil {
 		gasLimitBuffer = *configuration.PayoutConfiguration.TxGasLimitBuffer
+	}
+
+	ktGasLimitBuffer := int64(constants.DEFAULT_KT_TX_GAS_LIMIT_BUFFER)
+	if configuration.PayoutConfiguration.KtTxGasLimitBuffer != nil {
+		ktGasLimitBuffer = *configuration.PayoutConfiguration.KtTxGasLimitBuffer
 	}
 
 	deserializaGasBuffer := int64(constants.DEFAULT_TX_DESERIALIZATION_GAS_BUFFER)
@@ -146,18 +148,28 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 		simulationBatchSize = *configuration.PayoutConfiguration.SimulationBatchSize
 	}
 
+	rpcPool := make([]string, 0, len(configuration.Network.RpcPool)+1)
+	if configuration.Network.RpcUrl != "" {
+		rpcPool = append(rpcPool, configuration.Network.RpcUrl)
+	}
+	for _, rpc := range configuration.Network.RpcPool {
+		if !slices.Contains(rpcPool, rpc) {
+			rpcPool = append(rpcPool, rpc)
+		}
+	}
+
 	return &RuntimeConfiguration{
 		BakerPKH: configuration.BakerPKH,
 		PayoutConfiguration: RuntimePayoutConfiguration{
 			WalletMode:                 walletMode,
 			PayoutMode:                 payoutMode,
-			BalanceCheckMode:           balanceCheckMode,
 			Fee:                        configuration.PayoutConfiguration.Fee,
 			IsPayingTxFee:              configuration.PayoutConfiguration.IsPayingTxFee,
 			IsPayingAllocationTxFee:    configuration.PayoutConfiguration.IsPayingAllocationTxFee,
 			MinimumAmount:              FloatAmountToMumav(configuration.PayoutConfiguration.MinimumAmount),
 			IgnoreEmptyAccounts:        configuration.PayoutConfiguration.IgnoreEmptyAccounts,
 			TxGasLimitBuffer:           gasLimitBuffer,
+			KtTxGasLimitBuffer:         ktGasLimitBuffer,
 			TxDeserializationGasBuffer: deserializaGasBuffer,
 			TxFeeBuffer:                feeBuffer,
 			KtTxFeeBuffer:              ktFeeBuffer,
@@ -181,7 +193,13 @@ func ConfigurationToRuntimeConfiguration(configuration *LatestConfigurationType)
 			DonateFees:  donateFees,
 			DonateBonds: donateBonds,
 		},
-		Network:        configuration.Network,
+		Network: RuntimeNetworkConfiguration{
+			RpcPool:                rpcPool,
+			MvktUrl:                configuration.Network.MvktUrl,
+			Explorer:               configuration.Network.Explorer,
+			DoNotPaySmartContracts: configuration.Network.DoNotPaySmartContracts,
+			IgnoreProtocolChanges:  configuration.Network.IgnoreProtocolChanges,
+		},
 		Overdelegation: configuration.Overdelegation,
 		NotificationConfigurations: lo.Map(configuration.NotificationConfigurations, func(item json.RawMessage, index int) RuntimeNotificatorConfiguration {
 			var isValid bool
