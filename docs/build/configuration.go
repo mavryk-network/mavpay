@@ -147,11 +147,11 @@ func genrateSample() *mavpay_configuration.ConfigurationV0 {
 		IncomeRecipients: mavpay_configuration.IncomeRecipientsV0{
 			Bonds: map[string]float64{
 				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.455,
-				"tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE": 0.545,
+				"mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D": 0.545,
 			},
 			Fees: map[string]float64{
 				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.455,
-				"tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE": 0.545,
+				"mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D": 0.545,
 			},
 			Donate:      &donate,
 			DonateFees:  &donateFees,
