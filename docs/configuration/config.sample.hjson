@@ -107,14 +107,14 @@
   income_recipients: {
     # list of addresses and their share of the bonds
     bonds: {
-      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
       mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D: 0.545
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
     }
 
     # list of addresses and their share of the fees
     fees: {
-      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
       mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D: 0.545
+      mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
     }
 
     # share of the rewards to donate

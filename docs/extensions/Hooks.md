@@ -164,9 +164,9 @@ This hook is capable of mutating data *currently*.
   "invalid_payouts": null,
   "reports_of_past_succesful_payouts": [
     {
-      "id": "7c7E1tgHsd48EmiM",
+      "id": "C9XGkNAcCsX1GcUi",
       "baker": "mv181VziBavwKZ5dqT5NJNj8BekysbEwEfHN",
-      "timestamp": "2026-01-24T19:24:11.936849496Z",
+      "timestamp": "2026-02-19T07:48:12.023935737Z",
       "cycle": 1,
       "kind": "delegator reward",
       "tx_kind": "fa1",
