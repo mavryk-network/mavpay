@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 type CycleMonitorOptions struct {

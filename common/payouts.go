@@ -2,16 +2,17 @@ package common
 
 import (
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/samber/lo"
+	"github.com/mavryk-network/gomavryk/base58"
 )
 
 type OpLimits struct {
@@ -42,27 +43,33 @@ type PayoutRecipe struct {
 	Recipient        mavryk.Address               `json:"recipient,omitempty"`
 	Kind             enums.EPayoutKind            `json:"kind,omitempty"`
 	TxKind           enums.EPayoutTransactionKind `json:"tx_kind,omitempty"`
-	FATokenId        mavryk.Z                     `json:"fa_token_id,omitempty"`
-	FAContract       mavryk.Address               `json:"fa_contract,omitempty"`
-	DelegatedBalance mavryk.Z                     `json:"delegator_balance,omitempty"`
-	StakedBalance    mavryk.Z                     `json:"-"` // enable in output when relevant (P)
-	Amount           mavryk.Z                     `json:"amount,omitempty"`
+	FATokenId        mavryk.Z                      `json:"fa_token_id,omitempty"`
+	FAContract       mavryk.Address                `json:"fa_contract,omitempty"`
+	FAAlias          string                       `json:"fa_alias,omitempty"`
+	FADecimals       int                          `json:"fa_decimals,omitempty"`
+	DelegatedBalance mavryk.Z                      `json:"delegator_balance,omitempty"`
+	StakedBalance    mavryk.Z                      `json:"staked_balance,omitempty"`
+	Amount           mavryk.Z                      `json:"amount,omitempty"`
 	FeeRate          float64                      `json:"fee_rate,omitempty"`
-	Fee              mavryk.Z                     `json:"fee,omitempty"`
-	OpLimits         *OpLimits                    `json:"op_limits,omitempty"`
+	Fee              mavryk.Z                      `json:"fee,omitempty"`
+	TxFee            int64                        `json:"tx_fee,omitempty"` // calculated during fee estimation
 	Note             string                       `json:"note,omitempty"`
 	IsValid          bool                         `json:"valid,omitempty"`
-	// mainly for accumulation to be able to check if fee was collected and subtract it from the amount
-	TxFeeCollected bool `json:"tx_fee_collected,omitempty"`
-	// mainly for accumulation to be able to check if fee was collected and subtract it from the amount
-	AllocationFeeCollected bool `json:"allocation_fee_collected,omitempty"`
+}
+
+func (candidate PayoutRecipe) GetKind() enums.EPayoutKind {
+	return candidate.Kind
+}
+
+func (candidate PayoutRecipe) GetDelegatedBalance() mavryk.Z {
+	return candidate.DelegatedBalance
 }
 
 func (candidate *PayoutRecipe) GetDestination() mavryk.Address {
 	return candidate.Recipient
 }
 
-func (candidate *PayoutRecipe) GetTxKind() enums.EPayoutTransactionKind {
+func (candidate PayoutRecipe) GetTxKind() enums.EPayoutTransactionKind {
 	return candidate.TxKind
 }
 
@@ -74,8 +81,12 @@ func (candidate *PayoutRecipe) GetFAContract() mavryk.Address {
 	return candidate.FAContract
 }
 
-func (candidate *PayoutRecipe) GetAmount() mavryk.Z {
+func (candidate PayoutRecipe) GetAmount() mavryk.Z {
 	return candidate.Amount
+}
+
+func (candidate PayoutRecipe) GetFee() mavryk.Z {
+	return candidate.Fee
 }
 
 type PayoutRecipeIdentifier struct {
@@ -100,90 +111,36 @@ func (recipe *PayoutRecipe) GetIdentifier() string {
 		TxKind:     recipe.TxKind,
 		FATokenId:  recipe.FATokenId,
 		FAContract: recipe.FAContract,
-		IsValid:    recipe.IsValid,
 	}
 	k, err := identifier.ToJSON()
 	if err != nil {
 		return ""
 	}
 	hashBytes := sha256.Sum256(k)
-	hash := hex.EncodeToString(hashBytes[:])
-	return hash
+	return base58.Encode(hashBytes[:])
 }
 
 func (recipe *PayoutRecipe) GetShortIdentifier() string {
 	return recipe.GetIdentifier()[:16]
 }
 
-func (recipe *PayoutRecipe) Combine(otherRecipe *PayoutRecipe) (*PayoutRecipe, error) {
-	if !recipe.Recipient.Equal(otherRecipe.Recipient) {
-		return nil, errors.New("cannot combine different recipients")
+func (recipe PayoutRecipe) AsAccumulated() *AccumulatedPayoutRecipe {
+	clone := recipe // make a copy to avoid issues with references
+	return &AccumulatedPayoutRecipe{
+		Delegator:  clone.Delegator,
+		Cycle:      clone.Cycle,
+		Recipient:  clone.Recipient,
+		Kind:       clone.Kind,
+		TxKind:     clone.TxKind,
+		FATokenId:  clone.FATokenId,
+		FAContract: clone.FAContract,
+		IsValid:    clone.IsValid,
+		Recipes:    []*PayoutRecipe{&clone},
+		Note:       clone.Note,
 	}
-	if !recipe.Delegator.Equal(otherRecipe.Delegator) {
-		return nil, errors.New("cannot combine different delegators")
-	}
-	if recipe.Kind != otherRecipe.Kind {
-		return nil, errors.New("cannot combine different kinds")
-	}
-	if recipe.TxKind != otherRecipe.TxKind {
-		return nil, errors.New("cannot combine different tx kinds")
-	}
-	if !recipe.FATokenId.Equal(otherRecipe.FATokenId) {
-		return nil, errors.New("cannot combine different FA token ids")
-	}
-	if !recipe.FAContract.Equal(otherRecipe.FAContract) {
-		return nil, errors.New("cannot combine different FA contracts")
-	}
-	if recipe.IsValid != otherRecipe.IsValid {
-		return nil, errors.New("cannot combine different validities")
-	}
-	if recipe.OpLimits == nil || otherRecipe.OpLimits == nil {
-		return nil, errors.New("cannot combine recipes with missing op limits")
-	}
-
-	recipe.DelegatedBalance = recipe.DelegatedBalance.Add(otherRecipe.DelegatedBalance).Div64(2)
-	recipe.StakedBalance = recipe.StakedBalance.Add(otherRecipe.StakedBalance).Div64(2)
-	recipe.Amount = recipe.Amount.Add(otherRecipe.Amount)
-	recipe.Fee = recipe.Fee.Add(otherRecipe.Fee)
-	recipe.OpLimits = &OpLimits{
-		StorageBurn:             recipe.OpLimits.StorageBurn + otherRecipe.OpLimits.StorageBurn,
-		AllocationBurn:          recipe.OpLimits.AllocationBurn + otherRecipe.OpLimits.AllocationBurn,
-		TransactionFee:          recipe.OpLimits.TransactionFee + otherRecipe.OpLimits.TransactionFee,
-		StorageLimit:            recipe.OpLimits.StorageLimit + otherRecipe.OpLimits.StorageLimit,
-		GasLimit:                recipe.OpLimits.GasLimit + otherRecipe.OpLimits.GasLimit,
-		DeserializationGasLimit: recipe.OpLimits.DeserializationGasLimit + otherRecipe.OpLimits.DeserializationGasLimit,
-	}
-
-	otherRecipe.Kind = enums.PAYOUT_KIND_ACCUMULATED
-	otherRecipe.Note = fmt.Sprintf("%s#%d", recipe.GetShortIdentifier(), recipe.Cycle)
-
-	return recipe, nil
 }
 
-func (pr *PayoutRecipe) GetAccumulatedIdentifier() string {
-	return fmt.Sprintf("%s#%d", pr.GetShortIdentifier(), pr.Cycle)
-}
-
-func (pr *PayoutRecipe) GetAccumulatedPayoutDetails() (wasAccumulated bool, id string, cycle int64) {
-	if pr.Kind != enums.PAYOUT_KIND_ACCUMULATED {
-		return false, "", 0
-	}
-	if len(pr.Note) > 0 {
-		_, err := fmt.Sscanf(pr.Note, "%s#%d", &id, &cycle)
-		if err == nil {
-			return true, id, cycle
-		}
-	}
-
-	return false, "", 0
-}
-
-func (pr *PayoutRecipe) ToPayoutReport() PayoutReport {
-	txFee := int64(0)
-	if pr.OpLimits != nil {
-		txFee = pr.OpLimits.TransactionFee
-	}
-
+func (pr PayoutRecipe) ToPayoutReport() PayoutReport {
 	return PayoutReport{
 		Id:               pr.GetShortIdentifier(),
 		Baker:            pr.Baker,
@@ -193,6 +150,8 @@ func (pr *PayoutRecipe) ToPayoutReport() PayoutReport {
 		TxKind:           pr.TxKind,
 		FAContract:       pr.FAContract,
 		FATokenId:        pr.FATokenId,
+		FAAlias:          pr.FAAlias,
+		FADecimals:       pr.FADecimals,
 		Delegator:        pr.Delegator,
 		DelegatedBalance: pr.DelegatedBalance,
 		StakedBalance:    pr.StakedBalance,
@@ -200,18 +159,15 @@ func (pr *PayoutRecipe) ToPayoutReport() PayoutReport {
 		Amount:           pr.Amount,
 		FeeRate:          pr.FeeRate,
 		Fee:              pr.Fee,
-		TransactionFee:   txFee,
+		TxFee:            pr.TxFee,
 		OpHash:           mavryk.ZeroOpHash,
 		IsSuccess:        false,
 		Note:             pr.Note,
 	}
 }
 
-func (pr *PayoutRecipe) GetTransactionFee() int64 {
-	if pr.OpLimits != nil {
-		return pr.OpLimits.TransactionFee
-	}
-	return 0
+func (pr PayoutRecipe) GetTxFee() int64 {
+	return pr.TxFee
 }
 
 func (pr *PayoutRecipe) ToTableRowData() []string {
@@ -222,10 +178,10 @@ func (pr *PayoutRecipe) ToTableRowData() []string {
 		string(pr.Kind),
 		ShortenAddress(pr.FAContract),
 		ToStringEmptyIfZero(pr.FATokenId.Int64()),
-		FormatAmount(pr.TxKind, pr.Amount.Int64()),
+		FormatTokenAmount(pr.TxKind, pr.Amount.Int64(), pr.FAAlias, pr.FADecimals),
 		FloatToPercentage(pr.FeeRate),
 		MumavToMavS(pr.Fee.Int64()),
-		MumavToMavS(pr.GetTransactionFee()),
+		MumavToMavS(pr.GetTxFee()),
 		pr.Note,
 	}
 }
@@ -246,17 +202,32 @@ func (pr *PayoutRecipe) GetTableHeaders() []string {
 	}
 }
 
-func GetRecipesTotals(recipes []PayoutRecipe) []string {
+// returns totals and number of filtered recipes
+
+type foo interface {
+	GetKind() enums.EPayoutKind
+	GetTxKind() enums.EPayoutTransactionKind
+	GetAmount() mavryk.Z
+	GetFee() mavryk.Z
+	GetTxFee() int64
+}
+
+func GetRecipesTotals[T foo](recipes []T, withFee bool) []string {
 	totalAmount := int64(0)
 	totalFee := int64(0)
 	totalTx := int64(0)
 	for _, recipe := range recipes {
-		if recipe.TxKind == enums.PAYOUT_TX_KIND_MAV {
-			totalAmount += recipe.Amount.Int64()
+		if recipe.GetTxKind() == enums.PAYOUT_TX_KIND_MAV {
+			totalAmount += recipe.GetAmount().Int64()
 		}
-		totalFee += recipe.Fee.Int64()
-		totalTx += recipe.GetTransactionFee()
+		totalFee += recipe.GetFee().Int64()
+		totalTx += recipe.GetTxFee()
 	}
+	fee := ""
+	if withFee {
+		fee = MumavToMavS(totalFee)
+	}
+
 	return []string{
 		"",
 		"",
@@ -266,71 +237,316 @@ func GetRecipesTotals(recipes []PayoutRecipe) []string {
 		"",
 		MumavToMavS(totalAmount),
 		"",
-		MumavToMavS(totalFee),
+		fee,
 		MumavToMavS(totalTx),
 		"",
 	}
 }
 
-// returns totals and number of filtered recipes
-func GetRecipesFilteredTotals(recipes []PayoutRecipe, kind enums.EPayoutKind) ([]string, int) {
-	r := lo.Filter(recipes, func(recipe PayoutRecipe, _ int) bool {
-		return recipe.Kind == kind
+func GetRecipesFilteredTotals[T foo](recipes []T, kind enums.EPayoutKind, withFee bool) ([]string, int) {
+	r := lo.Filter(recipes, func(recipe T, _ int) bool {
+		return recipe.GetKind() == kind
 	})
-	return GetRecipesTotals(r), len(r)
+	return GetRecipesTotals(r, withFee), len(r)
 }
 
-type CyclePayoutSummary struct {
-	Cycle                    int64     `json:"cycle"`
-	Delegators               int       `json:"delegators"`
-	PaidDelegators           int       `json:"paid_delegators"`
-	OwnStakedBalance         mavryk.Z  `json:"own_staked_balance"`
-	OwnDelegatedBalance      mavryk.Z  `json:"own_delegated_balance"`
-	ExternalStakedBalance    mavryk.Z  `json:"external_staked_balance"`
-	ExternalDelegatedBalance mavryk.Z  `json:"external_delegated_balance"`
-	EarnedFees               mavryk.Z  `json:"cycle_fees"`
-	EarnedRewards            mavryk.Z  `json:"cycle_rewards"`
-	DistributedRewards       mavryk.Z  `json:"distributed_rewards"`
-	BondIncome               mavryk.Z  `json:"bond_income"`
-	FeeIncome                mavryk.Z  `json:"fee_income"`
-	IncomeTotal              mavryk.Z  `json:"total_income"`
-	DonatedBonds             mavryk.Z  `json:"donated_bonds"`
-	DonatedFees              mavryk.Z  `json:"donated_fees"`
-	DonatedTotal             mavryk.Z  `json:"donated_total"`
-	Timestamp                time.Time `json:"timestamp"`
+type AccumulatedPayoutRecipe struct {
+	// PayoutRecipe
+	Delegator  mavryk.Address                `json:"delegator,omitempty"`
+	Cycle      int64                        `json:"cycle,omitempty"`
+	Recipient  mavryk.Address                `json:"recipient,omitempty"`
+	Kind       enums.EPayoutKind            `json:"kind,omitempty"`
+	TxKind     enums.EPayoutTransactionKind `json:"tx_kind,omitempty"`
+	FATokenId  mavryk.Z                      `json:"fa_token_id,omitempty"`
+	FAContract mavryk.Address                `json:"fa_contract,omitempty"`
+	IsValid    bool                         `json:"valid,omitempty"`
+	Note       string                       `json:"note,omitempty"`
+
+	OpLimits *OpLimits       `json:"op_limits,omitempty"`
+	Recipes  []*PayoutRecipe `json:"-"`
 }
 
-func (summary *CyclePayoutSummary) GetTotalStakedBalance() mavryk.Z {
-	return summary.OwnStakedBalance.Add(summary.ExternalStakedBalance)
+func (recipe *AccumulatedPayoutRecipe) GetTxFee() int64 {
+	return lo.Reduce(recipe.Recipes, func(agg int64, recipe *PayoutRecipe, _ int) int64 {
+		return agg + recipe.TxFee
+	}, 0)
 }
 
-func (summary *CyclePayoutSummary) GetTotalDelegatedBalance() mavryk.Z {
-	return summary.OwnDelegatedBalance.Add(summary.ExternalDelegatedBalance)
+func (recipe *AccumulatedPayoutRecipe) Sum() PayoutRecipe {
+	if len(recipe.Recipes) == 0 {
+		return PayoutRecipe{}
+	}
+	if len(recipe.Recipes) == 1 {
+		return *recipe.Recipes[0]
+	}
+
+	result := *recipe.Recipes[0]
+	for _, r := range recipe.Recipes[1:] {
+		result.DelegatedBalance = result.DelegatedBalance.Add(r.DelegatedBalance).Div64(2)
+		result.StakedBalance = result.StakedBalance.Add(r.StakedBalance).Div64(2)
+		result.Amount = result.Amount.Add(r.Amount)
+		result.Fee = result.Fee.Add(r.Fee)
+		result.TxFee = result.TxFee + r.TxFee
+	}
+	return result
 }
 
-func (summary *CyclePayoutSummary) CombineNumericData(another *CyclePayoutSummary) *CyclePayoutSummary {
-	return &CyclePayoutSummary{
-		OwnStakedBalance:         summary.OwnStakedBalance.Add(another.OwnStakedBalance),
-		OwnDelegatedBalance:      summary.OwnDelegatedBalance.Add(another.OwnDelegatedBalance),
-		ExternalStakedBalance:    summary.ExternalStakedBalance.Add(another.ExternalStakedBalance),
-		ExternalDelegatedBalance: summary.ExternalDelegatedBalance.Add(another.ExternalDelegatedBalance),
-		EarnedFees:               summary.EarnedFees.Add(another.EarnedFees),
-		EarnedRewards:            summary.EarnedRewards.Add(another.EarnedRewards),
-		DistributedRewards:       summary.DistributedRewards.Add(another.DistributedRewards),
-		BondIncome:               summary.BondIncome.Add(another.BondIncome),
-		FeeIncome:                summary.FeeIncome.Add(another.FeeIncome),
-		IncomeTotal:              summary.IncomeTotal.Add(another.IncomeTotal),
-		DonatedBonds:             summary.DonatedBonds.Add(another.DonatedBonds),
-		DonatedFees:              summary.DonatedFees.Add(another.DonatedFees),
-		DonatedTotal:             summary.DonatedTotal.Add(another.DonatedTotal),
+func (r *AccumulatedPayoutRecipe) ToTableRowData() []string {
+	recipe := r.Sum()
+	return []string{
+		ShortenAddress(recipe.Delegator),
+		ShortenAddress(recipe.Recipient),
+		MumavToMavS(recipe.DelegatedBalance.Int64()),
+		string(recipe.Kind),
+		ShortenAddress(recipe.FAContract),
+		ToStringEmptyIfZero(recipe.FATokenId.Int64()),
+		FormatTokenAmount(recipe.TxKind, recipe.Amount.Int64(), recipe.FAAlias, recipe.FADecimals),
+		FloatToPercentage(recipe.FeeRate),
+		MumavToMavS(recipe.Fee.Int64()),
+		MumavToMavS(recipe.GetTxFee()),
+		recipe.Note,
 	}
 }
 
+func (recipe *AccumulatedPayoutRecipe) Add(otherRecipe *PayoutRecipe) (*AccumulatedPayoutRecipe, error) {
+	if !recipe.Recipient.Equal(otherRecipe.Recipient) {
+		return nil, errors.New("cannot add different recipients")
+	}
+	if !recipe.Delegator.Equal(otherRecipe.Delegator) {
+		return nil, errors.New("cannot add different delegators")
+	}
+	if recipe.Kind != otherRecipe.Kind {
+		return nil, errors.New("cannot add different kinds")
+	}
+	if recipe.TxKind != otherRecipe.TxKind {
+		return nil, errors.New("cannot add different tx kinds")
+	}
+	if !recipe.FAContract.Equal(otherRecipe.FAContract) {
+		return nil, errors.New("cannot add different FA contracts")
+	}
+	if !recipe.FATokenId.Equal(otherRecipe.FATokenId) {
+		return nil, errors.New("cannot add different FA token ids")
+	}
+	if recipe.IsValid != otherRecipe.IsValid {
+		return nil, errors.New("cannot add different validity states")
+	}
+
+	otherRecipe.Note = fmt.Sprintf("%s_%d", recipe.GetShortIdentifier(), recipe.Cycle)
+	recipe.Recipes = append(recipe.Recipes, otherRecipe)
+	return recipe, nil
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetAmount() mavryk.Z {
+	return lo.Reduce(recipe.Recipes, func(agg mavryk.Z, recipe *PayoutRecipe, _ int) mavryk.Z {
+		return agg.Add(recipe.Amount)
+	}, mavryk.Zero)
+}
+
+func (recipe *AccumulatedPayoutRecipe) AddTxFee(amount mavryk.Z, charge bool) {
+	if len(recipe.Recipes) == 0 {
+		panic("THIS SHOULD NEVER HAPPEN: cannot add tx fee to empty accumulated payout")
+	}
+
+	if !charge {
+		recipe.Recipes[0].TxFee = recipe.Recipes[0].TxFee + amount.Int64()
+		return
+	}
+	// charge
+	remainder := amount
+	for _, r := range recipe.Recipes {
+		if r.Amount.IsLessEqual(remainder) {
+			remainder = remainder.Sub(r.Amount)
+			r.TxFee = r.TxFee + r.Amount.Int64()
+			r.Amount = mavryk.Zero
+			continue
+		}
+		r.Amount = r.Amount.Sub(remainder)
+		r.TxFee = r.TxFee + remainder.Int64()
+		break
+	}
+}
+
+func (recipe *AccumulatedPayoutRecipe) AddTxFee64(amount int64, charge bool) {
+	recipe.AddTxFee(mavryk.NewZ(amount), charge)
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetFee() mavryk.Z {
+	return lo.Reduce(recipe.Recipes, func(agg mavryk.Z, recipe *PayoutRecipe, _ int) mavryk.Z {
+		return agg.Add(recipe.Fee)
+	}, mavryk.Zero)
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetKind() enums.EPayoutKind {
+	return recipe.Kind
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetTxKind() enums.EPayoutTransactionKind {
+	return recipe.TxKind
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetFAContract() mavryk.Address {
+	return recipe.FAContract
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetFATokenId() mavryk.Z {
+	return recipe.FATokenId
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetDestination() mavryk.Address {
+	return recipe.Recipient
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetDelegatedBalance() mavryk.Z {
+	if len(recipe.Recipes) == 0 {
+		return mavryk.Zero
+	}
+	return recipe.Recipes[0].DelegatedBalance
+}
+
+func (recipe *AccumulatedPayoutRecipe) DisperseToInvalid() []PayoutRecipe {
+	if recipe.IsValid {
+		panic("THIS SHOULD NEVER HAPPEN: cannot disperse valid accumulated payout")
+	}
+
+	return lo.Map(recipe.Recipes, func(r *PayoutRecipe, _ int) PayoutRecipe {
+		r.IsValid = false
+		r.Note = recipe.Note
+		return *r
+	})
+}
+func (recipe *AccumulatedPayoutRecipe) GetIdentifier() string {
+	identifier := PayoutRecipeIdentifier{
+		Delegator:  recipe.Delegator,
+		Recipient:  recipe.Recipient,
+		Kind:       recipe.Kind,
+		TxKind:     recipe.TxKind,
+		FATokenId:  recipe.FATokenId,
+		FAContract: recipe.FAContract,
+		// IsValid:    recipe.IsValid,
+	}
+	k, err := identifier.ToJSON()
+	if err != nil {
+		return ""
+	}
+	hashBytes := sha256.Sum256(k)
+	return base58.Encode(hashBytes[:])
+}
+
+func (recipe *AccumulatedPayoutRecipe) GetShortIdentifier() string {
+	return recipe.GetIdentifier()[:16]
+}
+
+// AsRecipe returns the PayoutRecipe representation of the AccumulatedPayoutRecipe.
+// This is useful only for printing and reporting purposes. Do not use it for execution.
+func (recipe *AccumulatedPayoutRecipe) AsRecipe() PayoutRecipe {
+	return recipe.Sum()
+}
+
+func (recipe *AccumulatedPayoutRecipe) DeepClone() *AccumulatedPayoutRecipe {
+	clonedRecipes := lo.Map(recipe.Recipes, func(r *PayoutRecipe, _ int) *PayoutRecipe {
+		clone := *r
+		return &clone
+	})
+	return &AccumulatedPayoutRecipe{
+		Delegator:  recipe.Delegator,
+		Cycle:      recipe.Cycle,
+		Recipient:  recipe.Recipient,
+		Kind:       recipe.Kind,
+		TxKind:     recipe.TxKind,
+		FATokenId:  recipe.FATokenId,
+		FAContract: recipe.FAContract,
+		IsValid:    recipe.IsValid,
+		Note:       recipe.Note,
+		OpLimits:   recipe.OpLimits, // shallow copy is fine
+		Recipes:    clonedRecipes,
+	}
+}
+
+type CyclePayoutSummary struct {
+	Delegators               int       `json:"delegators"`
+	PaidDelegators           int       `json:"paid_delegators"`
+	OwnStakedBalance         mavryk.Z   `json:"own_staked_balance"`
+	OwnDelegatedBalance      mavryk.Z   `json:"own_delegated_balance"`
+	ExternalStakedBalance    mavryk.Z   `json:"external_staked_balance"`
+	ExternalDelegatedBalance mavryk.Z   `json:"external_delegated_balance"`
+	EarnedBlockFees          mavryk.Z   `json:"cycle_earned_fees"`
+	EarnedRewards            mavryk.Z   `json:"cycle_earned_rewards"`
+	EarnedTotal              mavryk.Z   `json:"cycle_earned_total"`
+	DistributedRewards       mavryk.Z   `json:"distributed_rewards"`
+	NotDistributedRewards    mavryk.Z   `json:"not_distributed_rewards"`
+	BondIncome               mavryk.Z   `json:"bond_income"`
+	FeeIncome                mavryk.Z   `json:"fee_income"`
+	IncomeTotal              mavryk.Z   `json:"total_income"`
+	TxFeesPaidForRewards     mavryk.Z   `json:"tx_fees_paid_for_rewards"`
+	TxFeesPaid               mavryk.Z   `json:"tx_fees_paid"`
+	DonatedBonds             mavryk.Z   `json:"donated_bonds"`
+	DonatedFees              mavryk.Z   `json:"donated_fees"`
+	DonatedTotal             mavryk.Z   `json:"donated_total"`
+	Timestamp                time.Time `json:"timestamp"`
+}
+
+type PayoutSummary struct {
+	CyclePayoutSummary
+	Cycles         []int64                      `json:"cycle"`
+	CycleSummaries map[int64]CyclePayoutSummary `json:"cycle_summaries,omitempty"`
+}
+
+func (summary *PayoutSummary) GetTotalStakedBalance() mavryk.Z {
+	return summary.OwnStakedBalance.Add(summary.ExternalStakedBalance)
+}
+
+func (summary *PayoutSummary) GetTotalDelegatedBalance() mavryk.Z {
+	return summary.OwnDelegatedBalance.Add(summary.ExternalDelegatedBalance)
+}
+
+func (summary *PayoutSummary) AddCycleSummary(cycle int64, another *CyclePayoutSummary) {
+	if summary.CycleSummaries == nil {
+		summary.CycleSummaries = make(map[int64]CyclePayoutSummary)
+	}
+	if _, ok := summary.CycleSummaries[cycle]; ok {
+		panic("cannot add the same cycle summary twice")
+	}
+	summary.Cycles = append(summary.Cycles, cycle)
+	slices.Sort(summary.Cycles)
+	summary.CycleSummaries[cycle] = *another
+
+	summary.OwnStakedBalance = summary.OwnStakedBalance.Add(another.OwnStakedBalance)
+	summary.OwnDelegatedBalance = summary.OwnDelegatedBalance.Add(another.OwnDelegatedBalance)
+	summary.ExternalStakedBalance = summary.ExternalStakedBalance.Add(another.ExternalStakedBalance)
+	summary.ExternalDelegatedBalance = summary.ExternalDelegatedBalance.Add(another.ExternalDelegatedBalance)
+	summary.EarnedBlockFees = summary.EarnedBlockFees.Add(another.EarnedBlockFees)
+	summary.EarnedRewards = summary.EarnedRewards.Add(another.EarnedRewards)
+	summary.EarnedTotal = summary.EarnedTotal.Add(another.EarnedTotal)
+	summary.DistributedRewards = summary.DistributedRewards.Add(another.DistributedRewards)
+	summary.NotDistributedRewards = summary.NotDistributedRewards.Add(another.NotDistributedRewards)
+	summary.BondIncome = summary.BondIncome.Add(another.BondIncome)
+	summary.FeeIncome = summary.FeeIncome.Add(another.FeeIncome)
+	summary.IncomeTotal = summary.IncomeTotal.Add(another.IncomeTotal)
+	summary.TxFeesPaid = summary.TxFeesPaid.Add(another.TxFeesPaid)
+	summary.TxFeesPaidForRewards = summary.TxFeesPaidForRewards.Add(another.TxFeesPaidForRewards)
+	summary.DonatedBonds = summary.DonatedBonds.Add(another.DonatedBonds)
+	summary.DonatedFees = summary.DonatedFees.Add(another.DonatedFees)
+	summary.DonatedTotal = summary.DonatedTotal.Add(another.DonatedTotal)
+}
+
 type CyclePayoutBlueprint struct {
-	Cycle                                int64              `json:"cycles,omitempty"`
-	Payouts                              []PayoutRecipe     `json:"payouts,omitempty"`
-	Summary                              CyclePayoutSummary `json:"summary,omitempty"`
-	BatchMetadataDeserializationGasLimit int64              `json:"batch_metadata_deserialization_gas_limit,omitempty"`
+	Cycle   int64          `json:"cycle,omitempty"`
+	Payouts []PayoutRecipe `json:"payouts,omitempty"`
+
+	OwnStakedBalance         mavryk.Z   `json:"own_staked_balance"`
+	OwnDelegatedBalance      mavryk.Z   `json:"own_delegated_balance"`
+	ExternalStakedBalance    mavryk.Z   `json:"external_staked_balance"`
+	ExternalDelegatedBalance mavryk.Z   `json:"external_delegated_balance"`
+	EarnedBlockFees          mavryk.Z   `json:"cycle_earned_fees"`
+	EarnedRewards            mavryk.Z   `json:"cycle_earned_rewards"`
+	EarnedTotal              mavryk.Z   `json:"cycle_earned_total"`
+	BondIncome               mavryk.Z   `json:"bond_income"`
+	FeeIncome                mavryk.Z   `json:"fee_income"`
+	IncomeTotal              mavryk.Z   `json:"total_income"`
+	DonatedBonds             mavryk.Z   `json:"donated_bonds"`
+	DonatedFees              mavryk.Z   `json:"donated_fees"`
+	DonatedTotal             mavryk.Z   `json:"donated_total"`
+	Timestamp                time.Time `json:"timestamp"`
 }
 
 type GeneratePayoutsEngineContext struct {
@@ -372,22 +588,20 @@ func (engines *GeneratePayoutsEngineContext) Validate() error {
 }
 
 type GeneratePayoutsOptions struct {
-	Cycle                    int64 `json:"cycle,omitempty"`
-	SkipBalanceCheck         bool  `json:"skip_balance_check,omitempty"`
-	WaitForSufficientBalance bool  `json:"wait_for_sufficient_balance,omitempty"`
+	Cycle int64 `json:"cycle,omitempty"`
 }
 
 type CyclePayoutBlueprints []*CyclePayoutBlueprint
 
-func (results CyclePayoutBlueprints) GetSummary() *CyclePayoutSummary {
-	summary := &CyclePayoutSummary{}
-	delegators := 0
-	for _, result := range results {
-		delegators += result.Summary.Delegators
-		summary = summary.CombineNumericData(&result.Summary)
-	}
-	summary.Delegators = delegators / len(results) // average
-	return summary
+func (results CyclePayoutBlueprints) GetCycles() []int64 {
+	return lo.Reduce(results, func(acc []int64, result *CyclePayoutBlueprint, _ int) []int64 {
+		for _, p := range result.Payouts {
+			if !slices.Contains(acc, p.Cycle) {
+				acc = append(acc, p.Cycle)
+			}
+		}
+		return acc
+	}, []int64{})
 }
 
 type PreparePayoutsEngineContext struct {
@@ -435,15 +649,26 @@ func (engines *PreparePayoutsEngineContext) Validate() error {
 }
 
 type PreparePayoutsOptions struct {
-	Accumulate bool `json:"accumulate,omitempty"`
+	Accumulate               bool `json:"accumulate,omitempty"`
+	SkipBalanceCheck         bool `json:"skip_balance_check,omitempty"`
+	WaitForSufficientBalance bool `json:"wait_for_sufficient_balance,omitempty"`
 }
 
 type PreparePayoutsResult struct {
-	Blueprints                    []*CyclePayoutBlueprint `json:"blueprint,omitempty"`
-	ValidPayouts                  []PayoutRecipe          `json:"payouts,omitempty"`
-	AccumulatedPayouts            []PayoutRecipe          `json:"accumulated_payouts,omitempty"`
-	InvalidPayouts                []PayoutRecipe          `json:"invalid_payouts,omitempty"`
-	ReportsOfPastSuccesfulPayouts []PayoutReport          `json:"reports_of_past_succesful_payouts,omitempty"`
+	Blueprints                           []*CyclePayoutBlueprint    `json:"blueprint,omitempty"`
+	ValidPayouts                         []*AccumulatedPayoutRecipe `json:"payouts,omitempty"`
+	InvalidPayouts                       []PayoutRecipe             `json:"invalid_payouts,omitempty"`
+	ReportsOfPastSuccessfulPayouts       []PayoutReport             `json:"reports_of_past_successful_payouts,omitempty"`
+	BatchMetadataDeserializationGasLimit int64                      `json:"batch_metadata_deserialization_gas_limit,omitempty"`
+}
+
+func (result *PreparePayoutsResult) GetCycles() []int64 {
+	return lo.Reduce(result.Blueprints, func(acc []int64, blueprint *CyclePayoutBlueprint, _ int) []int64 {
+		if !slices.Contains(acc, blueprint.Cycle) {
+			acc = append(acc, blueprint.Cycle)
+		}
+		return acc
+	}, []int64{})
 }
 
 type ExecutePayoutsEngineContext struct {
@@ -500,6 +725,7 @@ type ExecutePayoutsOptions struct {
 }
 
 type ExecutePayoutsResult struct {
-	BatchResults   BatchResults `json:"batch_results,omitempty"`
-	PaidDelegators int          `json:"paid_delegators,omitempty"`
+	BatchResults   BatchResults  `json:"batch_results,omitempty"`
+	PaidDelegators int           `json:"paid_delegators,omitempty"`
+	Summary        PayoutSummary `json:"cycle_payout_summary,omitempty"`
 }

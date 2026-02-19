@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -28,8 +27,8 @@ var payDateRangeCmd = &cobra.Command{
 
 		skipBalanceCheck, _ := cmd.Flags().GetBool(SKIP_BALANCE_CHECK_FLAG)
 		confirmed, _ := cmd.Flags().GetBool(CONFIRM_FLAG)
-		mixInContractCalls, _ := cmd.Flags().GetBool(DISABLE_SEPERATE_SC_PAYOUTS_FLAG)
-		mixInFATransfers, _ := cmd.Flags().GetBool(DISABLE_SEPERATE_FA_PAYOUTS_FLAG)
+		mixInContractCalls, _ := cmd.Flags().GetBool(DISABLE_SEPARATE_SC_PAYOUTS_FLAG)
+		mixInFATransfers, _ := cmd.Flags().GetBool(DISABLE_SEPARATE_FA_PAYOUTS_FLAG)
 		isDryRun, _ := cmd.Flags().GetBool(DRY_RUN_FLAG)
 
 		fsReporter := reporter_engines.NewFileSystemReporter(config, &common.ReporterEngineOptions{
@@ -69,41 +68,15 @@ var payDateRangeCmd = &cobra.Command{
 		defer unlock()
 
 		slog.Info("generating payouts for cycles in the date range", "date_range", fmt.Sprintf("%s - %s", startDate.Format(time.RFC3339), endDate.Format(time.RFC3339)), "cycles", cycles)
-		generationResults := make(common.CyclePayoutBlueprints, 0, len(cycles))
-
-		channels := make([]chan *common.CyclePayoutBlueprint, 0, len(cycles))
-
-		for _, cycle := range cycles {
-			ch := make(chan *common.CyclePayoutBlueprint)
-			channels = append(channels, ch)
-			go func() {
-				generationResult, err := core.GeneratePayouts(config, common.NewGeneratePayoutsEngines(collector, signer, notifyAdminFactory(config)),
-					&common.GeneratePayoutsOptions{
-						Cycle:            cycle,
-						SkipBalanceCheck: skipBalanceCheck,
-					})
-				if errors.Is(err, constants.ErrNoCycleDataAvailable) {
-					slog.Info("no data available for cycle, skipping", "cycle", cycle)
-					return
-				}
-				if err != nil {
-					slog.Error("failed to generate payouts", "error", err.Error())
-					os.Exit(EXIT_OPERTION_FAILED)
-				}
-				ch <- generationResult
-			}()
-		}
-		for _, ch := range channels {
-			generationResult := <-ch
-			if generationResult != nil {
-				generationResults = append(generationResults, generationResult)
-			}
-		}
+		generationResults := assertRunWithErrorHandler(func() (common.CyclePayoutBlueprints, error) {
+			return generatePayoutsForCycles(cycles, config, collector, signer, &common.GeneratePayoutsOptions{})
+		}, handleGeneratePayoutsFailure)
 
 		slog.Info("checking reports of past payouts")
 		preparationResult := assertRunWithResult(func() (*common.PreparePayoutsResult, error) {
 			return core.PreparePayouts(generationResults, config, common.NewPreparePayoutsEngineContext(collector, signer, fsReporter, notifyAdminFactory(config)), &common.PreparePayoutsOptions{
-				Accumulate: true,
+				Accumulate:       true,
+				SkipBalanceCheck: skipBalanceCheck,
 			})
 		}, EXIT_OPERTION_FAILED)
 
@@ -111,26 +84,30 @@ var payDateRangeCmd = &cobra.Command{
 		case state.Global.GetWantsOutputJson():
 			slog.Info(constants.LOG_MESSAGE_PREPAYOUT_SUMMARY,
 				constants.LOG_FIELD_CYCLES, cycles,
-				constants.LOG_FIELD_REPORTS_OF_PAST_PAYOUTS, preparationResult.ReportsOfPastSuccesfulPayouts,
-				constants.LOG_FIELD_ACCUMULATED_PAYOUTS, preparationResult.AccumulatedPayouts,
+				constants.LOG_FIELD_REPORTS_OF_PAST_PAYOUTS, preparationResult.ReportsOfPastSuccessfulPayouts,
+				constants.LOG_FIELD_ACCUMULATED_PAYOUTS, preparationResult.ValidPayouts,
 				constants.LOG_FIELD_VALID_PAYOUTS, preparationResult.ValidPayouts,
 				constants.LOG_FIELD_INVALID_PAYOUTS, preparationResult.InvalidPayouts,
 			)
 		default:
-			PrintPreparationResults(preparationResult, cycles...)
+			utils.PrintPreparePayoutsResult(preparationResult, &utils.PrintPreparePayoutsResultOptions{AutoMergeRecords: true})
 		}
 
 		if len(preparationResult.ValidPayouts) == 0 {
 			slog.Info("nothing to pay out")
 			notificator, _ := cmd.Flags().GetString(NOTIFICATOR_FLAG)
 			if notificator != "" { // rerun notification through notificator if specified manually
-				notifyPayoutsProcessed(config, generationResults.GetSummary(), notificator)
+				notifyPayoutsProcessed(config, utils.GeneratePayoutSummaryFromPreparationResult(preparationResult), notificator)
 			}
 			os.Exit(0)
 		}
 
 		if !confirmed {
-			assertRequireConfirmation("Do you want to pay out above VALID payouts?")
+			msg := "Do you want to pay out above VALID payouts?"
+			if isDryRun {
+				msg = msg + " " + constants.DRY_RUN_NOTE
+			}
+			assertRequireConfirmation(msg)
 		}
 
 		slog.Info("executing payout")
@@ -153,17 +130,16 @@ var payDateRangeCmd = &cobra.Command{
 			slog.Error("failed operations detected", "failed_count", failedCount, "total_count", len(executionResult.BatchResults))
 			os.Exit(EXIT_OPERTION_FAILED)
 		}
-		if silent, _ := cmd.Flags().GetBool(SILENT_FLAG); !silent {
-			summary := generationResults.GetSummary()
-			summary.PaidDelegators = executionResult.PaidDelegators
-			notifyPayoutsProcessedThroughAllNotificators(config, summary)
+		if silent, _ := cmd.Flags().GetBool(SILENT_FLAG); !silent && !isDryRun {
+			notifyPayoutsProcessedThroughAllNotificators(config, &executionResult.Summary)
 		}
 		switch {
 		case state.Global.GetWantsOutputJson():
 			slog.Info(constants.LOG_MESSAGE_PAYOUTS_EXECUTED, constants.LOG_FIELD_CYCLES, cycles, "phase", "result")
 		default:
-			utils.PrintBatchResults(executionResult.BatchResults, fmt.Sprintf("Results of #%s", utils.FormatCycleNumbers(cycles...)), config.Network.Explorer)
+			utils.PrintBatchResults(executionResult.BatchResults, fmt.Sprintf("Results of %s", utils.FormatCycleNumbers(cycles...)), config.Network.Explorer)
 		}
+		PrintPayoutWalletRemainingBalance(collector, signer)
 	},
 }
 
@@ -173,12 +149,12 @@ func init() {
 	payDateRangeCmd.Flags().String(END_DATE_FLAG, "", "end date for payout generation (format: 2024-02-01)")
 	payDateRangeCmd.Flags().String(MONTH_FLAG, "", "month to generate payout for (format: 2024-02)")
 	payDateRangeCmd.Flags().Bool(REPORT_TO_STDOUT, false, "prints them to stdout (wont write to file)")
-	payDateRangeCmd.Flags().Bool(DISABLE_SEPERATE_SC_PAYOUTS_FLAG, false, "disables smart contract separation (mixes txs and smart contract calls within batches)")
-	payDateRangeCmd.Flags().Bool(DISABLE_SEPERATE_FA_PAYOUTS_FLAG, false, "disables fa transfers separation (mixes txs and fa transfers within batches)")
+	payDateRangeCmd.Flags().Bool(DISABLE_SEPARATE_SC_PAYOUTS_FLAG, false, "disables smart contract separation (mixes txs and smart contract calls within batches)")
+	payDateRangeCmd.Flags().Bool(DISABLE_SEPARATE_FA_PAYOUTS_FLAG, false, "disables fa transfers separation (mixes txs and fa transfers within batches)")
 	payDateRangeCmd.Flags().BoolP(SILENT_FLAG, "s", false, "suppresses notifications")
 	payDateRangeCmd.Flags().String(NOTIFICATOR_FLAG, "", "Notify through specific notificator")
 	payDateRangeCmd.Flags().Bool(SKIP_BALANCE_CHECK_FLAG, false, "skips payout wallet balance check")
-	payDateRangeCmd.Flags().Bool(DRY_RUN_FLAG, false, "skips payout wallet balance check")
+	payDateRangeCmd.Flags().Bool(DRY_RUN_FLAG, false, "Performs all actions except sending transactions. Reports are stored in 'reports/dry' folder")
 
 	RootCmd.AddCommand(payDateRangeCmd)
 }

@@ -2,6 +2,7 @@ package transactor_engines
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -11,15 +12,15 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/engines/mvkt"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/mavryk"
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/mavryk"
+	"github.com/mavryk-network/gomavryk/rpc"
 )
 
 type DefaultRpcTransactor struct {
-	rpcUrl string
-	rpc    *rpc.Client
-	mvkt   *mvkt.Client
+	rpc_urls []string
+	rpcs     []*rpc.Client
+	mvkt     *mvkt.Client
 }
 
 type DefaultRpcTransactorOpResult struct {
@@ -80,27 +81,26 @@ func (result *DefaultRpcTransactorOpResult) WaitForApply() error {
 }
 
 func InitDefaultTransactor(config *configuration.RuntimeConfiguration) (*DefaultRpcTransactor, error) {
-	client := &http.Client{
+	http_client := &http.Client{
 		Timeout: 10 * 60 * time.Second,
 	}
 
-	rpcClient, err := rpc.NewClient(config.Network.RpcUrl, client)
+	rpc_clients, err := utils.InitializeRpcClients(context.Background(), config.Network.RpcPool, http_client)
 	if err != nil {
 		return nil, err
 	}
 
-	mvktClient, err := mvkt.InitClient(config.Network.MvktUrl, config.Network.ProtocolRewardsUrl, &mvkt.MvktClientOptions{
-		HttpClient:       client,
-		BalanceCheckMode: config.PayoutConfiguration.BalanceCheckMode,
+	mvktClient, err := mvkt.InitClient(config.Network.MvktUrl, &mvkt.MvktClientOptions{
+		HttpClient: http_client,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	result := &DefaultRpcTransactor{
-		rpcUrl: config.Network.RpcUrl,
-		rpc:    rpcClient,
-		mvkt:   mvktClient,
+		rpc_urls: config.Network.RpcPool,
+		rpcs:     rpc_clients,
+		mvkt:     mvktClient,
 	}
 	return result, result.RefreshParams()
 }
@@ -110,21 +110,25 @@ func (transactor *DefaultRpcTransactor) GetId() string {
 }
 
 func (transactor *DefaultRpcTransactor) RefreshParams() error {
-	return transactor.rpc.Init(context.Background())
-}
-
-func (transactor *DefaultRpcTransactor) GetNewRpcClient() (*rpc.Client, error) {
-	client, err := rpc.NewClient(transactor.rpcUrl, transactor.rpc.Client())
-	client.ChainId = transactor.rpc.ChainId
-	client.Params = transactor.rpc.Params
-	if err != nil {
-		return nil, err
+	failures := 0
+	for _, rpc := range transactor.rpcs {
+		err := rpc.Init(context.Background())
+		if err != nil {
+			slog.Debug("failed to refresh rpc params", "error", err.Error(), "rpc_url", rpc.BaseURL.String())
+			failures++
+		}
 	}
-	return client, nil
+	if failures == len(transactor.rpcs) {
+		return fmt.Errorf("failed to refresh rpc params for all clients, all %d failed", failures)
+	}
+
+	return nil
 }
 
 func (transactor *DefaultRpcTransactor) GetLimits() (*common.OperationLimits, error) {
-	params, err := transactor.rpc.GetParams(context.Background(), rpc.NewBlockOffset(rpc.Head, 0))
+	params, err := utils.AttemptWithRpcClients(context.Background(), transactor.rpcs, func(client *rpc.Client) (*mavryk.Params, error) {
+		return client.GetParams(context.Background(), rpc.Head)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -136,8 +140,14 @@ func (transactor *DefaultRpcTransactor) GetLimits() (*common.OperationLimits, er
 }
 
 func (transactor *DefaultRpcTransactor) Complete(op *codec.Op, key mavryk.Key) error {
-	op = op.WithParams(transactor.rpc.Params)
-	err := transactor.rpc.Complete(context.Background(), op, key)
+	_, err := utils.AttemptWithRpcClients(context.Background(), transactor.rpcs, func(client *rpc.Client) (bool, error) {
+		op = op.WithParams(client.Params)
+		err := client.Complete(context.Background(), op, key)
+		if err == nil {
+			return true, nil
+		}
+		return false, err
+	})
 	return err
 }
 
@@ -145,34 +155,39 @@ func (transactor *DefaultRpcTransactor) initOpResult(opHash mavryk.OpHash, opts 
 	if opts == nil {
 		opts = &rpc.DefaultOptions
 	}
-	rpcClient, err := transactor.GetNewRpcClient()
+
+	rpc_client, err := utils.InitializeSingleRpcFromRpcPool(context.Background(), transactor.rpc_urls, &http.Client{
+		Timeout: 10 * 60 * time.Second,
+	})
 	if err != nil {
 		return nil, err
 	}
-	err = rpcClient.Init(context.Background())
+	err = rpc_client.Init(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	rpcClient.Listen()
+	rpc_client.Listen()
 	res := rpc.NewResult(opHash).WithTTL(opts.TTL).WithConfirmations(opts.Confirmations)
-	res.Listen(rpcClient.BlockObserver)
+	res.Listen(rpc_client.BlockObserver)
 	return &DefaultRpcTransactorOpResult{
 		opHash: opHash,
 		result: res,
-		rpc:    rpcClient,
+		rpc:    rpc_client,
 		mvkt:   transactor.mvkt,
 	}, nil
 }
 
-func (transactor *DefaultRpcTransactor) Broadcast(op *codec.Op) (mavryk.OpHash, error) {
-	return transactor.rpc.Broadcast(context.Background(), op)
+func (transactor *DefaultRpcTransactor) broadcast(op *codec.Op) (mavryk.OpHash, error) {
+	return utils.AttemptWithRpcClients(context.Background(), transactor.rpcs, func(client *rpc.Client) (mavryk.OpHash, error) {
+		return client.Broadcast(context.Background(), op)
+	})
 }
 
 func (transactor *DefaultRpcTransactor) Dispatch(op *codec.Op, opts *rpc.CallOptions) (common.OpResult, error) {
 	if opts == nil {
 		opts = &rpc.DefaultOptions
 	}
-	opHash, err := transactor.Broadcast(op)
+	opHash, err := transactor.broadcast(op)
 	if err != nil {
 		return nil, err
 	}
@@ -184,23 +199,7 @@ func (transactor *DefaultRpcTransactor) Dispatch(op *codec.Op, opts *rpc.CallOpt
 }
 
 func (transactor *DefaultRpcTransactor) Send(op *codec.Op, opts *rpc.CallOptions) (*rpc.Receipt, error) {
-	return transactor.rpc.Send(context.Background(), op, opts)
-}
-
-func (transactor *DefaultRpcTransactor) WaitOpConfirmation(opHash mavryk.OpHash, ttl int64, confirmations int64) (*rpc.Receipt, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	res := rpc.NewResult(opHash).WithTTL(ttl).WithConfirmations(confirmations)
-	transactor.rpc.Listen()
-	res.Listen(transactor.rpc.BlockObserver)
-	utils.CallbackOnInterrupt(ctx, func() {
-		slog.Warn("waiting for confirmation canceled", "op_hash", opHash)
-		cancel()
+	return utils.AttemptWithRpcClients(context.Background(), transactor.rpcs, func(client *rpc.Client) (*rpc.Receipt, error) {
+		return client.Send(context.Background(), op, opts)
 	})
-	res.WaitContext(ctx)
-	if err := res.Err(); err != nil {
-		return nil, err
-	}
-
-	// return receipt
-	return res.GetReceipt(context.Background())
 }

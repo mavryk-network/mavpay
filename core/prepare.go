@@ -19,16 +19,21 @@ func PreparePayouts(blueprints []*common.CyclePayoutBlueprint, config *configura
 
 	ctx, err = WrapContext[*prepare.PayoutPrepareContext, *common.PreparePayoutsOptions](ctx).ExecuteStages(options,
 		prepare.PreparePayouts,
-		prepare.AccumulatePayouts).Unwrap()
-	return &common.PreparePayoutsResult{
-		Blueprints:                    ctx.PayoutBlueprints,
-		ValidPayouts:                  ctx.StageData.ValidPayouts,
-		AccumulatedPayouts:            ctx.StageData.AccumulatedPayouts,
-		InvalidPayouts:                ctx.StageData.InvalidPayouts,
-		ReportsOfPastSuccesfulPayouts: ctx.StageData.ReportsOfPastSuccesfulPayouts,
-	}, err
-}
+		prepare.AccumulatePayouts,
+		prepare.CheckSufficientBalance,
+		prepare.CollectTransactionFees,
+		prepare.ValidatePreparedPayouts,
+		// prepare.FinalizePayouts,
+	).Unwrap()
+	if err != nil {
+		return nil, err
+	}
 
-func PrepareCyclePayouts(blueprint *common.CyclePayoutBlueprint, config *configuration.RuntimeConfiguration, engineContext *common.PreparePayoutsEngineContext, options *common.PreparePayoutsOptions) (*common.PreparePayoutsResult, error) {
-	return PreparePayouts([]*common.CyclePayoutBlueprint{blueprint}, config, engineContext, options)
+	return &common.PreparePayoutsResult{
+		Blueprints:                           ctx.PayoutBlueprints,
+		ValidPayouts:                         ctx.StageData.AccumulatedPayouts,
+		InvalidPayouts:                       ctx.StageData.InvalidRecipes,
+		ReportsOfPastSuccessfulPayouts:       ctx.StageData.ReportsOfPastSuccesfulPayouts,
+		BatchMetadataDeserializationGasLimit: ctx.StageData.BatchMetadataDeserializationGasLimit,
+	}, nil
 }

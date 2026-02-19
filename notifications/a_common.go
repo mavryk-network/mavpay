@@ -5,8 +5,9 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/samber/lo"
 	"github.com/mavryk-network/mavpay/common"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type NotificationKind string
@@ -27,15 +28,34 @@ const (
 	EMAIL_NOTIFICATOR    NotificatorKind = "email"
 	EXTERNAL_NOTIFICATOR NotificatorKind = "external"
 	WEBHOOK_NOTIFICATOR  NotificatorKind = "webhook"
+	BLUESKY_NOTIFICATOR  NotificatorKind = "bluesky"
 )
 
-func PopulateMessageTemplate(messageTempalte string, summary *common.CyclePayoutSummary, additionalData map[string]string) string {
+func PopulateMessageTemplate(messageTempalte string, summary *common.PayoutSummary, additionalData map[string]string) string {
 	v := reflect.ValueOf(*summary)
 	typeOfS := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
 		val := fmt.Sprintf("%v", v.Field(i).Interface())
-		if typeOfS.Field(i).Type.Name() == "Z" && strings.Contains(typeOfS.Field(i).Type.PkgPath(), "mvgo/mavryk") {
+		if typeOfS.Field(i).Type.Name() == "Z" && strings.Contains(typeOfS.Field(i).Type.PkgPath(), "gomavryk/mavryk") {
+			val = fmt.Sprintf("%v", common.MumavToMavS(v.Field(i).Interface().(mavryk.Z).Int64()))
+		}
+		if typeOfS.Field(i).Name == "Cycles" {
+			val = strings.Join(lo.Map(summary.Cycles, func(c int64, _ int) string {
+				return fmt.Sprintf("#%d", c)
+			}), ", ")
+		}
+		messageTempalte = strings.ReplaceAll(messageTempalte, fmt.Sprintf("<%s>", typeOfS.Field(i).Name), val)
+		if typeOfS.Field(i).Name == "Cycles" { // backward compatibility
+			messageTempalte = strings.ReplaceAll(messageTempalte, "<Cycle>", val)
+		}
+	}
+
+	v = reflect.ValueOf(summary.CyclePayoutSummary)
+	typeOfS = v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		val := fmt.Sprintf("%v", v.Field(i).Interface())
+		if typeOfS.Field(i).Type.Name() == "Z" && strings.Contains(typeOfS.Field(i).Type.PkgPath(), "tzgo/mavryk") {
 			val = fmt.Sprintf("%v", common.MumavToMavS(v.Field(i).Interface().(mavryk.Z).Int64()))
 		}
 		messageTempalte = strings.ReplaceAll(messageTempalte, fmt.Sprintf("<%s>", typeOfS.Field(i).Name), val)

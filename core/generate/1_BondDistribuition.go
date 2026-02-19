@@ -7,7 +7,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/extension"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 
 	"github.com/samber/lo"
 )
@@ -31,9 +31,25 @@ func getBakerBondsAmount(cycleData *common.BakersCycleData, effectiveDelegatorsD
 	if maximumDelegated.Sub(totalDelegatedBalance).IsNeg() && configuration.Overdelegation.IsProtectionEnabled { // overdelegated and protection enabled
 		totalDelegatedBalance = maximumDelegated // this will bracket the totalDelegatedBalance to maximumDelegated and baker takes his full share from delegated balance, the rest is dilluted
 	}
+	if maximumDelegated.IsLess(bakerDelegatedBalance) && configuration.Overdelegation.IsProtectionEnabled {
+		// this is just to give sane results in case bakers is overdelegated to itself
+		// without this mavpay reports negative rewards for delegators in such cases
+		bakerDelegatedBalance = maximumDelegated
+	}
 	bakerDelegatedBondsAmount := totalRewards.Mul(bakerDelegatedBalance).Div(totalDelegatedBalance)
-
 	return bakerDelegatedBondsAmount
+}
+
+func isDelegatorEligibleForBonds(candidate PayoutCandidate, configuration *configuration.RuntimeConfiguration) bool {
+	if candidate.IsInvalid {
+		if candidate.InvalidBecause == enums.INVALID_DELEGATOR_IGNORED {
+			return false
+		}
+		if configuration.Delegators.Requirements.BellowMinimumBalanceRewardDestination == enums.REWARD_DESTINATION_EVERYONE && candidate.InvalidBecause == enums.INVALID_DELEGATOR_LOW_BAlANCE {
+			return false
+		}
+	}
+	return true
 }
 
 func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) (*PayoutGenerationContext, error) {
@@ -45,13 +61,8 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	candidates := ctx.StageData.PayoutCandidates
 	totalDelegatorsDelegatedBalance := lo.Reduce(candidates, func(total mavryk.Z, candidate PayoutCandidate, _ int) mavryk.Z {
 		// of all delegators, including invalids, except ignored and possibly excluding bellow minimum balance
-		if candidate.IsInvalid {
-			if candidate.InvalidBecause == enums.INVALID_DELEGATOR_IGNORED {
-				return total
-			}
-			if ctx.configuration.Delegators.Requirements.BellowMinimumBalanceRewardDestination == enums.REWARD_DESTINATION_EVERYONE && candidate.InvalidBecause == enums.INVALID_DELEGATOR_LOW_BAlANCE {
-				return total
-			}
+		if !isDelegatorEligibleForBonds(candidate, configuration) {
+			return total
 		}
 		return total.Add(candidate.GetDelegatedBalance())
 	}, mavryk.NewZ(0))
@@ -60,15 +71,19 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	availableRewards := ctx.StageData.CycleData.GetTotalDelegatedRewards(configuration.PayoutConfiguration.PayoutMode).Sub(bakerBonds)
 
 	ctx.StageData.PayoutCandidatesWithBondAmount = lo.Map(candidates, func(candidate PayoutCandidate, _ int) PayoutCandidateWithBondAmount {
-		if candidate.IsInvalid {
+		if !isDelegatorEligibleForBonds(candidate, configuration) {
 			return PayoutCandidateWithBondAmount{
 				PayoutCandidate: candidate,
 				BondsAmount:     mavryk.Zero,
 			}
 		}
+
+		delegatorBondsAmount := availableRewards.Mul(candidate.GetDelegatedBalance()).Div(totalDelegatorsDelegatedBalance)
+		utils.AssertZAmountPositiveOrZero(delegatorBondsAmount)
+
 		return PayoutCandidateWithBondAmount{
 			PayoutCandidate: candidate,
-			BondsAmount:     availableRewards.Mul(candidate.GetDelegatedBalance()).Div(totalDelegatorsDelegatedBalance),
+			BondsAmount:     delegatorBondsAmount,
 			TxKind:          enums.PAYOUT_TX_KIND_MAV,
 		}
 	})
@@ -76,6 +91,8 @@ func DistributeBonds(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	bondsDonate := utils.GetZPortion(bakerBonds, configuration.IncomeRecipients.DonateBonds)
 	ctx.StageData.BakerBondsAmount = bakerBonds.Sub(bondsDonate)
 	ctx.StageData.DonateBondsAmount = bondsDonate
+	utils.AssertZAmountPositiveOrZero(ctx.StageData.BakerBondsAmount)
+	utils.AssertZAmountPositiveOrZero(ctx.StageData.DonateBondsAmount)
 
 	hookData := &AfterBondsDistributedHookData{
 		Cycle:      options.Cycle,

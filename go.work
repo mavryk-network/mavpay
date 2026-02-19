@@ -1,0 +1,7 @@
+go 1.25.0
+
+use (
+	.
+	./extension/official/payout-fa
+	./extension/official/payout-fixer
+)

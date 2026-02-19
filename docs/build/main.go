@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/mavryk-network/mavpay/cmd"
 
@@ -9,7 +10,11 @@ import (
 )
 
 func main() {
-	err := doc.GenMarkdownTreeCustom(cmd.RootCmd, "./docs/cmd",
+	docsDirectory := "./docs/cmd"
+	os.RemoveAll(docsDirectory)
+	os.MkdirAll(docsDirectory, os.ModePerm)
+
+	err := doc.GenMarkdownTreeCustom(cmd.RootCmd, docsDirectory,
 		func(p string) string { return p },
 		func(s string) string { return "/mavpay/reference/cmd/" + s[:len(s)-3] },
 	)

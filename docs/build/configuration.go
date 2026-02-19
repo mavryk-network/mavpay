@@ -9,7 +9,7 @@ import (
 	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func GenerateDefaultHJson() {
@@ -37,6 +37,7 @@ func genrateSample() *mavpay_configuration.ConfigurationV0 {
 	donateFees := 0.05
 	donateBonds := 0.03
 	gasLimitBuffer := int64(200)
+	ktGasLimitBuffer := int64(400)
 	deserializationGasBuffer := int64(5)
 	feeBuffer := int64(10)
 	ktFeeBuffer := int64(50)
@@ -71,10 +72,10 @@ func genrateSample() *mavpay_configuration.ConfigurationV0 {
 			Prefilter: []mavryk.Address{mavryk.MustParseAddress("mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3"), mavryk.MustParseAddress("mv1Qe2hoRHRHYxYCHzD8vUX2We8uEJrEdWAb")},
 		},
 		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
-			RpcUrl:                 constants.DEFAULT_RPC_URL,
+			RpcUrl:                 "https://rpc.mavryk.network",
+			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,
-			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
-			Explorer:               "https://tzstats.com/",
+			Explorer:               "https://nexus.mavryk.org/",
 			DoNotPaySmartContracts: true,
 		},
 		Overdelegation: mavpay_configuration.OverdelegationConfigurationV0{
@@ -83,12 +84,12 @@ func genrateSample() *mavpay_configuration.ConfigurationV0 {
 		PayoutConfiguration: mavpay_configuration.PayoutConfigurationV0{
 			WalletMode:                 enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			PayoutMode:                 enums.PAYOUT_MODE_IDEAL,
-			BalanceCheckMode:           enums.PROTOCOL_BALANCE_CHECK_MODE,
 			Fee:                        .075,
 			IsPayingTxFee:              true,
 			IsPayingAllocationTxFee:    true,
 			MinimumAmount:              10.5,
 			TxGasLimitBuffer:           &gasLimitBuffer,
+			KtTxGasLimitBuffer:         &ktGasLimitBuffer,
 			TxDeserializationGasBuffer: &deserializationGasBuffer,
 			TxFeeBuffer:                &feeBuffer,
 			KtTxFeeBuffer:              &ktFeeBuffer,
@@ -146,11 +147,11 @@ func genrateSample() *mavpay_configuration.ConfigurationV0 {
 		IncomeRecipients: mavpay_configuration.IncomeRecipientsV0{
 			Bonds: map[string]float64{
 				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.455,
-				"tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE": 0.545,
+				"mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D": 0.545,
 			},
 			Fees: map[string]float64{
 				"mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3": 0.455,
-				"tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE": 0.545,
+				"mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D": 0.545,
 			},
 			Donate:      &donate,
 			DonateFees:  &donateFees,
@@ -208,11 +209,10 @@ func genrateStarter() *mavpay_configuration.ConfigurationV0 {
 			IsProtectionEnabled: true,
 		},
 		PayoutConfiguration: mavpay_configuration.PayoutConfigurationV0{
-			WalletMode:       enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
-			BalanceCheckMode: enums.PROTOCOL_BALANCE_CHECK_MODE,
-			PayoutMode:       enums.PAYOUT_MODE_ACTUAL,
-			Fee:              .10,
-			MinimumAmount:    0.01,
+			WalletMode:    enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
+			PayoutMode:    enums.PAYOUT_MODE_ACTUAL,
+			Fee:           .10,
+			MinimumAmount: 0.01,
 		},
 	}
 }

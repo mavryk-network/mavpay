@@ -4,21 +4,22 @@ import (
 	"bufio"
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/constants"
+	"github.com/mavryk-network/mavpay/core"
 	collector_engines "github.com/mavryk-network/mavpay/engines/collector"
 	signer_engines "github.com/mavryk-network/mavpay/engines/signer"
 	transactor_engines "github.com/mavryk-network/mavpay/engines/transactor"
 	"github.com/mavryk-network/mavpay/extension"
 	"github.com/mavryk-network/mavpay/state"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type configurationAndEngines struct {
@@ -64,6 +65,7 @@ func loadConfigurationEnginesExtensions() (*configurationAndEngines, error) {
 	extEnv := &extension.ExtensionStoreEnviromnent{
 		BakerPKH:  config.BakerPKH.String(),
 		PayoutPKH: signerEngine.GetPKH().String(),
+		RpcPool:   config.Network.RpcPool,
 	}
 	if err = extension.InitializeExtensionStore(context.Background(), config.Extensions, extEnv); err != nil {
 		return nil, errors.Join(constants.ErrExtensionStoreInitializationFailed, err)
@@ -77,7 +79,7 @@ func loadConfigurationEnginesExtensions() (*configurationAndEngines, error) {
 	}, nil
 }
 
-func loadGeneratedPayoutsFromBytes(data []byte) (*common.CyclePayoutBlueprint, error) {
+func loadGeneratedPayoutsFromBytes(data []byte) (common.CyclePayoutBlueprints, error) {
 	payouts, err := utils.PayoutBlueprintFromJson(data)
 	if err != nil {
 		return nil, errors.Join(constants.ErrPayoutsFromBytesLoadFailed, err)
@@ -85,7 +87,7 @@ func loadGeneratedPayoutsFromBytes(data []byte) (*common.CyclePayoutBlueprint, e
 	return payouts, nil
 }
 
-func loadGeneratedPayoutsFromStdin() (*common.CyclePayoutBlueprint, error) {
+func loadGeneratedPayoutsFromStdin() (common.CyclePayoutBlueprints, error) {
 	slog.Info("reading payouts from stdin")
 	scanner := bufio.NewScanner(os.Stdin) // by default reads line by line
 	if !scanner.Scan() {
@@ -94,7 +96,7 @@ func loadGeneratedPayoutsFromStdin() (*common.CyclePayoutBlueprint, error) {
 	return loadGeneratedPayoutsFromBytes(scanner.Bytes())
 }
 
-func loadGeneratedPayoutsFromFile(fromFile string) (*common.CyclePayoutBlueprint, error) {
+func loadGeneratedPayoutsFromFile(fromFile string) (common.CyclePayoutBlueprints, error) {
 	slog.Info("reading payouts from file", "path", fromFile)
 	data, err := os.ReadFile(fromFile)
 	if err != nil {
@@ -103,7 +105,7 @@ func loadGeneratedPayoutsFromFile(fromFile string) (*common.CyclePayoutBlueprint
 	return loadGeneratedPayoutsFromBytes(data)
 }
 
-func writePayoutBlueprintToFile(toFile string, blueprint *common.CyclePayoutBlueprint) error {
+func writePayoutBlueprintToFile(toFile string, blueprint common.CyclePayoutBlueprints) error {
 	slog.Info("writing payouts to file", "path", toFile)
 	err := os.WriteFile(toFile, utils.PayoutBlueprintToJson(blueprint), 0644)
 	if err != nil {
@@ -127,11 +129,124 @@ func GetProtocolWithRetry(collector common.CollectorEngine) mavryk.ProtocolHash 
 	return protocol
 }
 
-func PrintPreparationResults(preparationResult *common.PreparePayoutsResult, cyclesForTitle ...int64) {
-	title := utils.FormatCycleNumbers(cyclesForTitle...)
+func PrintPayoutWalletRemainingBalance(collector common.CollectorEngine, signer common.SignerEngine) {
+	addr := signer.GetPKH()
+	balance, err := collector.GetBalance(addr)
+	if err != nil {
+		slog.Error("failed to get balance", "error", err.Error())
+		return
+	}
 
-	utils.PrintPayouts(preparationResult.InvalidPayouts, fmt.Sprintf("Invalid - %s", title), false)
-	utils.PrintPayouts(preparationResult.AccumulatedPayouts, fmt.Sprintf("Accumulated - %s", title), false)
-	utils.PrintReports(preparationResult.ReportsOfPastSuccesfulPayouts, fmt.Sprintf("Already Successfull - %s", title), true)
-	utils.PrintPayouts(preparationResult.ValidPayouts, fmt.Sprintf("Valid - %s", title), true)
+	slog.Info("the payout wallet remaining balance", "wallet", addr.String(), "balance", common.FormatMavAmount(balance.Int64()), "phase", "payout_wallet_remaining_balance")
+}
+
+func handleGeneratePayoutsFailure(err error) {
+	if err == nil {
+		return // no error
+	}
+	slog.Error("failed to generate payouts", "error", err.Error())
+	switch {
+	case errors.Is(err, constants.ErrInsufficientBalance):
+		os.Exit(EXIT_INSUFFICIENT_BALANCE_FAILURE)
+	case errors.Is(err, constants.ErrFailedToCheckBalance):
+		os.Exit(EXIT_FAILED_TO_CHECK_BALANCE)
+	default:
+		os.Exit(EXIT_OPERTION_FAILED)
+	}
+}
+
+func getBoundedPayoutInterval(interval int64) int64 {
+	min := constants.MINIMUM_PAYOUT_INTERVAL_CYCLES
+	max := constants.MAXIMUM_PAYOUT_INTERVAL_CYCLES
+
+	if interval < min {
+		slog.Warn("payout interval too low, capping to min", "min", min)
+		return min
+	}
+	if interval > max {
+		slog.Warn("payout interval too high, capping to max", "max", max)
+		return max
+	}
+	return interval
+}
+
+func boundToInterval(value, interval int64, name string) int64 {
+	if interval <= 1 {
+		return 0 // no offset possible
+	}
+
+	min := int64(0)
+	max := interval
+
+	if value < min {
+		slog.Warn(name+" too low, capping to min", "min", min)
+		return min
+	}
+	if value > max {
+		slog.Warn(name+" too high, capping to max", "max", max)
+		return max
+	}
+	return value
+}
+
+func getCyclesInCompletedPeriod(cycle, interval, offset, includePrevious int64) (periodCycles []int64, ok bool) {
+	if cycle <= 0 || interval <= 0 || (cycle+offset)%interval != 0 {
+		return nil, false
+	}
+
+	periodCycles = make([]int64, 0, interval)
+	startCycle := cycle - interval + 1 - includePrevious
+	if startCycle < 0 {
+		startCycle = 0
+	}
+
+	for c := cycle; c >= startCycle; c-- {
+		periodCycles = append(periodCycles, c)
+	}
+
+	return periodCycles, true
+}
+
+func generatePayoutsForCycles(cycles []int64, config *configuration.RuntimeConfiguration, collector common.CollectorEngine, signer common.SignerEngine, options *common.GeneratePayoutsOptions) (common.CyclePayoutBlueprints, error) {
+	slog.Info("generating payouts for cycles", "cycles", cycles)
+	generationResults := make(common.CyclePayoutBlueprints, 0, len(cycles))
+	bluePrintChannel := make(chan *common.CyclePayoutBlueprint, len(cycles))
+	errChannel := make(chan error, len(cycles))
+	var wg sync.WaitGroup
+
+	for _, cycle := range cycles {
+		wg.Go(func() {
+			var cycleOptions common.GeneratePayoutsOptions
+			if options != nil {
+				cycleOptions = *options
+			}
+			cycleOptions.Cycle = cycle // set cycle for this go routine
+			generationResult, err := core.GeneratePayouts(config, common.NewGeneratePayoutsEngines(collector, signer, notifyAdminFactory(config)), &cycleOptions)
+			switch {
+			case errors.Is(err, constants.ErrNoCycleDataAvailable):
+				slog.Info("no data available for cycle, skipping", "cycle", cycle)
+				return
+			case err != nil:
+				errChannel <- err
+				return
+			}
+			bluePrintChannel <- generationResult
+		})
+		// NOTE: do we want to run sequentially to avoid rate limits?
+		// If not we can remove the Wait here and just wait after the loop
+		wg.Wait()
+	}
+	wg.Wait()
+	close(bluePrintChannel)
+	close(errChannel)
+
+	for result := range bluePrintChannel {
+		generationResults = append(generationResults, result)
+	}
+	for err := range errChannel {
+		if err != nil {
+			return nil, err
+		}
+	}
+	return generationResults, nil
 }

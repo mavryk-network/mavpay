@@ -12,7 +12,7 @@ import (
 	"github.com/mavryk-network/mavpay/configuration"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/core"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-package generate
+package prepare
 
 import (
 	"errors"
@@ -12,15 +12,15 @@ import (
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/extension"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/samber/lo"
 )
 
 type CheckBalanceHookData struct {
-	SkipMavCheck bool                                  `json:"skip_mav_check"`
-	IsSufficient bool                                  `json:"is_sufficient"`
-	Message      string                                `json:"message"`
-	Payouts      []PayoutCandidateWithBondAmountAndFee `json:"payouts"`
+	SkipMavCheck bool                              `json:"skip_mav_check"`
+	IsSufficient bool                              `json:"is_sufficient"`
+	Message      string                            `json:"message"`
+	Payouts      []*common.AccumulatedPayoutRecipe `json:"payouts"`
 }
 
 func checkBalanceWithHook(data *CheckBalanceHookData) error {
@@ -31,7 +31,7 @@ func checkBalanceWithHook(data *CheckBalanceHookData) error {
 	return nil
 }
 
-func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGenerationContext) error {
+func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutPrepareContext) error {
 	if data.SkipMavCheck { // skip mav check for cases when pervious hook already checked it
 		return nil
 	}
@@ -42,41 +42,29 @@ func checkBalanceWithCollector(data *CheckBalanceHookData, ctx *PayoutGeneration
 
 	configuration := ctx.GetConfiguration()
 
-	totalPayouts := len(lo.Filter(data.Payouts, func(candidate PayoutCandidateWithBondAmountAndFee, _ int) bool {
-		return !candidate.IsInvalid
-	}))
-
-	// calculate bonds and fees portion
-	bondsPortionToBeForwarded := lo.Sum(lo.Values(configuration.IncomeRecipients.Bonds))
-	feesPortionToBeForwarded := lo.Sum(lo.Values(configuration.IncomeRecipients.Fees))
-
+	totalPayouts := len(data.Payouts)
 	// add all bonds, fees and donations destinations
 	totalPayouts = totalPayouts + len(configuration.IncomeRecipients.Bonds) + len(configuration.IncomeRecipients.Fees) + utils.Max(len(configuration.IncomeRecipients.Donations), 1)
 
-	requiredbalance := lo.Reduce(data.Payouts, func(agg mavryk.Z, candidate PayoutCandidateWithBondAmountAndFee, _ int) mavryk.Z {
-		if candidate.TxKind == enums.PAYOUT_TX_KIND_MAV {
-			return agg.Add(candidate.BondsAmount)
+	requiredbalance := lo.Reduce(data.Payouts, func(agg mavryk.Z, recipe *common.AccumulatedPayoutRecipe, _ int) mavryk.Z {
+		if recipe.TxKind == enums.PAYOUT_TX_KIND_MAV {
+			return agg.Add(recipe.GetAmount()).Add64(recipe.GetTxFee())
 		}
 		return agg
 	}, mavryk.Zero)
-	// bonds * bondsPortionToBeForwarded
-	bondsToBeForwarded := ctx.StageData.BakerBondsAmount.Mul64(int64(bondsPortionToBeForwarded * 1000000)).Div64(1000000)
-	// fees * feesPortionToBeForwarded
-	feesToBeForwarded := ctx.StageData.BakerFeesAmount.Mul64(int64(feesPortionToBeForwarded * 1000000)).Div64(1000000)
 
 	// add bonds,fees and donations to required balance
-	requiredbalance = requiredbalance.Add(bondsToBeForwarded).Add(feesToBeForwarded).Add(ctx.StageData.DonateBondsAmount)
 	requiredbalance = requiredbalance.Add(mavryk.NewZ(constants.PAYOUT_FEE_BUFFER).Mul64(int64(totalPayouts)))
 
 	diff := payableBalance.Sub(requiredbalance)
 	if diff.IsNeg() || diff.IsZero() {
 		data.IsSufficient = false
-		data.Message = fmt.Sprintf("required: %s, available: %s", requiredbalance, payableBalance)
+		data.Message = fmt.Sprintf("required: %s, available: %s", common.FormatMavAmount(requiredbalance.Int64()), common.FormatMavAmount(payableBalance.Int64()))
 	}
 	return nil
 }
 
-func runBalanceCheck(ctx *PayoutGenerationContext, logger *slog.Logger, check func(*CheckBalanceHookData) error, data *CheckBalanceHookData, options *common.GeneratePayoutsOptions) error {
+func runBalanceCheck(ctx *PayoutPrepareContext, logger *slog.Logger, check func(*CheckBalanceHookData) error, data *CheckBalanceHookData, options *common.PreparePayoutsOptions) error {
 	notificatorTrigger := 0
 	for {
 		// we reset values before each check so we get relevant data for this check only
@@ -89,7 +77,7 @@ func runBalanceCheck(ctx *PayoutGenerationContext, logger *slog.Logger, check fu
 				time.Sleep(time.Minute * 5)
 				continue
 			}
-			return err
+			return errors.Join(constants.ErrFailedToCheckBalance, err)
 		}
 
 		if !data.IsSufficient {
@@ -115,7 +103,7 @@ but because of potential changes of transaction fees (on-chain state changes) it
 So we just try to estimate with a buffer which should be enough for most cases.
 */
 
-func CheckSufficientBalance(ctx *PayoutGenerationContext, options *common.GeneratePayoutsOptions) (*PayoutGenerationContext, error) {
+func CheckSufficientBalance(ctx *PayoutPrepareContext, options *common.PreparePayoutsOptions) (*PayoutPrepareContext, error) {
 	logger := ctx.logger.With("phase", "check_sufficient_balance")
 	if options.SkipBalanceCheck { // skip
 		return ctx, nil
@@ -124,7 +112,7 @@ func CheckSufficientBalance(ctx *PayoutGenerationContext, options *common.Genera
 	logger.Debug("checking sufficient balance")
 	hookResponse := CheckBalanceHookData{
 		IsSufficient: true,
-		Payouts:      ctx.StageData.PayoutCandidatesWithBondAmountAndFees,
+		Payouts:      ctx.StageData.AccumulatedPayouts,
 	}
 
 	checks := []func(*CheckBalanceHookData) error{

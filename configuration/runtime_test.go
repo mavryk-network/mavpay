@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/mavryk-network/mavpay/constants"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/stretchr/testify/assert"
 )
 

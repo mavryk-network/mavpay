@@ -5,7 +5,7 @@ import (
 
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/configuration"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type StageData struct {
@@ -13,18 +13,13 @@ type StageData struct {
 	PayoutCandidates                      []PayoutCandidate
 	PayoutCandidatesWithBondAmount        []PayoutCandidateWithBondAmount
 	PayoutCandidatesWithBondAmountAndFees []PayoutCandidateWithBondAmountAndFee
-	PayoutCandidatesSimulated             []PayoutCandidateSimulated
 	PayoutBlueprint                       *common.CyclePayoutBlueprint
 
 	Payouts           []common.PayoutRecipe
 	BakerBondsAmount  mavryk.Z
-	DonateBondsAmount mavryk.Z
 	BakerFeesAmount   mavryk.Z
+	DonateBondsAmount mavryk.Z
 	DonateFeesAmount  mavryk.Z
-	PaidDelegators    int
-
-	// protocol, signature etc.
-	BatchMetadataDeserializationGasLimit int64
 }
 
 type PayoutGenerationContext struct {

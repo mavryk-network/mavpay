@@ -13,7 +13,7 @@ type StageData struct {
 	ReportsOfPastSuccesfulPayouts []common.PayoutReport
 	Batches                       []common.RecipeBatch
 	BatchResults                  common.BatchResults
-	PaidDelegators                int
+	Summary                       common.PayoutSummary
 }
 
 type PayoutExecutionContext struct {
@@ -23,10 +23,11 @@ type PayoutExecutionContext struct {
 	protectedSection *utils.ProtectedSection
 	StageData        *StageData
 
-	ValidPayouts       []common.PayoutRecipe
-	InvalidPayouts     []common.PayoutRecipe
-	AccumulatedPayouts []common.PayoutRecipe
-	PayoutBlueprints   []*common.CyclePayoutBlueprint
+	Payouts          []*common.AccumulatedPayoutRecipe
+	InvalidPayouts   []common.PayoutRecipe
+	PayoutBlueprints []*common.CyclePayoutBlueprint
+
+	BatchMetadataDeserializationGasLimit int64
 
 	logger *slog.Logger
 }
@@ -46,13 +47,14 @@ func NewPayoutExecutionContext(preparationResult *common.PreparePayoutsResult, c
 
 		protectedSection: utils.NewProtectedSection("executing payouts, job will be terminated after next batch"),
 		StageData: &StageData{
-			ReportsOfPastSuccesfulPayouts: preparationResult.ReportsOfPastSuccesfulPayouts,
+			ReportsOfPastSuccesfulPayouts: preparationResult.ReportsOfPastSuccessfulPayouts,
 		},
 
-		ValidPayouts:       preparationResult.ValidPayouts,
-		InvalidPayouts:     preparationResult.InvalidPayouts,
-		AccumulatedPayouts: preparationResult.AccumulatedPayouts,
-		PayoutBlueprints:   preparationResult.Blueprints,
+		Payouts:          preparationResult.ValidPayouts,
+		InvalidPayouts:   preparationResult.InvalidPayouts,
+		PayoutBlueprints: preparationResult.Blueprints,
+
+		BatchMetadataDeserializationGasLimit: preparationResult.BatchMetadataDeserializationGasLimit,
 
 		logger: slog.Default().With("stage", "execute"),
 	}, nil

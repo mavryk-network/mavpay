@@ -3,7 +3,7 @@ package utils
 import (
 	"math"
 
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type FloatConstraint interface {
@@ -23,7 +23,11 @@ func GetZPortion[T FloatConstraint](val mavryk.Z, portion T) mavryk.Z {
 	if portion >= 1 {
 		return val
 	}
-	return getZPortion(val, portion)
+	result := getZPortion(val, portion)
+	if val.IsLessEqual(result) { // make sure we don't return more than the original value
+		return val
+	}
+	return result
 }
 
 func IsPortionWithin0n1[T FloatConstraint](portion T) bool {

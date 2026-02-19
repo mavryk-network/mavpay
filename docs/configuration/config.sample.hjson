@@ -13,9 +13,6 @@
     # payout mode to use, can be 'actual' or 'ideal'
     payout_mode: ideal
 
-    # balance check mode to use, can be 'protocol' or 'mvkt'
-    balance_check_mode: protocol
-
     # fee to charge delegators for the payout (portion of the reward as decimal, e.g. 0.075 for 7.5%)
     fee: 0.075
 
@@ -30,6 +27,9 @@
 
     # buffer for transaction gas limit
     transaction_gas_limit_buffer: 200
+
+    # buffer for contract transaction gas limit
+    kt_transaction_gas_limit_buffer: 400
 
     # buffer for transaction deserialization gas
     transaction_deserialization_gas_buffer: 5
@@ -108,13 +108,13 @@
     # list of addresses and their share of the bonds
     bonds: {
       mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
-      tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE: 0.545
+      mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D: 0.545
     }
 
     # list of addresses and their share of the fees
     fees: {
       mv1HCXRedE7zVSwmSqxDe3XZcMPLeF7xYqP3: 0.455
-      tz1X7U9XxVz6NDxL4DSZhijME61PW45bYUJE: 0.545
+      mv1CjNm5kcHDBKs5ZwaejxzMUcMVvNGyLC9D: 0.545
     }
 
     # share of the rewards to donate
@@ -136,16 +136,18 @@
   # mavryk network configuration
   network: {
     # Url to rpc endpoint
-    rpc_url: https://rpc.mavryk.network/
+    rpc_url: https://rpc.mavryk.network
+
+    # List of RPC nodes to use. Order is important, the first one is the primary node, unless rpc_url is set.
+    rpc_pool: [
+      https://rpc.mavryk.network/
+    ]
 
     # Url to mvkt endpoint
     mvkt_url: https://api.mavryk.network/
 
-    # Url to protocol rewards endpoint
-    protocol_rewards_url: https://protocol-rewards.mavryk.network/
-
     # Url to block explorer
-    explorer: https://tzstats.com/
+    explorer: https://nexus.mavryk.org/
 
     # if true, smart contracts will not be paid out (used for testing)
     ignore_kt: true

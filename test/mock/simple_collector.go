@@ -7,9 +7,9 @@ import (
 	"github.com/mavryk-network/mavpay/common"
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/codec"
-	"github.com/mavryk-network/mvgo/mavryk"
-	"github.com/mavryk-network/mvgo/rpc"
+	"github.com/mavryk-network/gomavryk/codec"
+	"github.com/mavryk-network/gomavryk/mavryk"
+	"github.com/mavryk-network/gomavryk/rpc"
 	"github.com/samber/lo"
 )
 
@@ -28,7 +28,7 @@ type SimpleCollectorOpts struct {
 	SerializationGasLimit int64
 }
 
-func InitSimpleColletor() *SimpleColletor {
+func InitSimpleCollector() *SimpleColletor {
 	return &SimpleColletor{
 		opts: &SimpleCollectorOpts{
 			AllocationBurn:        1000,
@@ -70,14 +70,14 @@ func (engine *SimpleColletor) GetLastCompletedCycle() (int64, error) {
 
 func (engine *SimpleColletor) GetCycleStakingData(baker mavryk.Address, cycle int64) (*common.BakersCycleData, error) {
 	return &common.BakersCycleData{
-		OwnStakedBalance:            mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
-		OwnDelegatedBalance:         mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
-		ExternalDelegatedBalance:    mavryk.NewZ(1_000_000).Mul64(constants.MUMAV_FACTOR),
-		BlockDelegatedRewards:       mavryk.NewZ(100).Mul64(constants.MUMAV_FACTOR),
-		EndorsementDelegatedRewards: mavryk.NewZ(50).Mul64(constants.MUMAV_FACTOR),
-		FrozenDepositLimit:          mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
-		DelegatorsCount:             2,
-		BlockDelegatedFees:          mavryk.NewZ(25).Mul64(constants.MUMAV_FACTOR),
+		OwnStakedBalance:             mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
+		OwnDelegatedBalance:          mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
+		ExternalDelegatedBalance:     mavryk.NewZ(1_000_000).Mul64(constants.MUMAV_FACTOR),
+		BlockDelegatedRewards:        mavryk.NewZ(100).Mul64(constants.MUMAV_FACTOR),
+		AttestationsDelegatedRewards: mavryk.NewZ(50).Mul64(constants.MUMAV_FACTOR),
+		FrozenDepositLimit:           mavryk.NewZ(50_000).Mul64(constants.MUMAV_FACTOR),
+		DelegatorsCount:              2,
+		BlockDelegatedFees:           mavryk.NewZ(25).Mul64(constants.MUMAV_FACTOR),
 		// TODO:
 		Delegators: []common.Delegator{},
 	}, nil

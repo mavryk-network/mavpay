@@ -31,12 +31,10 @@ var (
 	// collector engines
 
 	// baker did not have any rewards in cycle
-	ErrNoCycleDataAvailable                = errors.New("no cycle data available")
-	ErrCycleDataFetchFailed                = errors.New("failed to fetch cycle data")
-	ErrCycleDataProtocolRewardsFetchFailed = errors.New("failed to fetch protocol-rewards cycle data")
-	ErrCycleDataProtocolRewardsMismatch    = errors.New("protocol-rewards cycle data mismatch")
-	ErrCycleDataUnmarshalFailed            = errors.New("failed to unmarshal cycle data")
-	ErrOperationStatusCheckFailed          = errors.New("failed to check operation status")
+	ErrNoCycleDataAvailable       = errors.New("no cycle data available")
+	ErrCycleDataFetchFailed       = errors.New("failed to fetch cycle data")
+	ErrCycleDataUnmarshalFailed   = errors.New("failed to unmarshal cycle data")
+	ErrOperationStatusCheckFailed = errors.New("failed to check operation status")
 
 	// cycle monitor
 
@@ -51,6 +49,7 @@ var (
 	ErrMissingTransactorEngine = errors.New("undefined transactor engine")
 	ErrMissingConfiguration    = errors.New("undefined configuration")
 	ErrMissingPayoutBlueprint  = errors.New("undefined payout blueprint")
+	ErrMixedRpcs               = errors.New("defined rpcs from different networks")
 
 	// generate payouts
 
@@ -62,10 +61,13 @@ var (
 	ErrPayoutsFromStdinLoadFailed            = errors.New("failed to load payouts from stdin")
 	ErrPayoutsSaveToFileFailed               = errors.New("failed to save payouts to file")
 	ErrInsufficientBalance                   = errors.New("insufficient balance")
+	ErrFailedToCheckBalance                  = errors.New("failed to check balance")
 	ErrFailedToEstimateSerializationGasLimit = errors.New("failed to estimate batch serialization gas limit")
 
 	// execute payouts
 
+	ErrFailedToCompleteOperation    = errors.New("failed to complete operation")
+	ErrFailedToSignOperation        = errors.New("failed to sign operation")
 	ErrExecutePayoutsUserTerminated = errors.New("user terminated execution")
 	ErrGetChainLimitsFailed         = errors.New("failed to get chain limits")
 
@@ -92,4 +94,7 @@ var (
 	ErrUnsupportedExtensionHookMode = errors.New("unsupported extension hook mode")
 	ErrUnsupportedExtensionKind     = errors.New("unsupported extension kind")
 	ErrExtensionHookMissingData     = errors.New("no data forwarded to hook, cannot execute")
+
+	// mvkt client
+	ErrMvktVersionCheckFailed = errors.New("failed to check mvkt version")
 )

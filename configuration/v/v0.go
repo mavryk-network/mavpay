@@ -7,7 +7,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type IncomeRecipientsV0 struct {
@@ -43,12 +43,12 @@ type DelegatorsConfigurationV0 struct {
 
 type MavrykNetworkConfigurationV0 struct {
 	// RpcUrl represents the URL to the RPC node.
-	RpcUrl                 string `json:"rpc_url,omitempty" comment:"Url to rpc endpoint"`
-	MvktUrl                string `json:"mvkt_url,omitempty" comment:"Url to mvkt endpoint"`
-	ProtocolRewardsUrl     string `json:"protocol_rewards_url,omitempty" comment:"Url to protocol rewards endpoint"`
-	Explorer               string `json:"explorer,omitempty" comment:"Url to block explorer"`
-	DoNotPaySmartContracts bool   `json:"ignore_kt,omitempty" comment:"if true, smart contracts will not be paid out (used for testing)"`
-	IgnoreProtocolChanges  bool   `json:"ignore_protocol_changes,omitempty" comment:"if true, protocol changes will be ignored, otherwise the payout will be stopped if the protocol changes"`
+	RpcUrl                 string   `json:"rpc_url,omitempty" comment:"Url to rpc endpoint"`
+	RpcPool                []string `json:"rpc_pool,omitempty" comment:"List of RPC nodes to use. Order is important, the first one is the primary node, unless rpc_url is set."`
+	MvktUrl                string   `json:"mvkt_url,omitempty" comment:"Url to mvkt endpoint"`
+	Explorer               string   `json:"explorer,omitempty" comment:"Url to block explorer"`
+	DoNotPaySmartContracts bool     `json:"ignore_kt,omitempty" comment:"if true, smart contracts will not be paid out (used for testing)"`
+	IgnoreProtocolChanges  bool     `json:"ignore_protocol_changes,omitempty" comment:"if true, protocol changes will be ignored, otherwise the payout will be stopped if the protocol changes"`
 }
 
 type OverdelegationConfigurationV0 struct {
@@ -56,21 +56,21 @@ type OverdelegationConfigurationV0 struct {
 }
 
 type PayoutConfigurationV0 struct {
-	WalletMode                 enums.EWalletMode       `json:"wallet_mode" comment:"wallet mode to use for signing transactions, can be 'local-private-key' or 'remote-signer'"`
-	PayoutMode                 enums.EPayoutMode       `json:"payout_mode" comment:"payout mode to use, can be 'actual' or 'ideal'"`
-	BalanceCheckMode           enums.EBalanceCheckMode `json:"balance_check_mode" comment:"balance check mode to use, can be 'protocol' or 'mvkt'"`
-	Fee                        float64                 `json:"fee,omitempty" comment:"fee to charge delegators for the payout (portion of the reward as decimal, e.g. 0.075 for 7.5%)" validate:"required,min=0,max=1"`
-	IsPayingTxFee              bool                    `json:"baker_pays_transaction_fee,omitempty" comment:"if true, baker pays the transaction fee"`
-	IsPayingAllocationTxFee    bool                    `json:"baker_pays_allocation_fee,omitempty" comment:"if true, baker pays the allocation transaction fee"`
-	MinimumAmount              float64                 `json:"minimum_payout_amount,omitempty" comment:"minimum amount to pay out to delegators, if the amount is less, the payout will be ignored"`
-	IgnoreEmptyAccounts        bool                    `json:"ignore_empty_accounts,omitempty" comment:"if true, empty accounts will be ignored"`
-	TxGasLimitBuffer           *int64                  `json:"transaction_gas_limit_buffer,omitempty" comment:"buffer for transaction gas limit"`
-	TxDeserializationGasBuffer *int64                  `json:"transaction_deserialization_gas_buffer,omitempty" comment:"buffer for transaction deserialization gas"`
-	TxFeeBuffer                *int64                  `json:"transaction_fee_buffer,omitempty" comment:"buffer for transaction fee"`
-	KtTxFeeBuffer              *int64                  `json:"kt_transaction_fee_buffer,omitempty" comment:"buffer for KT transaction fee"`
-	MinimumDelayBlocks         *int64                  `json:"minimum_delay_blocks,omitempty" comment:"minimum delay in blocks before the payout is executed"`
-	MaximumDelayBlocks         *int64                  `json:"maximum_delay_blocks,omitempty" comment:"maximum delay in blocks before the payout is executed"`
-	SimulationBatchSize        *int                    `json:"simulation_batch_size,omitempty" comment:"size of the batch for simulation (number of transactions, higher usually means faster simulation but in case of failure, more transactions will be lost and need to be simulated again)"`
+	WalletMode                 enums.EWalletMode `json:"wallet_mode" comment:"wallet mode to use for signing transactions, can be 'local-private-key' or 'remote-signer'"`
+	PayoutMode                 enums.EPayoutMode `json:"payout_mode" comment:"payout mode to use, can be 'actual' or 'ideal'"`
+	Fee                        float64           `json:"fee,omitempty" comment:"fee to charge delegators for the payout (portion of the reward as decimal, e.g. 0.075 for 7.5%)" validate:"required,min=0,max=1"`
+	IsPayingTxFee              bool              `json:"baker_pays_transaction_fee,omitempty" comment:"if true, baker pays the transaction fee"`
+	IsPayingAllocationTxFee    bool              `json:"baker_pays_allocation_fee,omitempty" comment:"if true, baker pays the allocation transaction fee"`
+	MinimumAmount              float64           `json:"minimum_payout_amount,omitempty" comment:"minimum amount to pay out to delegators, if the amount is less, the payout will be ignored"`
+	IgnoreEmptyAccounts        bool              `json:"ignore_empty_accounts,omitempty" comment:"if true, empty accounts will be ignored"`
+	TxGasLimitBuffer           *int64            `json:"transaction_gas_limit_buffer,omitempty" comment:"buffer for transaction gas limit"`
+	KtTxGasLimitBuffer         *int64            `json:"kt_transaction_gas_limit_buffer,omitempty" comment:"buffer for contract transaction gas limit"`
+	TxDeserializationGasBuffer *int64            `json:"transaction_deserialization_gas_buffer,omitempty" comment:"buffer for transaction deserialization gas"`
+	TxFeeBuffer                *int64            `json:"transaction_fee_buffer,omitempty" comment:"buffer for transaction fee"`
+	KtTxFeeBuffer              *int64            `json:"kt_transaction_fee_buffer,omitempty" comment:"buffer for KT transaction fee"`
+	MinimumDelayBlocks         *int64            `json:"minimum_delay_blocks,omitempty" comment:"minimum delay in blocks before the payout is executed"`
+	MaximumDelayBlocks         *int64            `json:"maximum_delay_blocks,omitempty" comment:"maximum delay in blocks before the payout is executed"`
+	SimulationBatchSize        *int              `json:"simulation_batch_size,omitempty" comment:"size of the batch for simulation (number of transactions, higher usually means faster simulation but in case of failure, more transactions will be lost and need to be simulated again)"`
 }
 
 type ExtensionConfigurationV0 = common.ExtensionDefinition
@@ -96,6 +96,7 @@ type NotificatorConfigurationBase struct {
 
 func GetDefaultV0() ConfigurationV0 {
 	gasLimitBuffer := int64(constants.DEFAULT_TX_GAS_LIMIT_BUFFER)
+	ktGasLimitBuffer := int64(constants.DEFAULT_KT_TX_GAS_LIMIT_BUFFER)
 	deserializaGasBuffer := int64(constants.DEFAULT_TX_DESERIALIZATION_GAS_BUFFER)
 	minimumPayoutDelayBlocks := constants.DEFAULT_CYCLE_MONITOR_MINIMUM_DELAY
 	maximumPayoutDelayBlocks := constants.DEFAULT_CYCLE_MONITOR_MAXIMUM_DELAY
@@ -115,9 +116,8 @@ func GetDefaultV0() ConfigurationV0 {
 			Ignore:    make([]mavryk.Address, 0),
 		},
 		Network: MavrykNetworkConfigurationV0{
-			RpcUrl:                 constants.DEFAULT_RPC_URL,
+			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,
-			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			Explorer:               constants.DEFAULT_EXPLORER_URL,
 			DoNotPaySmartContracts: false,
 			IgnoreProtocolChanges:  false,
@@ -128,12 +128,12 @@ func GetDefaultV0() ConfigurationV0 {
 		PayoutConfiguration: PayoutConfigurationV0{
 			WalletMode:                 enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			PayoutMode:                 enums.PAYOUT_MODE_ACTUAL,
-			BalanceCheckMode:           enums.PROTOCOL_BALANCE_CHECK_MODE,
 			Fee:                        constants.DEFAULT_BAKER_FEE,
 			IsPayingTxFee:              false,
 			IsPayingAllocationTxFee:    false,
 			MinimumAmount:              constants.DEFAULT_PAYOUT_MINIMUM_AMOUNT,
 			TxGasLimitBuffer:           &gasLimitBuffer,
+			KtTxGasLimitBuffer:         &ktGasLimitBuffer,
 			TxDeserializationGasBuffer: &deserializaGasBuffer,
 			MinimumDelayBlocks:         &minimumPayoutDelayBlocks,
 			MaximumDelayBlocks:         &maximumPayoutDelayBlocks,

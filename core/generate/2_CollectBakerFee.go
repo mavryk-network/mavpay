@@ -1,3 +1,4 @@
+
 package generate
 
 import (
@@ -5,7 +6,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/extension"
 	"github.com/mavryk-network/mavpay/utils"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	"github.com/samber/lo"
 )
 
@@ -25,12 +26,6 @@ func CollectBakerFee(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	candidates := ctx.StageData.PayoutCandidatesWithBondAmount
 
 	candidatesWithBondsAndFees := lo.Map(candidates, func(candidateWithBondsAmount PayoutCandidateWithBondAmount, _ int) PayoutCandidateWithBondAmountAndFee {
-		if candidateWithBondsAmount.IsInvalid {
-			return PayoutCandidateWithBondAmountAndFee{
-				PayoutCandidateWithBondAmount: candidateWithBondsAmount,
-			}
-		}
-
 		if candidateWithBondsAmount.TxKind != enums.PAYOUT_TX_KIND_MAV {
 			logger.Debug("skipping fee collection for non mavryk payout", "delegate", candidateWithBondsAmount.Source, "tx_kind", candidateWithBondsAmount.TxKind)
 			return PayoutCandidateWithBondAmountAndFee{
@@ -41,9 +36,14 @@ func CollectBakerFee(ctx *PayoutGenerationContext, options *common.GeneratePayou
 		fee := utils.GetZPortion(candidateWithBondsAmount.BondsAmount, candidateWithBondsAmount.FeeRate)
 		candidateWithBondsAmount.BondsAmount = candidateWithBondsAmount.BondsAmount.Sub(fee)
 		if candidateWithBondsAmount.BondsAmount.IsZero() || candidateWithBondsAmount.BondsAmount.IsNeg() {
-			candidateWithBondsAmount.IsInvalid = true
-			candidateWithBondsAmount.InvalidBecause = enums.INVALID_PAYOUT_BELLOW_MINIMUM
+			if !candidateWithBondsAmount.IsInvalid {
+				candidateWithBondsAmount.IsInvalid = true
+				candidateWithBondsAmount.InvalidBecause = enums.INVALID_NOT_ENOUGH_BONDS_FOR_BAKER_FEE
+			}
+			candidateWithBondsAmount.BondsAmount = mavryk.Zero // this is to prevent negative bonds amount
 		}
+		utils.AssertZAmountPositiveOrZero(candidateWithBondsAmount.BondsAmount)
+
 		return PayoutCandidateWithBondAmountAndFee{
 			PayoutCandidateWithBondAmount: candidateWithBondsAmount,
 			Fee:                           fee,
@@ -68,6 +68,5 @@ func CollectBakerFee(ctx *PayoutGenerationContext, options *common.GeneratePayou
 	ctx.StageData.BakerFeesAmount = collectedFees.Sub(feesDonate)
 	ctx.StageData.DonateFeesAmount = feesDonate
 	ctx.StageData.PayoutCandidatesWithBondAmountAndFees = candidatesWithBondsAndFees
-
 	return ctx, nil
 }

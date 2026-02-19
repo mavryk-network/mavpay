@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	mavpay_configuration "github.com/mavryk-network/mavpay/configuration/v"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 	test_assert "github.com/stretchr/testify/assert"
 )
 

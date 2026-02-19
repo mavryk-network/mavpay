@@ -8,7 +8,7 @@ import (
 	"github.com/mavryk-network/mavpay/constants"
 	"github.com/mavryk-network/mavpay/constants/enums"
 	"github.com/mavryk-network/mavpay/notifications"
-	"github.com/mavryk-network/mvgo/mavryk"
+	"github.com/mavryk-network/gomavryk/mavryk"
 )
 
 type RuntimeDelegatorRequirements struct {
@@ -40,21 +40,21 @@ type RuntimeNotificatorConfiguration struct {
 }
 
 type RuntimePayoutConfiguration struct {
-	WalletMode                 enums.EWalletMode       `json:"wallet_mode,omitempty"`
-	PayoutMode                 enums.EPayoutMode       `json:"payout_mode,omitempty"`
-	BalanceCheckMode           enums.EBalanceCheckMode `json:"balance_check_mode,omitempty"`
-	Fee                        float64                 `json:"fee,omitempty"`
-	IsPayingTxFee              bool                    `json:"baker_pays_transaction_fee,omitempty"`
-	IsPayingAllocationTxFee    bool                    `json:"baker_pays_allocation_fee,omitempty"`
-	MinimumAmount              mavryk.Z                `json:"minimum_payout_amount,omitempty"`
-	IgnoreEmptyAccounts        bool                    `json:"ignore_empty_accounts,omitempty"`
-	TxGasLimitBuffer           int64                   `json:"transaction_gas_limit_buffer,omitempty"`
-	TxDeserializationGasBuffer int64                   `json:"transaction_deserialization_gas_buffer,omitempty"`
-	TxFeeBuffer                int64                   `json:"transaction_fee_buffer,omitempty"`
-	KtTxFeeBuffer              int64                   `json:"kt_transaction_fee_buffer,omitempty"`
-	MinimumDelayBlocks         int64                   `json:"minimum_delay_blocks,omitempty"`
-	MaximumDelayBlocks         int64                   `json:"maximum_delay_blocks,omitempty"`
-	SimulationBatchSize        int                     `json:"simulation_batch_size,omitempty"`
+	WalletMode                 enums.EWalletMode `json:"wallet_mode,omitempty"`
+	PayoutMode                 enums.EPayoutMode `json:"payout_mode,omitempty"`
+	Fee                        float64           `json:"fee,omitempty"`
+	IsPayingTxFee              bool              `json:"baker_pays_transaction_fee,omitempty"`
+	IsPayingAllocationTxFee    bool              `json:"baker_pays_allocation_fee,omitempty"`
+	MinimumAmount              mavryk.Z           `json:"minimum_payout_amount,omitempty"`
+	IgnoreEmptyAccounts        bool              `json:"ignore_empty_accounts,omitempty"`
+	TxGasLimitBuffer           int64             `json:"transaction_gas_limit_buffer,omitempty"`
+	KtTxGasLimitBuffer         int64             `json:"kt_transaction_gas_limit_buffer,omitempty"`
+	TxDeserializationGasBuffer int64             `json:"transaction_deserialization_gas_buffer,omitempty"`
+	TxFeeBuffer                int64             `json:"transaction_fee_buffer,omitempty"`
+	KtTxFeeBuffer              int64             `json:"kt_transaction_fee_buffer,omitempty"`
+	MinimumDelayBlocks         int64             `json:"minimum_delay_blocks,omitempty"`
+	MaximumDelayBlocks         int64             `json:"maximum_delay_blocks,omitempty"`
+	SimulationBatchSize        int               `json:"simulation_batch_size,omitempty"`
 }
 
 type RuntimeIncomeRecipients struct {
@@ -65,12 +65,20 @@ type RuntimeIncomeRecipients struct {
 	Donations   map[string]float64 `json:"donations,omitempty"`
 }
 
+type RuntimeNetworkConfiguration struct {
+	RpcPool                []string `json:"rpc_pool,omitempty" comment:"Url to rpc endpoint"`
+	MvktUrl                string   `json:"mvkt_url,omitempty" comment:"Url to mvkt endpoint"`
+	Explorer               string   `json:"explorer,omitempty" comment:"Url to block explorer"`
+	DoNotPaySmartContracts bool     `json:"ignore_kt,omitempty" comment:"if true, smart contracts will not be paid out (used for testing)"`
+	IgnoreProtocolChanges  bool     `json:"ignore_protocol_changes,omitempty" comment:"if true, protocol changes will be ignored, otherwise the payout will be stopped if the protocol changes"`
+}
+
 type RuntimeConfiguration struct {
 	BakerPKH                   mavryk.Address
 	PayoutConfiguration        RuntimePayoutConfiguration
 	Delegators                 RuntimeDelegatorsConfiguration
 	IncomeRecipients           RuntimeIncomeRecipients
-	Network                    mavpay_configuration.MavrykNetworkConfigurationV0
+	Network                    RuntimeNetworkConfiguration
 	Overdelegation             mavpay_configuration.OverdelegationConfigurationV0
 	NotificationConfigurations []RuntimeNotificatorConfiguration
 	Extensions                 []mavpay_configuration.ExtensionConfigurationV0
@@ -84,13 +92,13 @@ func GetDefaultRuntimeConfiguration() RuntimeConfiguration {
 		PayoutConfiguration: RuntimePayoutConfiguration{
 			WalletMode:                 enums.WALLET_MODE_LOCAL_PRIVATE_KEY,
 			PayoutMode:                 enums.PAYOUT_MODE_ACTUAL,
-			BalanceCheckMode:           enums.PROTOCOL_BALANCE_CHECK_MODE,
 			Fee:                        constants.DEFAULT_BAKER_FEE,
 			IsPayingTxFee:              false,
 			IsPayingAllocationTxFee:    false,
 			MinimumAmount:              FloatAmountToMumav(constants.DEFAULT_PAYOUT_MINIMUM_AMOUNT),
 			IgnoreEmptyAccounts:        false,
 			TxGasLimitBuffer:           constants.DEFAULT_TX_GAS_LIMIT_BUFFER,
+			KtTxGasLimitBuffer:         constants.DEFAULT_KT_TX_GAS_LIMIT_BUFFER,
 			TxDeserializationGasBuffer: constants.DEFAULT_TX_DESERIALIZATION_GAS_BUFFER,
 			TxFeeBuffer:                constants.DEFAULT_TX_FEE_BUFFER,
 			KtTxFeeBuffer:              constants.DEFAULT_KT_TX_FEE_BUFFER,
@@ -107,10 +115,9 @@ func GetDefaultRuntimeConfiguration() RuntimeConfiguration {
 			Ignore:    make([]mavryk.Address, 0),
 			Prefilter: make([]mavryk.Address, 0),
 		},
-		Network: mavpay_configuration.MavrykNetworkConfigurationV0{
-			RpcUrl:                 constants.DEFAULT_RPC_URL,
+		Network: RuntimeNetworkConfiguration{
+			RpcPool:                constants.DEFAULT_RPC_POOL,
 			MvktUrl:                constants.DEFAULT_MVKT_URL,
-			ProtocolRewardsUrl:     constants.DEFAULT_PROTOCOL_REWARDS_URL,
 			Explorer:               constants.DEFAULT_EXPLORER_URL,
 			DoNotPaySmartContracts: false,
 			IgnoreProtocolChanges:  false,
