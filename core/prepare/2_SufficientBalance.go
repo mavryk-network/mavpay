@@ -17,7 +17,7 @@ import (
 )
 
 type CheckBalanceHookData struct {
-	SkipMavCheck bool                              `json:"skip_tez_check"`
+	SkipMavCheck bool                              `json:"skip_mav_check"`
 	IsSufficient bool                              `json:"is_sufficient"`
 	Message      string                            `json:"message"`
 	Payouts      []*common.AccumulatedPayoutRecipe `json:"payouts"`

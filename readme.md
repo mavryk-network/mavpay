@@ -26,3 +26,7 @@ If you want to use mavpay in container, please refer to [container readme](conta
 ## Credits
 
 - MAVPAY [default data collector](https://github.com/mavryk-network/mavpay/blob/main/engines/colletor/default.go#L39) and [default transactor](https://github.com/mavryk-network/mavpay/blob/main/engines/transactor/default.go#L39) (*only available right now*) are **Powered by [MvKT API](https://api.mavryk.network/)**
+
+## Attribution
+
+MAVPAY is a fork of [tezpay](https://github.com/tez-capital/tezpay) by [alis.is](https://alis.is) / tez-capital, adapted for the Mavryk network. The original work is copyright © alis.is and is licensed under the [Server Side Public License v1 (SSPL)](LICENSE). Modifications made by Mavryk Network are also licensed under the SSPL v1.

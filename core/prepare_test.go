@@ -72,12 +72,12 @@ type mockPrepareReporter struct {
 
 func (engine *mockPrepareReporter) GetExistingReports(cycle int64) ([]common.PayoutReport, error) {
 	switch cycle {
-	case 1016:
+	case 55:
 		return []common.PayoutReport{
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Vv3mBK3Q166DndgzfaMux48Ye5Hmq9oGK"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Vv3mBK3Q166DndgzfaMux48Ye5Hmq9oGK"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -117,7 +117,7 @@ func Test_Prepare(t *testing.T) {
 	assert := assert.New(t)
 
 	var blueprint1 common.CyclePayoutBlueprint = common.CyclePayoutBlueprint{
-		Cycle:                    1016,
+		Cycle:                    55,
 		OwnStakedBalance:         mavryk.NewZ(16421212933),
 		OwnDelegatedBalance:      mavryk.NewZ(275708698),
 		ExternalStakedBalance:    mavryk.NewZ(29383795329),
@@ -135,7 +135,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1XHWTsUduZo49c36XvUeBggTVG4FCGz12p"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1XHWTsUduZo49c36XvUeBggTVG4FCGz12p"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -150,7 +150,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1X9TXhN3ywRxytgkDvGq6Bcaf7smz4chYU"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1X9TXhN3ywRxytgkDvGq6Bcaf7smz4chYU"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -165,7 +165,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1X2SWH5ewCXYzTE8G37tw9pHAz8LUuceJj"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1X2SWH5ewCXYzTE8G37tw9pHAz8LUuceJj"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -180,7 +180,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1WfXzCwhHES8YcDaJDArzxhCLQLQFxYQGU"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1WfXzCwhHES8YcDaJDArzxhCLQLQFxYQGU"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -195,7 +195,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1NRwexo4LRtPixUXhUQLbQyDnWnQ682GTd"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1NRwexo4LRtPixUXhUQLbQyDnWnQ682GTd"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -210,7 +210,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Wc4TxW2pNrZe4fvUh6Ux9Z6bdSdCJgtte"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Wc4TxW2pNrZe4fvUh6Ux9Z6bdSdCJgtte"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -225,7 +225,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1WV8nm6rnkpk6inA8Eqe74Gr36xkmhy9aC"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1WV8nm6rnkpk6inA8Eqe74Gr36xkmhy9aC"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -240,7 +240,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1WLJr1tSbZ1AcxNLN9BaocXw654EtaXUGX"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1WLJr1tSbZ1AcxNLN9BaocXw654EtaXUGX"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -255,7 +255,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1WG5a7s8o8KU5x1vVGgWHWEBQvLveB766Q"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1WG5a7s8o8KU5x1vVGgWHWEBQvLveB766Q"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -270,7 +270,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1WCTuyzCrBZMtHEJKXcxR9RWNCEBfoyM3Z"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1WCTuyzCrBZMtHEJKXcxR9RWNCEBfoyM3Z"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -285,7 +285,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Vv3mBK3Q166DndgzfaMux48Ye5Hmq9oGK"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Vv3mBK3Q166DndgzfaMux48Ye5Hmq9oGK"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -300,7 +300,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1VnvaH7sWiY6jRX57VCFnpPcax3FnQ2zjb"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1VnvaH7sWiY6jRX57VCFnpPcax3FnQ2zjb"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -315,7 +315,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1VWJUsAUkWhXN4EqdeRQEHF1jobTN4KjMc"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1VWJUsAUkWhXN4EqdeRQEHF1jobTN4KjMc"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -330,7 +330,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1VJqqe9A4otkv32xZZuj663PszaBxXAvV3"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1VJqqe9A4otkv32xZZuj663PszaBxXAvV3"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -345,7 +345,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1V7DmkL7ApfzW9x4Z888K9SBwMvhY12S3G"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1V7DmkL7ApfzW9x4Z888K9SBwMvhY12S3G"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -360,7 +360,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1V4ntsKBfPWueYCSVjBLA8WsRwr89otXqC"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1V4ntsKBfPWueYCSVjBLA8WsRwr89otXqC"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -375,7 +375,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1V1jSM6s66pPjoSFh2ysafeJubmQuH6EPy"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1V1jSM6s66pPjoSFh2ysafeJubmQuH6EPy"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -390,7 +390,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UwtfjoqsW2VSnh6ua9bXWqQXC75Hc1sRT"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UwtfjoqsW2VSnh6ua9bXWqQXC75Hc1sRT"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -405,7 +405,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UqEZgmL7M5X836tX5eU3ToTrrBeSwpsQ5"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UqEZgmL7M5X836tX5eU3ToTrrBeSwpsQ5"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -420,7 +420,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UaZuPQcBSZ6vBk8dqL8uLpMJvc4rFEwJt"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UaZuPQcBSZ6vBk8dqL8uLpMJvc4rFEwJt"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -435,7 +435,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UZF5SdgTcosigsnovTEbgUaFEiNCsG9NJ"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UZF5SdgTcosigsnovTEbgUaFEiNCsG9NJ"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -450,7 +450,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UYABMCi3JHWKhsjA5uqjQkX6VpbbMRg6V"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UYABMCi3JHWKhsjA5uqjQkX6VpbbMRg6V"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -465,7 +465,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UVKnfHCrzbUcfHS63xFeYbD4PfBCNAfYw"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UVKnfHCrzbUcfHS63xFeYbD4PfBCNAfYw"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -480,7 +480,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1UPcgbYJCHWj6xg15VD2z1mAPMHH1VY3Sn"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1UPcgbYJCHWj6xg15VD2z1mAPMHH1VY3Sn"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -495,7 +495,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1U7MzxbVWSVnjYWMwvrkWxReQwSzPkXcvB"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1U7MzxbVWSVnjYWMwvrkWxReQwSzPkXcvB"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -510,7 +510,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1TnGFAE2ehvQe5F2U5HbWZWb2FX423Vd8i"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1TnGFAE2ehvQe5F2U5HbWZWb2FX423Vd8i"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -525,7 +525,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Tf75a2fUGmrThNuyse4vKFbPWM697SrNY"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Tf75a2fUGmrThNuyse4vKFbPWM697SrNY"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -540,7 +540,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Te9TpceACAx9ovhntt2VdsvkpLEDqvBvn"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Te9TpceACAx9ovhntt2VdsvkpLEDqvBvn"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -555,7 +555,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1TWUZkUjutJHgo9t7FqxTNiqoFPuGEC4Bq"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1TWUZkUjutJHgo9t7FqxTNiqoFPuGEC4Bq"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -570,7 +570,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1TUaXztR5AK1BiRBxkFVLL49rkYLY3UqvZ"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1TUaXztR5AK1BiRBxkFVLL49rkYLY3UqvZ"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -585,7 +585,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1TSNZFAJaf8EQw4wreZjXtrcqZ8h4DFguU"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1TSNZFAJaf8EQw4wreZjXtrcqZ8h4DFguU"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -600,7 +600,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1TNgdUnE5udE6azQKy4HmDQJUWnKq2XQHu"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1TNgdUnE5udE6azQKy4HmDQJUWnKq2XQHu"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -615,7 +615,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1TGgFyRj2X6HovN3bCVSzMNZpJAuZGfmah"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1TGgFyRj2X6HovN3bCVSzMNZpJAuZGfmah"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -630,7 +630,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1SqGXUmNrBnnxE8zGueLteyK8nGf8MEX3A"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1SqGXUmNrBnnxE8zGueLteyK8nGf8MEX3A"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -645,7 +645,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1SpdbvjSeBH2sVGbwWdS6PjT3fTjcJXrND"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1SpdbvjSeBH2sVGbwWdS6PjT3fTjcJXrND"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -660,7 +660,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1SoxkkpjGAxigEX9jYEZjnhytAwYiJQXSM"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1SoxkkpjGAxigEX9jYEZjnhytAwYiJQXSM"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -675,7 +675,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1SXRSyhLnM9gSCc4YK3Ve6usdUN3pxNUtP"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1SXRSyhLnM9gSCc4YK3Ve6usdUN3pxNUtP"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -690,7 +690,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1SEq4K9xCso46WdqhDTPLHU6intuatA5Rz"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1SEq4K9xCso46WdqhDTPLHU6intuatA5Rz"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -705,7 +705,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1S8DRaNqHFRMNkpPgz3m5VnDGNSp4g4E71"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1S8DRaNqHFRMNkpPgz3m5VnDGNSp4g4E71"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -720,7 +720,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1RJjoUbdiZhG5ifQteRXVMPbooozCXwSbQ"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1RJjoUbdiZhG5ifQteRXVMPbooozCXwSbQ"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -735,7 +735,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1REFFS2cy5hwqiDtxgeQmMpWTgoJdTwnBQ"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1REFFS2cy5hwqiDtxgeQmMpWTgoJdTwnBQ"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -750,7 +750,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1QuSnBhYgaYwSq9Xy2985c5paAsFp9wBC5"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1QuSnBhYgaYwSq9Xy2985c5paAsFp9wBC5"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -765,7 +765,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("KT1AmQTRDjTwfJDASJRJZdd7uJwDqs5W2mjA"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("KT1AmQTRDjTwfJDASJRJZdd7uJwDqs5W2mjA"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -780,7 +780,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1QtzoiuEztATbwANYP4gtEAdczn5ddV4Nj"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1QtzoiuEztATbwANYP4gtEAdczn5ddV4Nj"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -795,7 +795,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1QmgAgBAMDHrx5th182efP3oygKWr1C2uU"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1QmgAgBAMDHrx5th182efP3oygKWr1C2uU"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -810,7 +810,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Qa4KUBhQKbwypURu3DCZVd1eyfAGwiVWp"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Qa4KUBhQKbwypURu3DCZVd1eyfAGwiVWp"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -825,7 +825,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("KT1Kmai449TQT76GZXbihwNFHTUy432y1Z6Y"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("KT1Kmai449TQT76GZXbihwNFHTUy432y1Z6Y"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -840,7 +840,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1QVVWyMc5yUJSja4ekcSceiw2kr8QnMZbF"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1QVVWyMc5yUJSja4ekcSceiw2kr8QnMZbF"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -855,7 +855,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1QFwxFkC9c7fezjNE4VPATXfefbam1GFAt"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1QFwxFkC9c7fezjNE4VPATXfefbam1GFAt"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -870,7 +870,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1Pf1ZpN3v4fBW3oSYhTj4wnf9XTEQATfDK"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1Pf1ZpN3v4fBW3oSYhTj4wnf9XTEQATfDK"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -885,7 +885,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1PXgWu6bukpMfSCMgmLHqPvwCxUFkVuT3A"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1PXgWu6bukpMfSCMgmLHqPvwCxUFkVuT3A"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -900,7 +900,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1PM6eS9LcrNZGQGiAuistbK64odUvw5CqG"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1PM6eS9LcrNZGQGiAuistbK64odUvw5CqG"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -915,7 +915,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("KT19XE62UbrJ2gWW4ZWq2UxTQLhrnjBHLvBm"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("KT19XE62UbrJ2gWW4ZWq2UxTQLhrnjBHLvBm"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -930,7 +930,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1PJLDRgEZGwxwCJsjM4hv3Rhx5AMbYuaJa"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1PJLDRgEZGwxwCJsjM4hv3Rhx5AMbYuaJa"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -945,7 +945,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("mv1PHN4Ck48rVjhj35FGWq23vYVSDKRD5sny"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1PHN4Ck48rVjhj35FGWq23vYVSDKRD5sny"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -960,7 +960,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("KT1FtGbyLR1KV9oQGEYgBUpKPkEC8BcQn4cD"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("KT1FtGbyLR1KV9oQGEYgBUpKPkEC8BcQn4cD"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -975,7 +975,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.MustParseAddress("KT1B5KPckWy2Mw99ii3wKuE4TQWKKQtSNXFE"),
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("KT1B5KPckWy2Mw99ii3wKuE4TQWKKQtSNXFE"),
 				Kind:             "delegator reward",
 				TxKind:           "mav",
@@ -990,7 +990,7 @@ func Test_Prepare(t *testing.T) {
 			{
 				Baker:            mavryk.MustParseAddress("mv1T9xoFWkkNgy6wH5xeDg9XgdwnqznpuDXs"),
 				Delegator:        mavryk.Address{}, // Represents an empty delegator address
-				Cycle:            1016,
+				Cycle:            55,
 				Recipient:        mavryk.MustParseAddress("mv1WLJr1tSbZ1AcxNLN9BaocXw654EtaXUGX"),
 				Kind:             "donation",
 				TxKind:           "mav",

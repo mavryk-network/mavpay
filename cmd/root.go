@@ -94,8 +94,11 @@ var (
 		Use:   "mavpay",
 		Short: "MAVPAY",
 		Long: fmt.Sprintf(`MAVPAY %s - the mavryk reward distributor
-Copyright © %d alis.is
-`, constants.VERSION, time.Now().Year()),
+Based on tezpay (https://github.com/tez-capital/tezpay) by alis.is, modified by Mavryk Network.
+Copyright © %d alis.is (original tezpay)
+Copyright © %d Mavryk Network (mavpay modifications)
+Licensed under the Server Side Public License v1 (SSPL).
+`, constants.VERSION, time.Now().Year(), time.Now().Year()),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			format, _ := cmd.Flags().GetString(OUTPUT_FORMAT_FLAG)
 			disableDonationPrompt, _ := cmd.Flags().GetBool(DISABLE_DONATION_PROMPT_FLAG)
